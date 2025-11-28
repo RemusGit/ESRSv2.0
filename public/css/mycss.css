@@ -1,0 +1,217 @@
+
+.content{
+  background-image: linear-gradient(to top, #ffffffff 75%,  rgb(235, 255, 239));
+  background-size: cover; 
+  background-repeat: no-repeat;
+}
+
+/*
+  body {
+    display: none;
+    transition: display 1s ease;
+  }
+    */
+
+nav.sidebar a:hover{
+    /*background-color: #a6a7a6;*/
+         background-color: #c3f0c2;
+         color: #2d382d !important;
+        /*transition: background-color 1s ease;*/
+    }
+
+    /*
+  .card:hover{
+      background-color: #d2f3c3;
+      transition: background-color 0.2s ease;
+  } 
+      */
+
+.table-hover tbody tr:hover {
+  background-color: #c3f0c2; /* Light blue example */
+  /*transition: background-color 0.2s ease;*/
+}
+
+/*
+.container-fluid .accordion , .esrsTitle{
+        margin-left: 320px;
+    }   
+        */
+
+.mainIcon i{
+    font-size: 30px;
+}
+
+.mainIcon p{
+    font-size: 10px;
+   
+}
+
+.mainIcon a{
+ text-decoration: none !important;
+}
+
+/*
+.accordion-button.collapsed {
+ /* background-color: #262; 
+  /* color: #fff;  
+}
+*/
+
+.accordion-button:not(.collapsed) {
+ background-color: #242; /* */
+  color: #fff;
+}
+
+   body {
+      overflow-x: hidden;
+        height: 100vh;          /* Full height of the viewport */
+      overflow-y: auto; 
+    }
+    /* Top Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1040;
+    }
+    /* Sidebar */
+    nav.sidebar {
+      position: fixed;
+      /* top: 56px;  height of navbar */
+      left: 0;
+      height: 110%;
+      width: 240px;
+      /*background-color: #f8f9fa;*/
+      background-image: linear-gradient(to top,#13361a, #202621);
+      border-right: 1px solid #dee2e6;
+      padding-top: 1rem;
+      transition: width 0.3s ease;
+      overflow-y: auto;
+      z-index: 1030;
+
+    }
+    /* Content area */
+    .content {
+      /*margin-top: 56px;  push below navbar */
+      margin-top: -10px;
+      margin-left: 220px; /* push beside sidebar */
+      padding: 20px;
+      transition: margin-left 0.3s ease;
+    }
+
+
+    @media (max-width: 1582px){
+
+      .font11px{
+        font-size: 11px;
+      }
+
+        nav.sidebar {
+            width: 200px;
+        }
+
+        .content {
+            margin-left: 180px;
+        }
+
+        .subMenu{
+            margin-left: -10px;
+        }
+
+        nav.sidebar .nav-item {
+
+          font-size: 13px;
+        }
+
+
+    }
+
+
+    /* Smaller Device collapse sidebar */
+    @media (max-width: 509px) {
+
+        nav.sidebar {
+            width: 70px;
+        }
+        nav.sidebar .nav-link .sidebar span , .hideOnSmallDevice {
+            display: none; /* hide text, keep icons */
+        }
+        .content {
+            margin-left: 70px;
+        }
+
+        .subMenu{
+            margin-left: -20px;
+        }
+
+        .side1 .nav-link span{
+        font-size: 50%;
+        /*display: none;*/
+        transition: display 0.5;
+        }
+  
+    }
+
+    @media (max-width: 670px){
+         .esrsTitle{
+            display: none;
+         }
+    }
+
+
+.page-item.active .page-link {
+  color: #fff; /* Text color for the active page link */
+  background-color: #198754; /* Background color for the active page link */
+  border-color: #198754; /* Border color for the active page link */
+}
+    
+.page-item .page-link{
+  color: #198754; 
+}
+
+.cursorPointer:hover{
+  cursor: pointer;
+}
+
+/*
+.dropdown-menu {
+  position: fixed !important;
+  z-index: 1050 !important;
+}
+*/
+.dropdown-menu {
+    position: absolute !important;
+}
+
+
+.dropdown-menu.show {
+  z-index: 9999 !important;
+}
+
+/*
+.dropdownPosFixed{
+  position: fixed !important;
+}
+  */
+
+/*
+.table{
+  min-height: 200px; 
+}
+*/
+
+/* FORM FLOATING WITH SELECT2 */
+.form-floating > .select2-container {
+  height: calc(3.5rem + 2px); /* same as .form-select */
+}
+
+.form-floating > .select2-container .select2-selection--single {
+  height: 100%;
+  padding-top: 1.625rem; /* adjust label position */
+}
+
+.form-floating label {
+  z-index: 5;
+  pointer-events: none;
+}

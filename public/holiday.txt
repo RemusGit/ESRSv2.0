@@ -1,0 +1,38 @@
+01-Jan-25	Wednesday	New Year's Day	Regular Holiday	 
+23-Jan-25	Thursday	First Philippine Republic Day	Special Working Day	 
+27-Jan-25	Monday	Lailatul Isra Wal Mi Raj	Muslim, Common Local Holiday	 
+29-Jan-25	Wednesday	Lunar New Year's Day	Special Non-working Holiday	 
+25-Feb-25	Tuesday	People Power Anniversary	Observance	 
+02-Mar-25	Sunday	Ramadan Start	Observance, Muslim	 
+20-Mar-25	Thursday	March Equinox	Season	 
+31-Mar-25	Monday	Eidul-Fitar	Muslim, Common Local Holiday	 
+01-Apr-25	Tuesday	Eidul-Fitar Holiday	Regular Holiday	 
+09-Apr-25	Wednesday	The Day of Valor	Regular Holiday	 
+17-Apr-25	Thursday	Maundy Thursday	Regular Holiday	 
+18-Apr-25	Friday	Good Friday	Regular Holiday	 
+19-Apr-25	Saturday	Black Saturday	Special Non-working Holiday	 
+20-Apr-25	Sunday	Easter Sunday	Observance	 
+01-May-25	Thursday	Labor Day	Regular Holiday	 
+12-May-25	Monday	National and Local Election Holiday	Special Non-working Holiday	 
+06-Jun-25	Friday	Eid al-Adha (Feast of the Sacrifice)	Regular Holiday	 
+07-Jun-25	Saturday	Eid al-Adha Day 2	Muslim, Common Local Holiday	 
+12-Jun-25	Thursday	Independence Day	Regular Holiday	 
+21-Jun-25	Saturday	June Solstice	Season	 
+26-Jun-25	Thursday	Amun Jadid	Muslim, Common Local Holiday	 
+27-Jul-25	Sunday	Founding Anniversary of Iglesia ni Cristo	Special Non-working Holiday	 
+21-Aug-25	Thursday	Ninoy Aquino Day	Special Non-working Holiday	 
+25-Aug-25	Monday	National Heroes Day	Regular Holiday	 
+03-Sep-25	Wednesday	Yamashita Surrender Day	Special Working Day	 
+05-Sep-25	Friday	Maulid un-Nabi	Muslim, Common Local Holiday	 
+08-Sep-25	Monday	Feast of the Nativity of Mary	Special Working Day	 
+23-Sep-25	Tuesday	September Equinox	Season	 
+31-Oct-25	Friday	Special non-working Day	Special Non-working Holiday	 
+01-Nov-25	Saturday	All Saints' Day	Special Non-working Holiday	 
+02-Nov-25	Sunday	All Souls' Day	Special Non-working Holiday	  
+30-Nov-25	Sunday	Bonifacio Day	Regular Holiday	 
+08-Dec-25	Monday	Feast of the Immaculate Conception	Special Non-working Holiday	 
+21-Dec-25	Sunday	December Solstice	Season	 
+24-Dec-25	Wednesday	Christmas Eve	Special Non-working Holiday	 
+25-Dec-25	Thursday	Christmas Day	Regular Holiday	 
+30-Dec-25	Tuesday	Rizal Day	Regular Holiday	 
+31-Dec-25	Wednesday	New Year's Eve	Special Non-working Holiday	

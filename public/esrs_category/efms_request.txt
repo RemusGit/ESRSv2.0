@@ -1,0 +1,9 @@
+Repair of Medical Equipment
+Repair of Office Equipment
+Repair of Architectural Works
+Repair of Civil Works
+Repair of Electrical Works
+Repair of Plumbing Works
+Technical Assistance
+Travel Conduction
+Others
