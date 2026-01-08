@@ -22,7 +22,7 @@ Route::post('/officer_dashboard' , [AccountsTabController::class , 'officerDashb
 
 Route::get('/login' , [AccountsTabController::class , 'login'])->name('login'); //required by laravel when user is not authenticate
 
-Route::get('/logout' , [AccountsTabController::class , 'logout']);
+Route::get('/logout' , [AccountsTabController::class , 'logout'])->name('logout');
 
 //Route::post('/filter_reference' , [RequestOfficerController::class , 'filterReference'])->name('filter_reference');
 
@@ -155,6 +155,11 @@ Route::post('/officer_add_location' , [RequestOfficerController::class , 'office
 Route::post('/officer_delete_location' , [RequestOfficerController::class , 'officerDeleteLocation'])->name('officerDeleteLocation');
 Route::post('/officer_update_location' , [RequestOfficerController::class , 'officerUpdateLoc'])->name('officerUpdateLoc');
 Route::post('/officer_add_duration' , [RequestOfficerController::class , 'officerAddDuration'])->name('officerAddDuration');
+Route::post('/officer_update_duration' , [RequestOfficerController::class , 'officerUpdateDuration'])->name('officerUpdateDuration');
+Route::post('/officer_delete_duration' , [RequestOfficerController::class , 'officerDeleteDuration'])->name('officerDeleteDuration');
+Route::post('/edit_accomplished' , [RequestOfficerController::class , 'editAccomplished']);
+Route::post('/officer_service_report' , [RequestOfficerController::class , 'officerServiceReport']);
+Route::get('/service_report_form_pdf/{refID}' , [RequestOfficerController::class , 'serviceReportFormPDF']);
 
 Route::post('/test_notify' , [RequestOfficerController::class , 'testNotify']);
 
@@ -162,11 +167,27 @@ Route::post('/ajax_officer_open' , [RequestOfficerController::class , 'ajaxOffic
 Route::post('/ajax_client_list' , [RequestClientController::class , 'ajaxClientList'])->name('ajaxClientList');
 Route::post('/ajax_load_tag_agent' , [RequestOfficerController::class , 'ajaxLoadTagAgents'])->name('ajaxLoadTagAgents');
 Route::post('/ajax_tag_agent_confirm' , [RequestOfficerController::class , 'ajaxTagAgentConfirm'])->name('ajaxTagAgentConfirm');
+Route::post('/ajax_delete_action_taken' , [RequestOfficerController::class , 'ajaxDeleteActionTaken'])->name('ajaxDeleteActionTaken');
+Route::post('/ajax_check_acknowledge' , [RequestClientController::class , 'checkAcknowledge'])->name('checkAcknowledge');
+Route::post('/ajax_load_users' , [AccountsTabController::class , 'loadUsers'])->name('loadUsers');
+Route::post('/ajax_display_chat' , [AccountsTabController::class , 'displayChat'])->name('displayChat');
+Route::post('/ajax_activate_category' , [RequestOfficerController::class , 'activateCategory'])->name('activateCategory');
+
+Route::post('/update_avatar' , [AccountsTabController::class , 'updateAvatar']);
 
 //WEBSOCKET AUTH
 Route::middleware('auth')->post('/broadcasting/auth', function (Request $request) {
     return Broadcast::auth($request);
 });
 
+//UPDATE CATEGORY TAB 2
+Route::get('/update_category_tab_list' , [RequestOfficerController::class , 'updateCategoryTab2']);
+
 //TEMPORARY USER LIST
-Route::post('authenticate_user' , [AccountsTabController::class , 'authUser'])->name('authUser');
+Route::post('/authenticate_user' , [AccountsTabController::class , 'authUser'])->name('authUser');
+
+Route::get('/under_development_page' , [AccountsTabController::class , 'underDev']);
+
+Route::get('/icon_list' , function(){ return view('AccountsTab.icon_list'); });
+
+Route::post('/send_msg' , [AccountsTabController::class , 'sendMsg'])->name('sendMsg');

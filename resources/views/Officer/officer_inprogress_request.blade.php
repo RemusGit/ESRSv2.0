@@ -23,10 +23,26 @@
 
  @include('officer.officer_table_inprogress')
 
- @include('partials.modal_seemore')
-
 </div> <!--EOF CONTAINER FLUID-->
 </main>
+
+@include('officer.modals.modal_action_taken_officer')
+
+@include('officer.modals.modal_cancel_request')
+
+@include('client.modals.modal_view_attachment')
+
+@include('officer.modals.modal_new_action')
+
+@if(Auth::user()->agentunit_id == 1)
+    @include('officer.modals.modal_service_report')
+@else
+    @include('officer.modals.modal_condemn_request')
+@endif
+
+@include('officer.modals.modal_update_category')
+
+@include('partials.modal_seemore')
 
 @include('partials.footer')
 

@@ -86,7 +86,8 @@
 
 <script>
     $(document).ready(function(){
-        $('.officerCondemnRequestBtn').click(function(){
+        //$('.officerCondemnRequestBtn').click(function(){
+        $(document).on('click' , '.officerCondemnRequestBtn' , function(){
 
             let array = this.id.split(",,");
             let getRefID = array[0];
@@ -94,6 +95,19 @@
             let serialNo = array[2];
             let modelNo = array[3];
             let propertyNo = array[4];
+
+            if(nameOfEquipment == null){
+              nameOfEquipment = '';
+            } 
+            if(serialNo == null){
+              serialNo = '';
+            } 
+            if(modelNo == null){
+              modelNo = '';
+            } 
+            if(propertyNo == null){
+              propertyNo = '';
+            } 
 
             $('#officerCondemnId').val(getRefID);
             $('#getNameOfEq').val(nameOfEquipment);

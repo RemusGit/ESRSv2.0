@@ -6,6 +6,7 @@
             let getRefID = array[0];
             let categoryID = array[1];
 
+
             let numberOnly = getRefID.replace(/\D/g, '');
             $.confirm({
                 icon: '',

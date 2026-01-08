@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMC-ESRS v1.0</title>
+    <title>VMC-ESRS v2.0</title>
 
     <!--BS5-->
     <link rel="stylesheet" href="{{ asset('css/bs_5.2.3.min.css') }}">
@@ -31,6 +31,13 @@
     <!--SELECT2 JS-->
     <script src="{{ asset('js/select2.min.js') }}"></script>
 
+
 </head>
 <body>
 <?php use Illuminate\Support\Facades\Crypt; ?>
+
+
+
+
+
+

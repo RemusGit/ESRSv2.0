@@ -31,16 +31,19 @@ class RequestOfficerController extends Controller
         $agentUnitID = session('agentunit_id');
 
         $sql = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
+            ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'request_tab.repairtype_id')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
             ->join('location_tab' , 'location_tab.location_id' , '=' , 'request_tab.location_id')
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo , 
-            category_tab.category_id as categoryId ,
+            repairtype_tab.repairtype_time as repairTime , 
+            category_tab_2.main_category as mainCategory ,
+            category_tab_2.category_id as categoryId ,
             request_tab.request_date as reqDate , 
             request_tab.request_duration as until ,
-            category_tab.category_value as categoryVal , 
+            category_tab_2.category_value as categoryVal , 
             request_tab.request_by as requestBy , 
             section_tab.section_abbre as sectionName , 
             request_tab.request_descript as reqDesc , 
@@ -61,6 +64,8 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->groupBy(
                 'refNo',
+                'repairTime' ,
+                'mainCategory',
                 'categoryId',
                 'reqDate',
                 'until',
@@ -192,16 +197,18 @@ class RequestOfficerController extends Controller
         $getDateTo = $req->reqDateTo;
 
         $sql = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
+            ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'request_tab.repairtype_id')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
             ->join('location_tab' , 'location_tab.location_id' , '=' , 'request_tab.location_id')
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
-            ->selectRaw("request_tab.request_refid as refNo , 
-            category_tab.category_id as categoryId ,
+            ->selectRaw("request_tab.request_refid as refNo ,
+            repairtype_tab.repairtype_time as repairTime , 
+            category_tab_2.category_id as categoryId ,
             request_tab.request_date as reqDate , 
             request_tab.request_duration as until ,
-            category_tab.category_value as categoryVal , 
+            category_tab_2.category_value as categoryVal , 
             request_tab.request_by as requestBy , 
             section_tab.section_abbre as sectionName , 
             request_tab.request_descript as reqDesc , 
@@ -223,6 +230,7 @@ class RequestOfficerController extends Controller
             ->where('request_tab.request_refid' , 'LIKE' ,  '%'.$getRefNo.'%')
             ->groupBy(
                 'refNo',
+                'repairTime' ,
                 'categoryId',
                 'reqDate',
                 'until',
@@ -302,7 +310,7 @@ class RequestOfficerController extends Controller
             'status_id' => 8 // ACKNOWLEDGE
         ]);
 
-        $this->notifRequestStatusUpdate($officerFullName , $requestDone , $refID , $categoryVal , 8);
+        $this->notifRequestStatusUpdate($officerFullName , $requestDone , $refID , $categoryVal , 8 , "Request Done");
         return back();
     }
 
@@ -323,7 +331,7 @@ class RequestOfficerController extends Controller
             'status_id' => 5 // IN-PROGRESS
         ]);
 
-        $this->notifRequestStatusUpdate($officerFullName , $dateUpdated , $refID , $categoryVal , 5);
+        $this->notifRequestStatusUpdate($officerFullName , $dateUpdated , $refID , $categoryVal , 5 , "Request Undo");
         return back();
     }
 
@@ -352,7 +360,7 @@ class RequestOfficerController extends Controller
             'action_datetime' => $actionDateTime
         ]);
         
-        $this->notifRequestStatusUpdate($officerFullName , $actionDateTime , $refID , $categoryVal , 2);
+        $this->notifRequestStatusUpdate($officerFullName , $actionDateTime , $refID , $categoryVal , 2 , "Request Re-Open");
 
         return back();
     }
@@ -380,7 +388,7 @@ class RequestOfficerController extends Controller
             'action_datetime' => $dateCancelled
         ]);
 
-        $this->notifRequestStatusUpdate($officerFullName , $dateCancelled , $refID , $categoryVal , 7);
+        $this->notifRequestStatusUpdate($officerFullName , $dateCancelled , $refID , $categoryVal , 7 , "Request Cancelled");
         return back();
     }
 
@@ -433,13 +441,33 @@ class RequestOfficerController extends Controller
         Timestamp: ".date('M. d, Y - h:i A' , strtotime(now())). "<br>
         Reference No. : <a href='/client_acknowledge_request'>".$refID. "</a>";
 
+
+        $updateRequestMsgForOfficer = "REQUEST UPDATED! <br> 
+        Status: Condemn<br>
+        Condemned by: ".$officerFullname. "<br>
+        Timestamp: ".date('M. d, Y - h:i A' , strtotime(now())). "<br>
+        Reference No. : ".$refID."<br>";
+
         $data = DB::table('request_tab')
         ->where('request_refid' , $refID)
-        ->select('account_id')
+        ->select('account_id' , 'agentunit_id')
         ->first();
         $accountEmpId = $data->account_id;
+        $agentUnitID = $data->agentunit_id;
 
+        //NOTIFY CLIENT
         broadcast(new NotifyUser($accountEmpId , $updateRequestMsg))->toOthers();
+
+        /*
+        //NOTIFY ACTION OFFICER
+        $data = DB::table('accounts_tab')
+        ->where('agentunit_id' , $agentUnitID)
+        ->get();
+
+        foreach($data as $datas){
+            broadcast(new NotifyUser($datas->account_empid , $updateRequestMsgForOfficer))->toOthers();
+        }
+        */
 
         return back();
     }
@@ -448,10 +476,15 @@ class RequestOfficerController extends Controller
 
         $agentUnit = session('agentunit_id');
 
-        $data = DB::table('category_tab')
+        $sql = DB::table('category_tab_2')
         ->where('agentunit_id' , $agentUnit)
-        ->orderBy('category_value' , 'ASC')
-        ->get();
+        ->orderBy('category_id' , 'ASC');
+
+        if($agentUnit == 1){
+            $sql->where('category_id' , '>=' , 43); // SHOW ONLY NEW EFMS
+        }
+
+        $data = $sql->get();
         return json_encode($data);
     }
 
@@ -463,6 +496,8 @@ class RequestOfficerController extends Controller
         $categoryVal = $req->getCategoryVal;
         $takenByFullName = $req->getTakenByName;
         $requestTaken = now();
+
+        //dd($takenByFullName);
     
         DB::table('request_tab')
         ->where('request_refid' , $refID)
@@ -473,11 +508,11 @@ class RequestOfficerController extends Controller
             'status_id' => 5 // IN-PROGRESS
         ]);
 
-        $this->notifRequestStatusUpdate($takenByFullName , $requestTaken , $refID , $categoryVal , 5);
+        $this->notifRequestStatusUpdate($takenByFullName , $requestTaken , $refID , $categoryVal , 5 , "Request Taken");
         return back();
     }
     //////////////////////////////////////////////////////////////////// NOTIFICATION - REQUEST STATUS UPDATE
-    public function notifRequestStatusUpdate($takenByFullName , $dateTaken , $refNo , $categoryVal , $status){
+    public function notifRequestStatusUpdate($takenByFullName , $dateTaken , $refNo , $categoryVal , $status , $actionDone){
 
         $statusText;
         $statusLink;
@@ -499,21 +534,52 @@ class RequestOfficerController extends Controller
             $statusLink = 'client_cancelled_request';
         }
 
-
-        $updateRequestMsg = "REQUEST UPDATED! <br> 
-        Status: ".$statusText."<br>
+        $updateRequestMsgForClient = "REQUEST UPDATED!<br> 
+        Status: ".$statusText." (".$actionDone.")<br>
         Action Officer: ".$takenByFullName. "<br>
         Timestamp: ".date('M. d, Y - h:i A' , strtotime($dateTaken)). "<br>
         Reference No. : <a href='/".$statusLink."'>".$refNo. "</a><br>
         Category: ".$categoryVal;
 
+        $updateRequestMsgForOfficer = "REQUEST UPDATED!<br> 
+        Status: ".$statusText." (".$actionDone.")<br>
+        Action Officer: ".$takenByFullName. "<br>
+        Timestamp: ".date('M. d, Y - h:i A' , strtotime($dateTaken)). "<br>
+        Reference No. : ".$refNo."<br>
+        Category: ".$categoryVal;
+
+        // GET CLIENT ID + AGENT UNIT ID
         $data = DB::table('request_tab')
         ->where('request_refid' , $refNo)
-        ->select('account_id')
+        ->select('account_id' , 'agentunit_id')
         ->first();
         $accountEmpId = $data->account_id;
+        $agentUnitID = $data->agentunit_id;
 
-        broadcast(new NotifyUser($accountEmpId , $updateRequestMsg))->toOthers();
+        //NOTIFY CLIENT
+        broadcast(new NotifyUser($accountEmpId , $updateRequestMsgForClient))->toOthers();
+
+        // IF STATUS OPEN OR FROM OPEN TO INPROGRESS OR VICE VERSA NOTIF ALL ACTION OFFICER USING AGENT UNIT ID
+        if($actionDone == "Request Taken" || $actionDone == "Request Re-Open"){
+
+            //NOTIFY ACTION OFFICER
+            $data = DB::table('accounts_tab')
+            ->where('agentunit_id' , $agentUnitID)
+            ->where('account_empid' , '!=' , Auth::user()->account_empid)
+            ->get();
+
+            /*
+            foreach($data as $datas){
+                broadcast(new NotifyUser($datas->account_empid , $updateRequestMsgForOfficer))->toOthers();
+            }
+            */
+
+            // BETTER APPROARCH VS USING FOREACH LOOP
+            $data->unique('account_empid')->each(function ($user) use ($updateRequestMsgForOfficer) {
+                NotifyUser::dispatch($user->account_empid, $updateRequestMsgForOfficer);
+            });
+        }
+
     }
 
     //////////////////////////////////////////////////////////////////////////////// LOG REPORT PDF
@@ -526,17 +592,17 @@ class RequestOfficerController extends Controller
         $accountEmpId = $req->reqAgent;
 
             $sql = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
             ->join('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->leftJoin('tagagent_tab' , 'tagagent_tab.request_refid' , '=' , 'request_tab.request_refid')
             ->selectRaw(
-                "category_tab.category_value as categoryVal ,
+                "category_tab_2.category_value as categoryVal ,
                 request_tab.request_refid as refID , 
                 request_tab.request_date as requestDate ,
                 request_tab.request_done as reqDone ,
-                category_tab.category_value as categoryVal , 
+                category_tab_2.category_value as categoryVal , 
                 request_tab.request_by as requestBy ,
                 section_tab.section_abbre as sectionVal ,
                 CONCAT(accounts_tab.account_fname , ' ' ,  accounts_tab.account_lname) as actionOfficer ,
@@ -544,7 +610,7 @@ class RequestOfficerController extends Controller
                 ")
             ->groupBy(
                 'categoryVal' , 
-                'category_tab.category_id',
+                'category_tab_2.category_id',
                 'refID' ,
                 'requestDate' ,
                 'reqDone' ,
@@ -554,7 +620,7 @@ class RequestOfficerController extends Controller
                 'actionOfficer' ,
                 'statusVal'
                 )
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->whereBetween('request_date' , [$dateFrom , $dateTo])
             ->orderBy('request_tab.request_date');
 
@@ -618,28 +684,28 @@ class RequestOfficerController extends Controller
         
             /*
             $summary = DB::table('request_tab')
-            ->leftJoin('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->selectRaw(
-                "category_tab.category_value as categoryVal ,
+                "category_tab_2.category_value as categoryVal ,
                 (SELECT COUNT(*) FROM request_tab 
                 LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
                 WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab.category_id AND
+                request_tab.category_id = category_tab_2.category_id AND
                 $statusWhere
                 ) AS requestTaken
                 ")
-            ->groupBy('categoryVal' , 'category_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->groupBy('categoryVal' , 'category_tab_2.category_id')
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
+            ->orderBy('category_tab_2.category_id')
             ->get();
             */
 
             $summary = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
             ->select(
-                'category_tab.category_value as categoryVal' ,
+                'category_tab_2.category_value as categoryVal' ,
                 'request_tab.category_id',
                 DB::raw("
                     COUNT(DISTINCT CASE 
@@ -648,10 +714,10 @@ class RequestOfficerController extends Controller
                         THEN request_tab.request_refid END) AS requestTaken
                         ")
             )
-            ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->groupBy('categoryVal' , 'category_tab_2.category_id' , 'request_tab.category_id')
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
+            ->orderBy('category_tab_2.category_id')
             ->get();
 
             
@@ -685,8 +751,13 @@ class RequestOfficerController extends Controller
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->SetXY(10, 33);
-        $pdf->Cell(0,10,'Integrated Management Information System Section' , 0 , 1 , 'C');
 
+        if(Auth::user()->agentunit_id == 1){
+            $pdf->Cell(0,10,'Engineering and Facilities Management Section' , 0 , 1 , 'C');
+        }
+        elseif(Auth::user()->agentunit_id == 2){
+            $pdf->Cell(0,10,'Integrated Management Information System Section' , 0 , 1 , 'C');
+        }
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetXY(9, 60);
@@ -734,6 +805,13 @@ class RequestOfficerController extends Controller
         $y = 0;
         $counter = 1;
         foreach($data as $datas){
+
+        if($y == 0 && $accountEmpId != 'All Agents'){
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->SetXY(9 , 55);
+            $pdf->Write(1, $datas->actionOfficer);
+        }
+
 
             /*
             $pdf->SetFont('Arial', '', 6);
@@ -832,7 +910,19 @@ class RequestOfficerController extends Controller
 
                 $pdf->SetFont('Arial', 'B', 10);
                 $pdf->SetXY(10, 33);
-                $pdf->Cell(0,10,'Integrated Management Information System Section' , 0 , 1 , 'C');
+
+                if(Auth::user()->agentunit_id == 1){
+                    $pdf->Cell(0,10,'Engineering and Facilities Management Section' , 0 , 1 , 'C');
+                }
+                elseif(Auth::user()->agentunit_id == 2){
+                    $pdf->Cell(0,10,'Integrated Management Information System Section' , 0 , 1 , 'C');
+                }
+                
+                if($y == 0 && $accountEmpId != 'All Agents'){
+                    $pdf->SetFont('Arial', 'B', 10);
+                    $pdf->SetXY(9 , 55);
+                    $pdf->Write(1, $datas->actionOfficer);
+                }
 
                 $pdf->SetFont('Arial', '', 9);
                 $pdf->SetXY(9, 60);
@@ -929,7 +1019,19 @@ class RequestOfficerController extends Controller
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->SetXY(10, 33);
-        $pdf->Cell(0,10,'Integrated Management Information System Section' , 0 , 1 , 'C');
+
+        if(Auth::user()->agentunit_id == 1){
+            $pdf->Cell(0,10,'Engineering and Facilities Management Section' , 0 , 1 , 'C');
+        }
+        elseif(Auth::user()->agentunit_id == 2){
+            $pdf->Cell(0,10,'Integrated Management Information System Section' , 0 , 1 , 'C');
+        }
+
+        if($y == 0 && $accountEmpId != 'All Agents'){
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->SetXY(9 , 55);
+            $pdf->Write(1, $datas->actionOfficer);
+        }
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetXY(9, 60);
@@ -979,7 +1081,16 @@ class RequestOfficerController extends Controller
         $pdf->Write(1,$sumTaken);
         
        
-        $signatory = "BILLY T. LUCENA";
+        $signatory = "";
+        $signatoryTitle = "";
+        if(Auth::user()->agentunit_id == 1){
+            $signatory = "Engr. ZORAIDA S. CUADRA";
+            $signatoryTitle = "EFMS Supervisor";
+        }
+        elseif(Auth::user()->agentunit_id == 2){
+            $signatory = "BILLY T. LUCENA";
+            $signatoryTitle = "IMISS Supervisor";
+        }
 
         $pdf->SetFont('Arial', 'B', 11);
         $pdf->SetXY(1, 130+$y);
@@ -987,7 +1098,7 @@ class RequestOfficerController extends Controller
 
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetXY(1, 134+$y);
-        $pdf->MultiCell(200,5, 'IMISS SUPERVISOR' , 0, 'C' , 0,);
+        $pdf->MultiCell(200,5, $signatoryTitle , 0, 'C' , 0,);
 
         return response($pdf->Output('S'), 200, [
             'Content-Type' => 'application/pdf',
@@ -1026,34 +1137,34 @@ class RequestOfficerController extends Controller
 
         /*
         $data = DB::table('request_tab')
-        ->leftJoin('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+        ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
         ->selectRaw(
-            "category_tab.category_value as categoryVal ,
+            "category_tab_2.category_value as categoryVal ,
             (SELECT COUNT(*) FROM request_tab 
             LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
             WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-            request_tab.category_id = category_tab.category_id AND
+            request_tab.category_id = category_tab_2.category_id AND
             (request_tab.agentacc_id = '".$accountEmpId."' OR tagagent_tab.agentacc_id = '".$accountEmpId."')
             AND $statusWhere
             ) AS requestTaken ,
             (SELECT COUNT(*) FROM request_tab 
             WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-            request_tab.category_id = category_tab.category_id AND
+            request_tab.category_id = category_tab_2.category_id AND
             request_tab.agentunit_id = '".$agentUnitID."' AND request_tab.status_id IN (2,5,6,7,8)
             ) AS overAll 
             ")
-        ->groupBy('categoryVal' , 'category_tab.category_id')
-        ->where('category_tab.agentunit_id' , $agentUnitID)
+        ->groupBy('categoryVal' , 'category_tab_2.category_id')
+        ->where('category_tab_2.agentunit_id' , $agentUnitID)
         ->where('request_tab.status_id' , '<>' , 2)
-        ->orderBy('category_tab.category_id')
+        ->orderBy('category_tab_2.category_id')
         ->get();
         */
 
         $data = DB::table('request_tab')
-        ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+        ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
         ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
         ->select(
-            'category_tab.category_value as categoryVal' ,
+            'category_tab_2.category_value as categoryVal' ,
             'request_tab.category_id',
             DB::raw("COUNT(CASE 
                         WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
@@ -1071,10 +1182,10 @@ class RequestOfficerController extends Controller
                     ) AS overAll
                     ")
         )
-        ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
-        ->where('category_tab.agentunit_id' , $agentUnitID)
+        ->groupBy('categoryVal' , 'category_tab_2.category_id' , 'request_tab.category_id')
+        ->where('category_tab_2.agentunit_id' , $agentUnitID)
         ->where('request_tab.status_id' , '<>' , 2)
-        ->orderBy('category_tab.category_id')
+        ->orderBy('category_tab_2.category_id')
         ->get();
 
 
@@ -1250,34 +1361,34 @@ class RequestOfficerController extends Controller
             }
             /*
             $data = DB::table('request_tab')
-            ->leftJoin('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->leftJoin('tagagent_tab' , 'tagagent_tab.request_refid' , '=' , 'request_tab.request_refid')
             ->selectRaw(
-                "category_tab.category_value as categoryVal ,
+                "category_tab_2.category_value as categoryVal ,
                 (SELECT COUNT(*) FROM request_tab 
                 LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
                 WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab.category_id AND
+                request_tab.category_id = category_tab_2.category_id AND
                 (request_tab.agentacc_id = '".$accountEmpId."' OR tagagent_tab.agentacc_id = '".$accountEmpId."' ) AND $statusWhere 
                 ) AS requestTaken ,
                 (SELECT COUNT(*) FROM request_tab 
                 WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab.category_id AND
+                request_tab.category_id = category_tab_2.category_id AND
                 request_tab.agentunit_id = '".$agentUnitID."'
                 ) AS overAll 
                 ")
-            ->groupBy('categoryVal' , 'category_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->groupBy('categoryVal' , 'category_tab_2.category_id')
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
+            ->orderBy('category_tab_2.category_id')
             ->get();
             */
 
             $data = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
             ->select(
-                'category_tab.category_value as categoryVal' ,
+                'category_tab_2.category_value as categoryVal' ,
                 'request_tab.category_id',
                 DB::raw("COUNT(CASE 
                             WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
@@ -1297,12 +1408,12 @@ class RequestOfficerController extends Controller
             )
             ->groupBy(
                 'categoryVal' , 
-                'category_tab.category_id' , 
+                'category_tab_2.category_id' , 
                 'request_tab.category_id'
             )
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
+            ->orderBy('category_tab_2.category_id')
             ->get();
 
             //dd($data);
@@ -1333,17 +1444,17 @@ class RequestOfficerController extends Controller
             $accountEmpId = $req->reqAgent;
 
             $sql = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
             ->leftJoin('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->leftJoin('tagagent_tab' , 'tagagent_tab.request_refid' , '=' , 'request_tab.request_refid')
             ->selectRaw(
-                "category_tab.category_value as categoryVal ,
+                "category_tab_2.category_value as categoryVal ,
                 request_tab.request_refid as refID , 
                 request_tab.request_date as requestDate ,
                 request_tab.request_done as reqDone ,
-                category_tab.category_value as categoryVal , 
+                category_tab_2.category_value as categoryVal , 
                 request_tab.request_by as requestBy ,
                 section_tab.section_abbre as sectionVal ,
                 CONCAT(accounts_tab.account_fname , ' ' ,  accounts_tab.account_lname) as actionOfficer ,
@@ -1351,7 +1462,7 @@ class RequestOfficerController extends Controller
                 ")
             ->groupBy(
                 'categoryVal' , 
-                'category_tab.category_id',
+                'category_tab_2.category_id',
                 'refID' ,
                 'requestDate' ,
                 'reqDone' ,
@@ -1426,28 +1537,28 @@ class RequestOfficerController extends Controller
 
             /*
             $summary = DB::table('request_tab')
-            ->leftJoin('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->selectRaw(
-                "category_tab.category_value as categoryVal ,
+                "category_tab_2.category_value as categoryVal ,
                 (SELECT COUNT(*) FROM request_tab 
                 LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
                 WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab.category_id AND
+                request_tab.category_id = category_tab_2.category_id AND
                 $statusWhere
                 ) AS requestTaken
                 ")
-            ->groupBy('categoryVal' , 'category_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->groupBy('categoryVal' , 'category_tab_2.category_id')
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
+            ->orderBy('category_tab_2.category_id')
             ->get();
             */
 
             $summary = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
             ->select(
-                'category_tab.category_value as categoryVal' ,
+                'category_tab_2.category_value as categoryVal' ,
                 'request_tab.category_id',
                 DB::raw("
                     COUNT(DISTINCT CASE 
@@ -1456,10 +1567,10 @@ class RequestOfficerController extends Controller
                         THEN request_tab.request_refid END) AS requestTaken
                         ")
             )
-            ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->groupBy('categoryVal' , 'category_tab_2.category_id' , 'request_tab.category_id')
+            ->where('category_tab_2.agentunit_id' , $agentUnitID)
             ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
+            ->orderBy('category_tab_2.category_id')
             ->get();
 
             return view('officer.officer_log_report' , compact('agents' , 'data' , 'summary') , ['oldData' => $req->all()]);
@@ -1561,17 +1672,22 @@ class RequestOfficerController extends Controller
         ")
         ->groupBy('locVal' , 'locAbbr' , 'locID')
         ->orderBy('location_tab.location_id')
-        //->where('deleted' , 0) // uncomment this line if table location_tab has column name -> 'deleted' with default value = 0
+        ->where('deleted' , 0) // uncomment this line if table location_tab has column name -> 'deleted' with default value = 0
         ->get();
 
         //dd($data);
-        return view('officer.location_floor_settings' , compact('data'));
+        return view('officer.location_floor_settings' , compact('data')); // USE ON TEST
+    }
+
+    public function underDev(){
+
+         return view('accountstab.under_dev'); // USE ON LIVE TO PREVENT ACCESS - UNDER DEVELOPEMENT
     }
 
     public function officerDeleteLocation(Request $req){
 
         $locID = (int)$req->locID;
-        dd($locID); // comment this line if table location_tab has column name -> 'deleted' with default value = 0
+        //dd($locID); // comment this line if table location_tab has column name -> 'deleted' with default value = 0
 
         DB::table('location_tab')
         ->where('location_id' , $locID)
@@ -1589,7 +1705,7 @@ class RequestOfficerController extends Controller
         $locAbbr = strtoupper($req->locAbbr);
         $floorNo = $req->floorNo;
 
-        dd($locID); // comment this line to enable update location
+        //dd($locID); // comment this line to enable update location
 
         //UPDATE location_tab TABLE
         DB::table('location_tab')
@@ -1611,15 +1727,20 @@ class RequestOfficerController extends Controller
 
     public function officerAddDuration(Request $req){
 
-        $durationName = strtoupper($req->durationName);
-        $durationTime = $req->durationTime;
+        $agentUnitID = session('agentunit_id');
 
-        dd($durationName);
+        $durationName = strtoupper($req->durationName);
+        $durationHour = $req->durationHour;
+        $durationDay = $req->durationDay;
+
+        $totalDuration = ($durationDay * 24) + $durationHour;
+        $totalDuration = $totalDuration.':00:00';
 
         DB::table('repairtype_tab')
         ->insert([
             'repairtype_value' => $durationName ,
-            'repairtype_time' => $durationTime ,
+            'repairtype_time' => $totalDuration ,
+            'added_by_agentunit_id' => $agentUnitID ,
         ]);
 
         return back();
@@ -1721,24 +1842,618 @@ class RequestOfficerController extends Controller
 
         $agentUnitID = session('agentunit_id');
 
-        if(Auth::user()->account_lname == 'DILANTAWI'){
-            $agentUnitID = 2;
-        }// comment this block when request duration is working or available to public
-
-        $data = DB::table('category_tab')
-        ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'category_tab.repairtype_id')
-        ->select('category_tab.category_value as categoryVal' , 'repairtype_tab.repairtype_time as repairTime')
+        $sql = DB::table('category_tab_2')
+        ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'category_tab_2.repairtype_id')
+        ->select(
+        'category_tab_2.active as categoryActive' ,
+        'category_tab_2.main_category as categoryMain' ,
+        'category_tab_2.category_id as categoryID' , 
+        'category_tab_2.category_value as categoryVal' , 
+        'repairtype_tab.repairtype_time as repairTime'
+        )
         ->where('agentunit_id' , $agentUnitID)
-        ->groupBy('category_tab.category_value' , 'repairtype_tab.repairtype_value' , 'repairtype_tab.repairtype_time')
-        ->orderBy('category_tab.category_value')
-        ->get();
+        ->groupBy(
+        'categoryActive' ,
+        'categoryMain' ,
+        'categoryID' , 
+        'category_tab_2.category_value' , 
+        'repairtype_tab.repairtype_value' , 
+        'repairtype_tab.repairtype_time'
+        )
+        ->orderBy('category_tab_2.category_id')
+        ->orderBy('category_tab_2.category_value');
+
+        if($agentUnitID == 1){
+            $sql->where('category_id' , '>=' , 43); // SHOW ALL NEW EFMS ONLY
+        }
+
+        $data = $sql->get();
 
         $durations = DB::table('repairtype_tab')
-        ->select('repairtype_value as repairVal' , 'repairtype_time as repairTime')
-        ->orderBy('repairtype_time')
+        ->select('repairtype_value as repairVal' , 'repairtype_time as repairTime' , 'repairtype_id as repairID')
+        ->where('deleted' , 0)
+        ->where('added_by_agentunit_id' , $agentUnitID)
+        ->orWhere('added_by_agentunit_id' , 0)
+        //->orderBy('repairtype_time')
         ->get();
 
         return view('officer.request_duration_settings' , compact('data' , 'durations'));
     }
 
+    public function officerUpdateDuration(Request $req){
+
+        $getDurationID = $req->getDurationID;
+        $getCategoryID = $req->getCategoryID;
+
+        DB::table('category_tab_2')
+        ->where('category_id' , $getCategoryID)
+        ->update([
+            'repairtype_id' => $getDurationID 
+        ]);
+
+        return back();
+    }
+
+    public function officerDeleteDuration(Request $req){
+
+        $durationID = $req->durationID;
+        DB::table('repairtype_tab')
+        ->where('repairtype_id' , $durationID)
+        ->update([
+            'deleted' => 1
+        ]);
+
+        return back();
+    }
+
+    public function updateCategoryTab2(){
+
+        //GET ALL CATEGORY FROM OLD CATEGORY TAB
+        $getOld = DB::table('category_tab')
+        ->orderBy('category_id')
+        ->get();
+
+        //UNCOMMENT TO UPDATE TABLE category_tab_2
+        /*
+        DB::table('category_tab_2')
+        ->truncate();
+
+        // insert all imiss request
+        $sql = DB::table('category_tab_2');
+        foreach($getOld as $data){
+            $sql->insert([
+                'category_id' => $data->category_id ,
+                'category_value' => $data->category_value ,
+                'main_category' => '' ,
+                'agentunit_id' => $data->agentunit_id ,
+                'repairtype_id' => $data->repairtype_id ,
+                'category_icon' => $data->category_icon ,
+            ]);
+        }
+
+        // insert all new efms request
+        $insertNewEFMS = DB::table('category_tab_2');
+        $filename = public_path()."/new_efms_request_11-24-2025.txt";
+        $handle = fopen($filename, "r");
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                $array = explode("," , $line);
+
+                $categoryVal = $array[0];
+                $catMain = $array[1];
+                $agentUnitID = $array[2];
+                $repairTypeID = $array[3];
+                $categoryIcon = $array[4];
+
+                $insertNewEFMS->insert([
+                    'category_value' => $categoryVal,
+                    'main_category' => $catMain,
+                    'agentunit_id' => $agentUnitID,
+                    'repairtype_id' => $repairTypeID,
+                    'category_icon' => $categoryIcon ,
+                ]);
+            }
+            fclose($handle);
+        } else {
+            echo "Error: Could not open the file '{$filename}'.";
+        }
+
+        $this->updateActionTakenTab2();
+        */
+
+        $data2 = DB::table('category_tab_2')
+        ->get();
+
+        return view('officer.category_tab_2_update' , compact('data2'));
+    }
+
+    public function updateActionTakenTab2(){
+
+        $getOldData = DB::table('actiontaken_tab')->get();
+
+        DB::table('actiontaken_tab_2')
+        ->truncate();
+
+        $sql = DB::table('actiontaken_tab_2');
+        foreach($getOldData as $d){
+            $sql->insert([
+                'request_refid' => $d->request_refid ,
+                'action_taken' => $d->action_taken ,
+                'action_datetime' => $d->action_datetime ,
+                'deleted' => 0 ,
+            ]);
+        }   
+    }
+
+    public function ajaxDeleteActionTaken(Request $req){
+
+        $actionID = $req->actionID;
+        $deletedBy = Auth::user()->account_fname.' '.Auth::user()->account_lname;
+
+
+        DB::table('actiontaken_tab')
+        ->where('action_id' , $actionID)
+        ->update([
+            'deleted' => 1 ,
+            'deleted_datetime' => now() ,
+            'deleted_by' => $deletedBy
+        ]);
+    }
+
+    public function activateCategory(Request $req){
+
+        $categoryID = $req->categoryID;
+        $activeVal = $req->activeVal;
+
+        if($activeVal == 'true'){
+            $activeVal = 1;
+        }else{
+            $activeVal = 0;
+        }
+
+        DB::table('category_tab_2')
+        ->where('category_id' , $categoryID)
+        ->update([
+            'active' => $activeVal
+        ]);
+
+        return $categoryID.'-'. $activeVal;
+    }
+
+    public function editAccomplished(Request $req){
+
+        $refID = $req->refID;
+        $newDateAccomplished = $req->newDateAccomplished;
+        $newTimeAccomplished = $req->newTimeAccomplished;
+
+        $newAccomplishedDateTime = $newDateAccomplished.' '.$newTimeAccomplished;
+
+        //dd($newAccomplishedDateTime);
+
+        DB::table('request_tab')
+        ->where('request_refid' , $refID)
+        ->update([
+            'request_done' => $newAccomplishedDateTime
+        ]);
+
+        return back();
+    }
+
+    public function officerServiceReport(Request $req){
+
+        $getRefID = $req->getRefID;
+        $nameOfEquipment = $req->getNameOfEqSR;
+        $modelNo = $req->getModelNoSR;
+        $serialNo = $req->getSerialNoSR;
+        $complain = $req->getComplaintSR;
+        $remarks = $req->getRemarksSR;
+
+        $recommendation = $req->recommendationSR;
+        $reason = $req->getReasonSR;
+
+        /*
+        $eqPartName = $req->input('eqPartName' , []);
+        $eqPartAmt = $req->input('eqPartAmount' , []);
+        */
+        $getPartsCounter = (int)$req->getPartsCounter;
+        for($i = 0; $i < $getPartsCounter; $i++){
+
+            $eqPartName = $req->input('eqPartName_'.$i);
+            $eqPartAmt = $req->input('eqPartAmount_'.$i);
+            $eqTypeID = $req->input('recommendationSR_'.$i);
+
+            //dd($eqPartName . ' / ' . $eqPartAmt . ' / ' .$eqTypeID);
+
+            DB::table('equipmentparts_tab')
+            ->insert([
+                'request_refid' => $getRefID,
+                'equipmentparts_name' => $eqPartName,
+                'equipmentparts_amount' => $eqPartAmt,
+                'equipmentparts_date' => now(),
+                'equipmenttype_id' => $eqTypeID
+            ]);
+        }
+
+        if($recommendation == 1){
+            DB::table('request_tab')
+            ->where('request_refid' , $getRefID)
+            ->update([
+                'request_done' => now(),
+                'status_id' => 8 ,
+                'name_of_equipment' => $nameOfEquipment ,
+                'serialno' => $serialNo ,
+                'modelno' => $modelNo ,
+                'name_of_equipment' => $nameOfEquipment ,
+                'request_remarks' => $remarks ,
+                'request_findings' => $complain ,
+                'request_recommendation' => $reason ,
+                'request_warranty' => 1 ,
+            ]);
+        }
+        elseif($recommendation == 2){
+
+            DB::table('request_tab')
+            ->where('request_refid' , $getRefID)
+            ->update([
+                'request_done' => now() ,
+                'status_id' => 8 ,
+                'name_of_equipment' => $nameOfEquipment ,
+                'serialno' => $serialNo ,
+                'modelno' => $modelNo ,
+                'name_of_equipment' => $nameOfEquipment ,
+                'request_remarks' => $remarks ,
+                'request_findings' => $complain ,
+                'request_recommendation' => $reason ,
+                'request_condemn' => 1 ,
+            ]);
+        }
+
+        return back();
+    }
+
+    public function serviceReportFormPDF(Request $req){
+
+        $refID = $req->refID;
+
+        $data = DB::table('request_tab')
+        ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
+        ->join('category_tab_2', 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
+        ->select(
+            'section_tab.section_name as sectionName' ,
+            'category_tab_2.category_value as categoryVal' ,
+            'request_tab.request_by as requestBy' ,
+            'request_tab.name_of_equipment as nameOfEq' ,
+            'request_tab.serialno as serialNo' ,
+            'request_tab.modelno as modelNo' ,
+            'request_tab.request_findings as reqFindings' ,
+            'request_tab.request_taken as reqTaken' ,
+            'request_tab.request_done as reqDone' ,
+            'request_tab.request_warranty as reqWarranty' ,
+            'request_tab.request_condemn as reqCondemn' ,
+            'request_tab.request_remarks as reqRemarks' ,
+            'request_tab.request_recommendation as reqRecommendation'
+        )
+        ->where('request_tab.request_refid' , $refID)
+        ->get();
+
+
+        $sectionName = "";
+        $categoryVal = "";
+        $nameOfEq = "";
+        $serialNo = "";
+        $modelNo = "";
+        $reqFindings = "";
+        $reqTaken = "";
+        $reqDone = "";
+        $reqWarranty = "";
+        $reqCondemn = "";
+        $reqRemarks = "";
+        $reqRecommendation = "";
+
+        $signatory1 = "FRANCISCO GUILALAS CAMPOSANO JR";
+        $signatory2 = "Engr. ZORAIDA S. CUADRA";
+        $signatory3 = "";
+
+        foreach($data as $rows){
+
+            $sectionName = $rows->sectionName;
+            $categoryVal = $rows->categoryVal;
+            $nameOfEq = $rows->nameOfEq;
+            $serialNo = $rows->serialNo;
+            $modelNo = $rows->modelNo;
+            $reqFindings = $rows->reqFindings;
+            $reqTaken = $rows->reqTaken;
+            $reqDone = $rows->reqDone;
+            $reqWarranty = $rows->reqWarranty;
+            $reqCondemn = $rows->reqCondemn;
+            $reqRemarks = $rows->reqRemarks;
+            $reqRecommendation = $rows->reqRecommendation;
+            $signatory3 = $rows->requestBy;
+        }
+
+
+        $actionTakens = DB::table('actiontaken_tab')
+        ->where('request_refid' , $refID)
+        ->where('deleted' , 0)
+        ->orderBy('action_datetime' , 'DESC')
+        ->limit(1)
+        ->get();
+
+        $eqParts = DB::table('equipmentparts_tab')
+        ->join('equipmenttype_tab' , 'equipmenttype_tab.equipmenttype_id' , '=' , 'equipmentparts_tab.equipmenttype_id')
+        ->where('request_refid' , $refID)
+        ->get();
+
+        $pdf = new \FPDF();
+        $pdf->AddPage();
+        
+        $pdf->Image(public_path('images/vmclogo.png'), 20, 10, 20,0);
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetXY(160, 10);
+        $pdf->MultiCell(40,5,"FM-EFMS-002 \nRev 3 - 06/15/17" , 1, 'C' , 0,);
+
+
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetXY(10, 10);
+        $pdf->Cell(0,10,'VALENZUELA MEDICAL CENTER' , 0 , 1 , 'C');
+
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->Cell(0,1,'Padrigal St., Karuhatan, Valenzuela City' , 0 , 1 , 'C');
+        $pdf->Cell(0,10,'Tel. No. 294-67-11' , 0 , 1 , 'C');
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->Cell(0,1,'Engineering and Facilities Management Section' , 0 , 1 , 'C');
+
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetXY(10, 45);
+        $pdf->Cell(0,10,'SERVICE REPORT FORM' , 0 , 1 , 'C');
+
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetXY(165, 55);
+        $pdf->Cell(0,10, date('M. d, Y' , strtotime(now())) , 0 , 1 , 'C');
+        $pdf->Line(165,63,200,63);
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(165, 65);
+        $pdf->Cell(0,1,'Date' , 0 , 1 , 'C');
+
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 85);
+        $pdf->Cell(50,1,'Name of Office/Unit' , 0 , 1 , 'L');
+        $pdf->Line(60,87,200,87);
+
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 84);
+        $pdf->Cell(50,1, $sectionName , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 90);
+        $pdf->Cell(50,1,'Service Order Number' , 0 , 1 , 'L');
+        $pdf->Line(60,92,200,92);
+
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 89);
+        $pdf->Cell(50,1, $refID , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 95);
+        $pdf->Cell(50,1,'Service Request Category' , 0 , 1 , 'L');
+        $pdf->Line(60,97,200,97);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 94);
+        $pdf->Cell(50,1, $categoryVal , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 100);
+        $pdf->Cell(50,1,'Equipment' , 0 , 1 , 'L');
+        $pdf->Line(60,102,200,102);
+
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 99);
+        $pdf->Cell(50,1, $nameOfEq , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 105);
+        $pdf->Cell(45,1,'Brand / Model' , 0 , 1 , 'R');
+        $pdf->Line(60,107,200,107);
+
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 104);
+        $pdf->Cell(50,1, $modelNo , 0 , 1 , 'L');
+
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 110);
+        $pdf->Cell(45,1,'Serial No.' , 0 , 1 , 'R');
+        $pdf->Line(60,112,200,112);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 109);
+        $pdf->Cell(50,1, $serialNo , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 115);
+        $pdf->Cell(50,1,'Complaint / Observation' , 0 , 1 , 'L');
+        $pdf->Line(60,117,200,117);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 114);
+        $pdf->Cell(50,1, $reqFindings , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 120);
+        $pdf->Cell(50,1,'Work Done' , 0 , 1 , 'L');
+        $pdf->Line(60,122,200,122);
+
+        $x = 0;
+        $countLetters = 0;
+        $workDone = "";
+        foreach($actionTakens as $rows){
+            $countLetters = strlen($rows->action_taken);
+            $workDone = $rows->action_taken;
+            if($x > 0){
+                $workDone = ', ' . $rows->action_taken;
+            }
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->SetXY(59 + $x, 119);
+            $pdf->Cell(1,1, $workDone , 0 , 1 , 'L');
+            $x+=($countLetters*2);
+        }
+
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 125);
+        $pdf->Cell(50,1,'Work Started (Date and Time)' , 0 , 1 , 'L');
+        $pdf->Line(60,127,200,127);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 124);
+        $pdf->Cell(50,1, date('M. d, Y - H:i:s' , strtotime($reqTaken)) , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 130);
+        $pdf->Cell(50,1,'Work Finished (Date and Time)' , 0 , 1 , 'L');
+        $pdf->Line(60,132,200,132);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 129);
+        $pdf->Cell(50,1, date('M. d, Y - H:i:s' , strtotime($reqDone)) , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 135);
+        $pdf->Cell(50,1,'Remarks' , 0 , 1 , 'L');
+        $pdf->Line(60,137,200,137);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59, 134);
+        $pdf->Cell(50,1, $reqRemarks , 0 , 1 , 'L');
+
+        $pdf->Line(10,150,200,150);
+        $pdf->Line(10,155,200,155);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 152);
+        $pdf->Cell(10,1,'Equipment' , 0 , 1 , 'L');
+        $pdf->SetXY(80, 152);
+        $pdf->Cell(10,1,'Part Type' , 0 , 1 , 'L');
+        $pdf->SetXY(190, 152);
+        $pdf->Cell(10,1,'Cost' , 0 , 1 , 'R');
+
+        $y = 0;
+        $totalCost = 0;
+        $pdf->SetFont('Arial', '', 9);
+        foreach($eqParts as $rows){
+
+            $pdf->SetXY(10, 157 + $y);
+            $pdf->Cell(10,1, $rows->equipmentparts_name , 0 , 1 , 'L');
+
+            $pdf->SetXY(80, 157 + $y);
+            $pdf->Cell(10,1, $rows->equipmenttype_value , 0 , 1 , 'L');
+
+            $pdf->SetXY(190, 157 + $y);
+            $pdf->Cell(10,1, number_format($rows->equipmentparts_amount , 0) , 0 , 1 , 'R');
+            $y+=5;
+            $totalCost = $totalCost + $rows->equipmentparts_amount;
+
+
+            if($y >= 120){
+                $pdf->AddPage();
+                $y = -145;
+            }
+        }
+
+        $pdf->Line(10,155 +$y,200,155 +$y);
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetXY(150, 160 +$y);
+        $pdf->Cell(10,1,'TOTAL :' , 0 , 1 , 'L');
+        $pdf->SetXY(170, 160 +$y);
+        $pdf->Cell(30,1, number_format($totalCost , 0) , 0 , 1 , 'R');
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetXY(10, 160 +$y);
+        $pdf->Cell(10,1,'(   ) For Outside Repair' , 0 , 1 , 'L');
+
+        if($reqWarranty == 1){
+            $pdf->Image(public_path('images\check2.png'), 11, 158+$y, 0,5);
+        }
+
+        $pdf->SetXY(75, 160 +$y);
+        $pdf->Cell(165,1,'(   ) For Condemn' , 0 , 1 , 'L');
+
+        if($reqCondemn == 1){
+            $pdf->Image(public_path('images\check2.png'), 76, 158 +$y, 0,5);
+        }
+
+        $pdf->SetXY(10, 170+$y);
+        $pdf->Cell(165,1,'Reason :' , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(25, 172+$y);
+        $pdf->MultiCell(175,5, $reqRecommendation , 0 , 'L' , 0,);
+
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(10, 250);
+        $pdf->Cell(20,1,'Serviced by:' , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(10, 265);
+        $pdf->Cell(70,0, $signatory1 , 0 , 1 , 'C');
+        $pdf->Line(15,267,75,267);
+
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetXY(10, 270);
+        $pdf->Cell(70,1,'Signature over Printed Name' , 0 , 1 , 'C');
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->SetXY(10, 273);
+        $pdf->Cell(70,1,'Staff, Engineering and Facilities Management' , 0 , 1 , 'C');
+
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(80, 250);
+        $pdf->Cell(20,1,'Verified by:' , 0 , 1 , 'L');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(80, 265);
+        $pdf->Cell(70,0, $signatory2 , 0 , 1 , 'C');
+        $pdf->Line(87,267,142,267);
+
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetXY(80, 270);
+        $pdf->Cell(70,1,'Signature over Printed Name' , 0 , 1 , 'C');
+
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->SetXY(80, 273);
+        $pdf->Cell(70,1,'Head, Engineering and Facilities Management' , 0 , 1 , 'C');
+
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(150, 250);
+        $pdf->Cell(20,1,'Accepted by:' , 0 , 1 , 'L');
+
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(142, 265);
+        $pdf->Cell(70,0, $signatory3 , 0 , 1 , 'C');
+        $pdf->Line(155,267,200,267);
+
+
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetXY(142, 270);
+        $pdf->Cell(70,1,'Signature over Printed Name' , 0 , 1 , 'C');
+
+
+        $pdf->SetFont('Arial', '', 6);
+        $pdf->SetXY(142, 273);
+        $pdf->Cell(70,1,'End-User' , 0 , 1 , 'C');
+
+        return response($pdf->Output('S'))
+        ->header('Content-Type', 'application/pdf');
+    }
 }

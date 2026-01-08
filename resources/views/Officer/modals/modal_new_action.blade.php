@@ -32,9 +32,11 @@
 
 <script>
     $(document).ready(function(){
-        $('.officerAddActionBtn').click(function(){
+        //$('.officerAddActionBtn').click(function(){
+        $(document).on('click' , '.officerAddActionBtn' , function(){
 
             let getRefID = this.id;
+            //console.log(getRefID);
 
             $('#officerAddActionId').val(getRefID);
             $('#addActionRefId').html(getRefID);

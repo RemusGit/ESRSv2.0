@@ -16,7 +16,7 @@
         <a href="/officer_dashboard" class="nav-link d-flex align-items-center text-white lead">
           <!--i class="bi bi-info-circle"></i> <span class="ms-2">About</span-->
           <i class="bi bi-journal-richtext"
-          data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Dashboard"></i> <span class="hideOnSmallDevice ps-1"> All Request</span>
+          data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="All Request"></i> <span class="hideOnSmallDevice ps-1"> All Request</span>
         </a>
     </li>
 

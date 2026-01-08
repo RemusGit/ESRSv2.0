@@ -32,99 +32,98 @@
 
 
 <script>
-    $(document).ready(function(){
 
-        //--------------------------------------------------- ONCLICK DISTRIBUTE REQUEST ---------------------------
-        //$('.distributeRequestGetRefID').click(function(){
-        $(document).on('click' , '.distributeRequestGetRefID' , function(){
+//--------------------------------------------------- ONCLICK DISTRIBUTE REQUEST ---------------------------
+//$('.distributeRequestGetRefID').click(function(){
+$(document).on('click' , '.distributeRequestGetRefID' , function(){
 
-            let array = this.id.split(",,");
-            let getRefID = array[0];
-            let getCategoryVal = array[1];
-            let getAgentID = {{session('agentunit_id')}};
-            //console.log(getAgentID);
+    let array = this.id.split(",,");
+    let getRefID = array[0];
+    let getCategoryVal = array[1];
+    console.log(getCategoryVal);
+    let getAgentID = {{session('agentunit_id')}};
+    //console.log(getAgentID);
 
-            $('#distributeRequestRefID').html(getRefID);
-            $('#distributeRequestStaffTable').empty();
+    $('#distributeRequestRefID').html(getRefID);
+    $('#distributeRequestStaffTable').empty();
 
-            $.ajax({
-                url: "{{ route('ajaxDistributeRequest') }}",
-                type: "POST",
-                data: {
-                    refID: getRefID,
-                    agentID: getAgentID,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(res) {
+    $.ajax({
+        url: "{{ route('ajaxDistributeRequest') }}",
+        type: "POST",
+        data: {
+            refID: getRefID,
+            agentID: getAgentID,
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(res) {
 
-                    $.each(JSON.parse(res) , function(i , item){
+            $.each(JSON.parse(res) , function(i , item){
 
-                        let csrf = '{{ csrf_token() }}';
+                let csrf = '{{ csrf_token() }}';
 
-                        let row =
-                            `<tr>
-                                <td style="font-size: 12px;" class="text-success">${i+1}.</td>
-                                <td>${item.empNo}</td>
-                                <td>${item.empFname} ${item.empLname}</td>
-                                <td>${item.userType}</td>
-                                <td>
-                                    <form action="{{ route('assignStaff') }}" method="POST" id="formAssignTask_${item.empNo}">
-                                        <input type="hidden" name="_token" value="${csrf}">
-                                        <input type="hidden" name="getTakenByName" value="${item.empFname} ${item.empLname}">
-                                        <input type="hidden" name="getCategoryVal" value="${getCategoryVal}">
-                                        <input type="hidden" name="getStaffID" value="${item.empNo}">
-                                        <input type="hidden" name="getRefID" value="${getRefID}">
-                                        <button class="btn btn-secondary btn-sm w-100 assigningStaff"
-                                        style="font-size:12px;" id="${item.empNo},,${item.empFname} ${item.empLname},,${getRefID}">Assign Task</button>
-                                    </form>
-                                </td>
-                                
-                            </tr>`;
+                let row =
+                    `<tr>
+                        <td style="font-size: 12px;" class="text-success">${i+1}.</td>
+                        <td>${item.empNo}</td>
+                        <td>${item.empFname} ${item.empLname}</td>
+                        <td>${item.userType}</td>
+                        <td>
+                            <form action="{{ route('assignStaff') }}" method="POST" id="formAssignTask_${item.empNo}">
+                                <input type="hidden" name="_token" value="${csrf}">
+                                <input type="hidden" name="getTakenByName" value="${item.empFname} ${item.empLname}">
+                                <input type="hidden" name="getCategoryVal" value="${getCategoryVal}">
+                                <input type="hidden" name="getStaffID" value="${item.empNo}">
+                                <input type="hidden" name="getRefID" value="${getRefID}">
+                                <button class="btn btn-secondary btn-sm w-100 assigningStaff"
+                                style="font-size:12px;" id="${item.empNo},,${item.empFname} ${item.empLname},,${getRefID}">Assign Task</button>
+                            </form>
+                        </td>
+                        
+                    </tr>`;
 
-                            $('#distributeRequestStaffTable').append(row);
-                    });
-                }, 
-                error: function(xhr) {
-                    console.error(xhr.responseText);
-                }
-            });//EOF AJAX
-
-        });// EOF DISTRIBUTE REQUEST ON CLICK
-
-
-        //--------------------------------------------------- ONCLICK ASSIGN STAFF ---------------------------
-        $('#distributeRequestStaffTable').on('click', '.assigningStaff', function(e) {
-
-            e.preventDefault();
-            array = this.id.split(",,");
-            
-            let getStaffID = array[0];
-            let getStaffName = array[1];
-            let getRefID = array[2];
-
-            $.confirm({
-                icon: '',
-                title: 'Confirm Assigning Staff',
-                content: 'Assign this request to ' + `<span class="text-success fw-bold">` + getStaffName + `</span>` + '?',
-                type: 'dark',
-                draggable: true,
-                buttons: {
-                    YES: {
-                        text: 'YES',
-                        btnClass: 'btn-success',
-                        keys: ['enter', 'shift'],
-                        action: function(){
-                            
-                            //location.href = '/assign_staff/'+getStaffID+'/'+getRefID;
-                            $('#formAssignTask_'+getStaffID).submit();
-                        }
-                    },
-                    NO: function () {
-                    }
-                }
+                    $('#distributeRequestStaffTable').append(row);
             });
+        }, 
+        error: function(xhr) {
+            console.error(xhr.responseText);
+        }
+    });//EOF AJAX
 
-        });//EOF ASSIGNING STAFF BTN CLICK
+});// EOF DISTRIBUTE REQUEST ON CLICK
 
-    });//EOF DOC READY
+
+//--------------------------------------------------- ONCLICK ASSIGN STAFF ---------------------------
+//$('#distributeRequestStaffTable').on('click', '.assigningStaff', function(e) {
+$(document).on('click' , '.assigningStaff' , function(e){
+    e.preventDefault();
+    array = this.id.split(",,");
+    
+    let getStaffID = array[0];
+    let getStaffName = array[1];
+    let getRefID = array[2];
+
+    $.confirm({
+        icon: '',
+        title: 'Confirm Assigning Staff',
+        content: 'Assign this request to ' + `<span class="text-success fw-bold">` + getStaffName + `</span>` + '?',
+        type: 'dark',
+        draggable: true,
+        buttons: {
+            YES: {
+                text: 'YES',
+                btnClass: 'btn-success',
+                keys: ['enter', 'shift'],
+                action: function(){
+                    
+                    //location.href = '/assign_staff/'+getStaffID+'/'+getRefID;
+                    $('#formAssignTask_'+getStaffID).submit();
+                }
+            },
+            NO: function () {
+            }
+        }
+    });
+
+});//EOF ASSIGNING STAFF BTN CLICK
+
 </script>

@@ -1,7 +1,10 @@
 
 @if(isset(Auth::user()->account_empid))
     @include('partials.notif_container')
+    @include('partials.modal_profile_pic')
+    @include('partials.modal_chat')
 @endif
+
 
 
 </body>
@@ -17,17 +20,19 @@
 
 @include('partials.logout_confirm')
 
+
 <script>
 
     $(document).ready(function(){
 
-        $('.actionBtnForAutoHeight').click(function(){
+        //$('.actionBtnForAutoHeight').click(function(){
+        $(document).on("click" , ".actionBtnForAutoHeight" , function(){
 
             var rowCount = $('.autoHeightTable tr').length - 1;
             //alert(rowCount - 1);
 
-            if(rowCount <= 2){
-
+            if(rowCount <= 3){
+                console.log(rowCount);
                // $('.dropdownMenu').removeClass('dropDownPosAbosulte');
                // $('.dropdownMenu').addClass('dropdownPosFixed');
                 $('.autoHeightTable').css('min-height' , '250px');
@@ -56,6 +61,12 @@
             }
         });
 
+    });
+
+    window.addEventListener("load", () => {
+        //document.getElementById("pageWrapper").classList.add("loaded");
+        //$('#pageWrapper').addClass("loaded");
+        $('.content').addClass("loaded");
     });
 
 </script>

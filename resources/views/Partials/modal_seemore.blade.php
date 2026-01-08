@@ -33,6 +33,7 @@
         $(document).on('click' , '.seeMoreClass' , function(){
 
             //let removeComma = this.id.replace(',',' ');
+
             let arrayStr = this.id.split(",,");
 
             let seemoreTitle = arrayStr[0];

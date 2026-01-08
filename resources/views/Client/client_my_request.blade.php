@@ -3,7 +3,7 @@
 @include('partials.sidebar_client')
 
 <main class="content  vh-100">
-<div class="container-fluid">
+<div class="container-fluid pe-4">
 
 
 @include('partials.client_top_display')
@@ -42,12 +42,15 @@
 
 @include('client.client_list_my_request')
 
-@include('partials.modal_seemore')
-
 </div> <!--EOF CONTAINER FLUID-->
 </main>
 
+@include('client.modals.modal_view_attachment')
+
+@include('partials.modal_seemore')
+
 @include('client.modals.modal_action_taken')
+
 @include('client.modals.modal_show_update')
 
 @include('partials.footer')

@@ -7,14 +7,14 @@
       </div>
       <div class="modal-body">
 
-        <form action="{{ route('officerAddLocation') }}" method="POST">
+        <form action="{{ route('officerAddLocation') }}" method="POST" id="formAddLocation">
         @csrf
         
         <div class="row">
             <div class="col-md-12">
                 <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text" class="form-control form-control-lg" placeholder="Location Name" name="locationName" required />
+                            <input type="text" class="form-control form-control-lg" placeholder="Location Name" name="locationName" id="locationName" required />
                             <label class="form-label"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Location Name</label>
                         </div>
                 </div>
@@ -25,7 +25,7 @@
             <div class="col-md-12">
                 <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text" class="form-control form-control-lg text-uppercase" placeholder="Location Abbreviation" name="locAbbr" required />
+                            <input type="text" class="form-control form-control-lg text-uppercase" placeholder="Location Abbreviation" name="locAbbr" id="locAbbr" required />
                             <label class="form-label"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Location Abbreviation</label>
                         </div>
                 </div>
@@ -43,6 +43,8 @@
             </div>
         </div>
 
+        <p class="text-danger text-center" style="font-size: 11px; display: none;" id="locAlreadyExist">Location Name Already Exist</p>
+        <p class="text-danger text-center" style="font-size: 11px; display: none;" id="abbrAlreadyExist">Abbreviation Already Exist</p>
       </div>
 
       <div class="modal-footer">
@@ -53,3 +55,47 @@
     </div>
   </div>
 </div>
+
+
+<script>
+  let arrayLocVal = @json($arrayLocVal);
+  let arrayLocAbbr = @json($arrayLocAbbr);
+
+
+  $('#locationName').on('change , keyup' , function(){
+      $('#locAlreadyExist').slideUp();
+      $('#abbrAlreadyExist').slideUp();
+  });
+
+  $('#locAbbr').on('change , keyup' , function(){
+    $('#locAlreadyExist').slideUp();
+    $('#abbrAlreadyExist').slideUp();
+  });
+
+  $('#formAddLocation').on('submit' , function(e){
+
+    e.preventDefault();
+
+    let getLocVal = $('#locationName').val();
+    for(let i = 0; i < arrayLocVal.length; i++){
+        
+        if(arrayLocVal[i] == getLocVal){
+          $('#locAlreadyExist').slideDown();
+          return false;
+        }
+    }
+
+    let getAbbrVal = $('#locAbbr').val();
+    for(let i = 0; i < arrayLocAbbr.length; i++){
+        
+        if(arrayLocAbbr[i] == getAbbrVal){
+          $('#abbrAlreadyExist').slideDown();
+          return false;
+        }
+    }
+
+    $('#formAddLocation')[0].submit();
+
+  });
+
+</script>

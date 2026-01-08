@@ -1,4 +1,5 @@
    <?php use Illuminate\Support\Str ?>
+   <?php use Carbon\Carbon; ?>
    
    <div class="table table-responsive mt-2">
         <table class="table table-hover table-sm table-striped shadow autoHeightTable">
@@ -32,35 +33,66 @@
                 }
             ?>
 
-
             @foreach($data as $datas)
+                <?php 
+                    $txtColor = "#000";
+                    $yellowMin = 0;
+
+                    if($datas->until != ''){
+
+                        $nowVsUntil = now()->diffInHours(Carbon::parse($datas->until));
+
+                        list($hour, $minute, $second) = explode(':', $datas->repairTime);
+                        $duration = (int)$hour;
+                        if($duration >= 24){
+                            $duration = $duration / 24;
+                            $nowVsUntil = $nowVsUntil / 24;
+                        }
+                        // GET 50% of DURATION
+                        $yellowMin = $duration * 0.5;
+                        if($yellowMin >= 24){
+                            $yellowMin = $yellowMin / 24;
+                            $nowVsUntil = $nowVsUntil / 24;
+                        }
+                        
+                        if( $nowVsUntil <= 0 ){
+                            $txtColor = "#ad1605ff";
+                        }
+                        elseif( $yellowMin >= $nowVsUntil){
+                            $txtColor = "#4103b4ff";
+                        }
+                        else{
+                            $txtColor = "#000";
+                        }
+                    }
+                ?>
                 <tr style="font-size: 12px;">
                     <td class="fw-bold text-success" style="font-size: 11px;">{{ $counter }}.</td>
                     <?php $counter++; ?>
-                    <td>{{ $datas->refNo }}</td>
-                    <td>{{ $datas->reqDate }}</td>
-                    <td>             
+                    <td style="color: {{$txtColor}};">{{ $datas->refNo }}</td>
+                    <td style="color: {{$txtColor}};">{{ $datas->reqDate }}</td>
+                    <td style="color: {{$txtColor}};">             
                         @if($datas->until != '')
                             {{ $datas->until }}
                         @else
                             Indefinite
                         @endif</td>
-                    <td style="max-width: 120px;">{{ $datas->categoryVal }}</td>
-                    <td>{{ $datas->requestBy }}</td>
-                    <td style="max-width: 150px;">{{ $datas->sectionName }}</td>
-                    <td>{{ $datas->locationVal }}</td>
-                    <td>{{ $datas->bldgFloorVal }}</td>
+                    <td style="max-width: 120px; color: {{$txtColor}};">{{ $datas->categoryVal }}</td>
+                    <td style="color: {{$txtColor}};">{{ $datas->requestBy }}</td>
+                    <td style="max-width: 150px; color: {{$txtColor}};">{{ $datas->sectionName }}</td>
+                    <td style="color: {{$txtColor}};">{{ $datas->locationVal }}</td>
+                    <td style="color: {{$txtColor}};">{{ $datas->bldgFloorVal }}</td>
 
-                    <td style="max-width: 110px;">
+                    <td style="max-width: 110px; color: {{$txtColor}};">
                         {{ Str::limit($datas->reqDesc , 18 , '...') }}
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
                         @if ($countDescription >= 18)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ $datas->reqDesc }},,{{ $datas->refNo }}'>See more</span>
+                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
                     </td>
 
-                    <td>
+                    <td style="color: {{$txtColor}};">
                         <?php $equipmentDetails = ''  ?>
                         @if($datas->eq1 == '' || $datas->eq2 == '' || $datas->eq3 == '' || $datas->eq4 == '')
                             Not included
@@ -108,16 +140,21 @@
                                     </a>
                                 </li>
 
+                                <li><a class="dropdown-item updateCategoryClassBtn" href="#" 
+                                id="{{ $datas->refNo }},,{{ $datas->categoryVal }},,{{ $datas->reqDesc }},,{{ $datas->categoryId }},,{{ $datas->reqDate }}"
+                                data-bs-toggle="modal" data-bs-target="#modalUpdateCategory"
+                                ><i class="bi bi-arrow-up-right-square-fill"></i> Update Category </a></li>
+
                                     <!-- VIEW ATTACHMENTS -->
                                     @if(
-                                    $datas->categoryVal == 'Biometrics Enrollment' 
-                                    || $datas->categoryVal == 'HOMIS Encoding Error'
-                                    || $datas->categoryVal == 'Network Installation / Internet Connection / Cable Transfer'
-                                    || $datas->categoryVal == 'Zoom Link'
-                                    || $datas->categoryVal == 'Website Uploads'
-                                    || $datas->categoryVal == 'System Enhancement / Modification / Homis / Other Installation'
-                                    || $datas->categoryVal == 'VMC ID Card Preparation'
-                                    || $datas->categoryVal == 'Travel Conduction'
+                                        $datas->categoryId == 12
+                                        || $datas->categoryId == 4
+                                        || $datas->categoryId == 6
+                                        || $datas->categoryId == 30
+                                        || $datas->categoryId == 7
+                                        || $datas->categoryId == 3
+                                        || $datas->categoryId == 13
+                                        || $datas->categoryId == 42
                                     )
                                         <li><a href="#" class="dropdown-item viewAttachment" id="{{ $datas->refNo }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refNo) }}"
                                         data-bs-toggle="modal" data-bs-target="#viewAttachmentModal"><i class="bi bi-paperclip"></i> View Attachment </a></li>
@@ -142,10 +179,3 @@
 
 </div> <!--EOF TABLE RESPONSIVE -->
 
-@include('officer.modals.modal_distribute_request')
-
-@include('officer.modals.modal_cancel_request')
-
-@include('partials.officer_take_request')
-
-@include('client.modals.modal_view_attachment')

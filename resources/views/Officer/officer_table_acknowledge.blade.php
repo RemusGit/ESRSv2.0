@@ -56,7 +56,7 @@
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
                         @if ($countDescription >= 20)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ $datas->reqDesc }},,{{ $datas->refNo }}'>See more</span>
+                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
                     </td>
 
@@ -78,16 +78,11 @@
                     </td>
 
 
-                    <?php $actionTaken = $datas->actionTaken  ?>
-                    <td style="max-width: 110px;">{{ Str::limit($actionTaken , 20 , '...') }}
-                        <?php  $countActionTaken = mb_strlen( $actionTaken ); ?>
-                        @if ($countActionTaken >= 20)
-                            <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Action Taken,,{{ $actionTaken }},,{{ $datas->refNo }}'>See more</span>
-                        @endif
-                        @if($countActionTaken == '' || $countActionTaken == null)
-                        N/A
-                        @endif
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill mt-2 pt-1 officerActionTaken" style="font-size: 8px;"
+                        id='{{ $datas->refNo }}' data-bs-toggle="modal" data-bs-target="#officerActionTakenModal">
+                            View Action
+                        </button>
                     </td>
 
 
@@ -106,6 +101,12 @@
                                 id="{{ $datas->refNo }},,{{ $datas->categoryVal }}" data-bs-toggle="modal" data-bs-target="#tagAgentModal">
                                 <i class="bi bi-person-fill-add"></i> Tag Agents </a></li>
 
+                                <!-- SERVICE REPORT FORM - EFMS ONLY -->
+                                @if(Auth::user()->agentunit_id == 1)
+                                    <li><a class="dropdown-item" href="/service_report_form_pdf/{{ $datas->refNo }}" target="blank">
+                                    <i class="bi bi-folder-symlink-fill"></i> Service Report Form </a></li>
+                                @endif
+
                                 <form action="/undo_request" method="POST" id="undoRequestForm_{{ preg_replace('/[^0-9]/', '', $datas->refNo) }}-{{ $datas->categoryId }}">
                                     @csrf
                                     <input type="hidden" name="categoryVal" value="{{ $datas->categoryVal }}">
@@ -114,16 +115,24 @@
                                     <input type="hidden" name="agentStaffID" value="{{ session('account_empid') }}">
                                     <li><a class="dropdown-item undoRequest" href="#" id="{{ $datas->refNo }}?{{ $datas->categoryId }}"><i class="bi bi-arrow-counterclockwise"></i> Undo </a></li>
                                 </form>
+
+                                <!-- EDITABLE DATE ACCOMPLISHED - EXCLUSIVE ONLY FOR SIR BILLY ACCOUNT ID = 1990-0022 -->
+                                @if(Auth::user()->account_empid == '1990-0022') 
+                                    <li><a class="dropdown-item editAccomplishedBtn" href="#"
+                                    id="{{ $datas->refNo }},,{{ $datas->accomplishedDate }}" data-bs-toggle="modal" data-bs-target="#modalEditAccomplished">
+                                    <i class="bi bi-calendar-check"></i> Edit Date Accomplished </a></li>
+                                @endif
+
                                     <!-- VIEW ATTACHMENTS -->
                                     @if(
-                                    $datas->categoryVal == 'Biometrics Enrollment' 
-                                    || $datas->categoryVal == 'HOMIS Encoding Error'
-                                    || $datas->categoryVal == 'Network Installation / Internet Connection / Cable Transfer'
-                                    || $datas->categoryVal == 'Zoom Link'
-                                    || $datas->categoryVal == 'Website Uploads'
-                                    || $datas->categoryVal == 'System Enhancement / Modification / Homis / Other Installation'
-                                    || $datas->categoryVal == 'VMC ID Card Preparation'
-                                    || $datas->categoryVal == 'Travel Conduction'
+                                        $datas->categoryId == 12
+                                        || $datas->categoryId == 4
+                                        || $datas->categoryId == 6
+                                        || $datas->categoryId == 30
+                                        || $datas->categoryId == 7
+                                        || $datas->categoryId == 3
+                                        || $datas->categoryId == 13
+                                        || $datas->categoryId == 42
                                     )
                                         <li><a href="#" class="dropdown-item viewAttachment" id="{{ $datas->refNo }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refNo) }}"
                                         data-bs-toggle="modal" data-bs-target="#viewAttachmentModal"><i class="bi bi-paperclip"></i> View Attachment </a></li>
@@ -151,8 +160,3 @@
 
 @include('partials.officer_undo_request')
 
-@include('client.modals.modal_view_attachment')
-
-@include('officer.modals.modal_new_action')
-
-@include('officer.modals.modal_tag_agent')

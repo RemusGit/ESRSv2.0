@@ -23,10 +23,20 @@
 
  @include('officer.officer_table_open')
 
-@include('partials.modal_seemore')
-
 </div> <!--EOF CONTAINER FLUID-->
 </main>
+
+@include('officer.modals.modal_update_category')
+
+@include('officer.modals.modal_distribute_request')
+
+@include('officer.modals.modal_cancel_request')
+
+@include('partials.officer_take_request')
+
+@include('client.modals.modal_view_attachment')
+
+@include('partials.modal_seemore')
 
 @include('partials.footer')
 

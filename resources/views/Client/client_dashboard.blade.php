@@ -12,8 +12,8 @@
 <!--Current PAGE-->
 <div class="row">
     <div class="col-lg-12 ">
-        <div class="lead fw-bold"><i class="bi bi-house-fill"></i> Dashboard / 
-        <span class="text-success" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Select service below"><i class="bi bi-envelope-plus"></i> Service Request </span></div>
+        <div class="lead fw-bold">Create
+        <span class="text-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Select service below">Service Request <i class="bi bi-clipboard-plus-fill"></i></span></div>
     </div>
 </div>
 <!--Current PAGE-->
@@ -21,17 +21,17 @@
     <!-- IMISS REQUESTS/DROPDOWN -->
     @include('client.imiss_request')
 
-    <!-- IMISS REQUESTS MODALS -->
-    @include('client.modals.create_service_request_modal')
-
-    @include('client.modals.all_request_modal')
-
     <!-- EFMS REQUESTS/DROPDOWN -->
     @include('client.efms_request')
 
     @include('client.js.all_request_js')
 
+
 </div> <!--EOF CONTAINER FLUID-->
 </main>
+
+@include('client.modals.create_service_request_modal')
+
+@include('client.modals.all_request_modal')
 
 @include('partials.footer')

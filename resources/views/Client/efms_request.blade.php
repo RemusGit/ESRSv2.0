@@ -1,90 +1,121 @@
-<!--EFMS SERVICE REQUEST-->
+    <!--EFMS SERVICE REQUEST-->
+    <div class="accordion-item my-4 shadow">
 
-  <div class="accordion-item my-4 shadow">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#efms" aria-expanded="false" aria-controls="collapseOne">
-        <p class=""><span class="fw-bold">EFMS</span> - Engineering & Facilities Management Section</p>
-      </button>
-    </h2>
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#efms" aria-expanded="false" aria-controls="collapseOne">
+            <p class=""><span class="fw-bold">EFMS</span> - Engineering & Facilities Management Section <i class="bi bi-caret-down-fill"></i></p>
+            </button>
+        </h2>
 
-<div id="efms" class="accordion-collapse collapse" data-bs-parent="#accMain">
-<div class="accordion-body">
-        
- <div class="row mt-5 text-center mainIcon">
+        <div id="efms" class="accordion-collapse collapse" data-bs-parent="#accMain">
 
-        <div class="col-md-4 col-sm-6">
-            <a href="#" class="text-dark all_request_class" id="repairMedEquipment"
-            data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-prescription2"></i>
-            <p>Repair of Medical Equipment</p></a>
-        </div>
+            <div class="accordion-body">
+                    
+                <div class="accordion accordion-flush" id="efmsMainCategory"> <!--ACCORDION PARENT EFMS --->
+                <?php $currentMainCategory = ""; ?>
 
-        <div class="col-md-4 col-sm-6">
-            <a href="#" class="text-dark all_request_class" id="repairOfficeEquipment"
-            data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-pen-fill"></i>
-            <p>Repair of Office Equipment</p></a>
-        </div>
+                <?php $rowCounter = 1; ?>
+                @foreach($efmsData as $d)
+                    
+                        @if($currentMainCategory != $d->main_category)
 
-        <div class="col-md-4 col-sm-6">
-            <a href="#" class="text-dark all_request_class" id="repairArcWorks"
-            data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-buildings"></i>
-            <p>Repair of Architectural Works</p></a>
-        </div>
+                            <?php $rowCounter = 1; ?>
+                            @if($currentMainCategory != '')
+                                </div><!-- EOF ACCORDION ITEM --->   
+                            @endif
 
-    </div>
+                            <?php $currentMainCategory = $d->main_category; ?>
 
-    <div class="row mt-5 text-center mainIcon">
+                            <div class="accordion-item" style="font-size: 10px;">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed fw-bold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne_{{ str_replace(' ' , '' , $d->main_category) }}" aria-expanded="false" aria-controls="flush-collapseOne">
+                                        • {{ $d->main_category }} <i class="bi bi-caret-down-fill"></i>
+                                    </button>
+                                </h2>
 
-        <div class="col-md-4 col-sm-6">
-            <a href="#" class="text-dark all_request_class" id="repairCivilWorks"
-            data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-motherboard"></i>
-            <p>Repair of Civil Works</p></a>
-        </div>
+                                @if($rowCounter==1)
+                                    <div class="row text-center mainIcon">
+                                @endif
 
-        <div class="col-md-4 col-sm-6">
-            <a href="#" class="text-dark all_request_class" id="repairElectricWorks"
-            data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-ev-station"></i>
-            <p>Repair of Electrical Works</p></a>
-        </div>
+                                @if( $rowCounter==5 )
+                                    <?php $rowCounter = 1; ?>
+                                    </div><!--EOF ROW-->
 
+                                    <div class="row text-center mainIcon">
+                                        <div class="col-md-3 col-sm-6">
+                                            <div id="flush-collapseOne_{{ str_replace(' ' , '' , $d->main_category) }}" class="accordion-collapse collapse" data-bs-parent="#efmsMainCategory">
+                                                <div class="accordion-body">
+                                                    <a href="#" class="text-dark all_request_class" id="EFMS,,{{ $d->main_category }},,{{ $d->category_value }},,{{ $d->repairtype_time }},,{{ $d->category_id }}"
+                                                    data-bs-toggle="modal" data-bs-target="#createServiceRequestModal">
+                                                        <i class="{{ $d->category_icon }}"></i>
+                                                        <p>{{ $d->category_value }}</p>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                @else
+                                    <div class="col-md-3 col-sm-6">
+                                        <div id="flush-collapseOne_{{ str_replace(' ' , '' , $d->main_category) }}" class="accordion-collapse collapse" data-bs-parent="#efmsMainCategory">
+                                            <div class="accordion-body">
+                                                <a href="#" class="text-dark all_request_class" id="EFMS,,{{ $d->main_category }},,{{ $d->category_value }},,{{ $d->repairtype_time }},,{{ $d->category_id }}"
+                                                data-bs-toggle="modal" data-bs-target="#createServiceRequestModal">
+                                                    <i class="{{ $d->category_icon }}"></i>
+                                                    <p>{{ $d->category_value }}</p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+ 
+                        @else
+                                @if($rowCounter==1)
+                                    <div class="row text-center mainIcon">
+                                @endif
 
-        <div class="col-md-4 col-sm-6">
-            <a href="#" class="text-dark all_request_class" id="repairPlumbingWorks"
-            data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-wrench"></i>
-            <p>Repair of Plumbing Works</p></a>
-        </div>
+                                @if( $rowCounter==5 )
+                                    <?php $rowCounter = 1; ?>
+                                    </div><!--EOF ROW-->
 
-    </div>
+                                        <div class="row text-center mainIcon">
+                                        <div class="col-md-3 col-sm-6">
+                                            <div id="flush-collapseOne_{{ str_replace(' ' , '' , $d->main_category) }}" class="accordion-collapse collapse" data-bs-parent="#efmsMainCategory">
+                                                <div class="accordion-body">
+                                                    <a href="#" class="text-dark all_request_class" id="EFMS,,{{ $d->main_category }},,{{ $d->category_value }},,{{ $d->repairtype_time }},,{{ $d->category_id }}"
+                                                    data-bs-toggle="modal" data-bs-target="#createServiceRequestModal">
+                                                        <i class="{{ $d->category_icon }}"></i>
+                                                        <p>{{ $d->category_value }}</p>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                @else
+                                    <div class="col-md-3 col-sm-6">
+                                        <div id="flush-collapseOne_{{ str_replace(' ' , '' , $d->main_category) }}" class="accordion-collapse collapse" data-bs-parent="#efmsMainCategory">
+                                            <div class="accordion-body">
+                                                <a href="#" class="text-dark all_request_class"
+                                                        id="EFMS,,{{ $d->main_category }},,{{ $d->category_value }},,{{ $d->repairtype_time }},,{{ $d->category_id }}"
+                                                        data-bs-toggle="modal" data-bs-target="#createServiceRequestModal">
+                                                        <i class="{{ $d->category_icon }}"></i>
+                                                    <p>{{ $d->category_value }}</p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                        @endif
 
-    <div class="row mt-5 text-center mainIcon">
-
-            <div class="col-md-4 col-sm-6">
-                <a href="#" class="text-dark all_request_class" id="techAssist2"
-                data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-people-fill"></i>
-                <p>Technical Assistance</p></a>
+                <?php $rowCounter++; ?>
+                @endforeach
+                        </div><!--EOF ROW-->
+                    </div><!-- EOF ACCORDION ITEM --->  
+                </div><!-- EOF ACCORDION PARENT EFMS --->
+ 
             </div>
+        </div>
+    </div> <!--EOF EFMS SERVICE REQUEST-->
+</div>
+<!--EOF ACCORDION PARENT FOR IMISS AND EFMS-->
 
-            <div class="col-md-4 col-sm-6">
-                <a href="#" class="text-dark all_request_class" id="travelConduct"
-                data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-airplane"></i>
-                <p>Travel Conduction</p></a>
-            </div>
 
-            <div class="col-md-4 col-sm-6">
-                <a href="#" class="text-dark all_request_class" id="othersEFMS"
-                data-bs-toggle="modal" data-bs-target="#createServiceRequestModal">
-                    <i class="bi bi-patch-question"></i>
-                    <p>Others</p>
-                </a>
-            </div>
-
-    </div>
-
-    </div>
 </div>
 </div>
-
-<!--EOF EFMS SERVICE REQUEST-->
-
-
-</div>
-<!--EOF ACCORDION PARENT-->

@@ -310,6 +310,7 @@
 
         </div><!--EOF FOR BIOMETRICS-->
 
+
         <div id="formVmcIdCard">
 
             <div class="row">
@@ -432,8 +433,6 @@
 
 
 <script>
-    $(document).ready(function(){
-
         //$('.viewAttachment').click(function(){
         $(document).on('click' , '.viewAttachment' , function(){
 
@@ -629,5 +628,4 @@
                         }
                     });//EOF AJAX
         });
-    });
 </script>

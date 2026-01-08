@@ -1,0 +1,34 @@
+UPDATES AS OF DEC 15 2025
+
+1. CUSTOM FILTER FOR BIO (SAME TO VMC ID CARD)
+2. NOTIF ALL (INCLUDING ACTION OFFICER) AFTER ANY STATUS UPDATES
+3. LOCATION FLOOR SETTING (ADD/EDIT/DELETE) - FULLY WORKING -> need to add 'deleted' column (SEE DB ADJSUTMENTS.TXT)
+4. DURATION SETTINGS '' - FULLY WORKING 
+	- need to add columns -> 'repairtype_id' , 'added_by_agentunit_id' ,  'deleted' (SEE DB ADJSUTMENTS.TXT)
+5. OPEN REQUEST NOTIF BUG (NOT SHOWING ACTION OFFICER + CATEGORY VAL)
+6. ACTION TAKEN - ALLOW DELETION WITH HISTORY - need to add table -> actiontaken_tab_2 (SEE DB ADJSUTMENTS.TXT)
+7. CONDENMED NOTIF TO ACTION OFFICER
+8. CUSTOMIZED AVATAR - need to add column 'profile_pic' in accounts_tab TABLE (SEE DB ADJSUTMENTS.TXT)
+9. ADDED ALL EFMS NEW CATEGORIES - 33 ITEMS - USING STANDARD REF ID - YEAR-'EFMS'-COUNTER 
+	- need to add table -> category_tab_2 SEE DB ADJSUTMENTS.TXT)
+10. REDIRECT TO /officer_open_request IF USER IS NOT CLIENT (BETTER INITIAL PAGE LOADING)
+11. UPDATED HOLIDAY.TXT - UP TO DEC 2026
+12. FPDF adjustments - address / auto resize image signature and picture
+13. ACTION TAKEN BUTTON IN -> ALL REQUEST UPDATED (OLD = SEE MORE...)
+14. REMOVED UNDO ACTION IN OFFICER COMPLETED TAB (AJAX RESULT OF NOTIF)
+15. UPDATED REVERB ENV FILE SETTING -> QUEUE_CONNECTION=redis (INSTANT BROADCAST)
+	- REQUIREMENTS
+		- install Redis-x64-5.0.14.1.exe (C:\Redis)
+		- download and copy php_redis.dll into C:\xampp\php\ext -> dl source https://repos.zend.com/zendphp/windows/archive/
+		- open php.ini add this -> extension=redis
+		- restart apache / php artisan optimize:clear
+		- php artisan queue:work redis --sleep=1 --tries=3 --timeout=30 --max-jobs=0 --max-time=0
+			sleep=0 -> instant broadcast / tries=1 prevent dups event / timeout=30 skip bad jobs / max-job=1000 prevent memory leak / max-time=3600 restart every 1hour
+		- done
+16. ADDED PM2 FOR MANAGING WORKERS
+	- REQUIREMENTS
+		- INSTALL NODE.JS
+		- INSTALL PM2 - npm install -g pm2
+		- SEARCH POWERSHELL RUN AS ADMIN - Set-ExecutionPolicy RemoteSigned -> PRESS Y
+		- run this command -> pm2 start php --name reverb-1 -- artisan queue:work redis --tries=1 --timeout=30
+		- or create a batch file (to run 4 or more workers max 8 for current cpu).. see -> C:\xampp\htdocs\ESRS\RUN_PM2_WORKERS.bat

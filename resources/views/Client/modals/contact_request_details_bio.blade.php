@@ -140,7 +140,6 @@
                   </div>
               </div>  
 
-
           </div>
           <!-- EOF ROW / REQUEST DETAILS 2-->
 

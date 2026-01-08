@@ -18,3 +18,4 @@ Broadcast::channel('user.{account_empid}', function ($user, $accountID) {
 
     return (string) $user->account_empid === (string) $accountID;
 });
+

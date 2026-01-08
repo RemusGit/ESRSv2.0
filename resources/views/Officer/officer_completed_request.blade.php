@@ -23,11 +23,18 @@
 
  @include('officer.officer_table_completed')
 
- @include('partials.modal_seemore')
-
-
 </div> <!--EOF CONTAINER FLUID-->
 </main>
+
+@include('officer.modals.modal_action_taken_officer')
+
+@include('client.modals.modal_view_attachment')
+
+@include('officer.modals.modal_new_action')
+
+@include('officer.modals.modal_tag_agent')
+
+ @include('partials.modal_seemore')
 
 @include('partials.footer')
 

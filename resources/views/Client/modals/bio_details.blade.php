@@ -65,7 +65,7 @@
                             <input type="text" id="bioCurrentIDNo" class="form-control form-control-lg" placeholder="Current ID Number" name="bioCurrentIDNo" required />
                             <label class="form-label" for="bioCurrentIDNo"><i class="bi bi-asterisk text-danger" style="font-size: 9px;"></i> Current ID No.</label>
                         </div>
-                  </div>
+                    </div>
               </div>  
 
 

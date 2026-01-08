@@ -1,8 +1,8 @@
-
 .content{
   background-image: linear-gradient(to top, #ffffffff 75%,  rgb(235, 255, 239));
   background-size: cover; 
   background-repeat: no-repeat;
+  margin-right: -20px;
 }
 
 /*
@@ -10,7 +10,14 @@
     display: none;
     transition: display 1s ease;
   }
-    */
+*/
+
+
+.nameHover:hover{
+         background-color: #b0b1b0;
+         color: #141414 !important;
+         border-radius: 50px;
+}
 
 nav.sidebar a:hover{
     /*background-color: #a6a7a6;*/
@@ -19,12 +26,12 @@ nav.sidebar a:hover{
         /*transition: background-color 1s ease;*/
     }
 
-    /*
+  /*
   .card:hover{
       background-color: #d2f3c3;
       transition: background-color 0.2s ease;
   } 
-      */
+  */
 
 .table-hover tbody tr:hover {
   background-color: #c3f0c2; /* Light blue example */
@@ -91,6 +98,7 @@ nav.sidebar a:hover{
       z-index: 1030;
 
     }
+   
     /* Content area */
     .content {
       /*margin-top: 56px;  push below navbar */
@@ -189,18 +197,6 @@ nav.sidebar a:hover{
   z-index: 9999 !important;
 }
 
-/*
-.dropdownPosFixed{
-  position: fixed !important;
-}
-  */
-
-/*
-.table{
-  min-height: 200px; 
-}
-*/
-
 /* FORM FLOATING WITH SELECT2 */
 .form-floating > .select2-container {
   height: calc(3.5rem + 2px); /* same as .form-select */
@@ -214,4 +210,21 @@ nav.sidebar a:hover{
 .form-floating label {
   z-index: 5;
   pointer-events: none;
+}
+
+.content {
+    opacity: 0;                
+    transform: translateX(-20px); 
+    transition: 
+        opacity 0.8s ease-out, 
+        transform 0.8s ease-out; 
+
+    position: static;  
+    z-index: auto !important;
+    pointer-events: auto;
+}
+
+.content.loaded {
+    opacity: 1;
+    transform: translateX(0);
 }

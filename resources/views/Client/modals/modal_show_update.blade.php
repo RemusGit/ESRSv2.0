@@ -47,7 +47,7 @@
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(res) {
-                            console.log(res);
+                            //console.log(res);
                             if(JSON.parse(res).length == 0){
 
                                 $('#updatesTable').hide();

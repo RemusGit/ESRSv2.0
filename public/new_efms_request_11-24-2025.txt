@@ -1,0 +1,33 @@
+Plumbing Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-wrench-adjustable
+Sanitary Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-bandaid
+Electrical Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-ev-station
+Emergency / Hazard Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-exclamation-diamond
+Architectural Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-buildings
+Carpentry Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-hammer
+Masonry Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-bricks
+Electrical / Plumbing / Sanitary Installation,BUILDING GROUND MAINTENANCE,1,4,bi bi-columns-gap
+Steel / Welding Repair,BUILDING GROUND MAINTENANCE,1,4,bi bi-magic
+Signages,BUILDING GROUND MAINTENANCE,1,4,bi bi-signpost
+Office / Hospital Furniture,BUILDING GROUND MAINTENANCE,1,4,bi bi-lamp
+Office Equipment,BUILDING GROUND MAINTENANCE,1,4,bi bi-pen-fill
+Renovation,BUILDING GROUND MAINTENANCE,1,4,bi bi-recycle
+Cleaning,GENERAL SERVICE,1,4,bi bi-trash2-fill
+Linen Request,GENERAL SERVICE,1,4,bi bi-square-half
+Air Condition Repair,GENERAL SERVICE,1,4,bi bi-window-dock
+Refrigiration Repair,GENERAL SERVICE,1,4,bi bi-terminal-split
+Ventillation / Blower Repair,GENERAL SERVICE,1,4,bi bi-wind
+Chair & Tables,GENERAL SERVICE,1,4,bi bi-balloon-fill
+Pest Control,GENERAL SERVICE,1,4,bi bi-bug-fill
+Linen Repair,GENERAL SERVICE,1,4,bi bi-square-fill
+Linen Fabrication,GENERAL SERVICE,1,4,bi bi-filter-square-fill
+Labelling,GENERAL SERVICE,1,4,bi bi-bookmarks
+Visitor Request,GENERAL SERVICE,1,4,bi bi-person-standing
+Request Under Security Management,GENERAL SERVICE,1,4,bi bi-shield-lock-fill
+Air Condition Installation,GENERAL SERVICE,1,4,bi bi-window-stack
+Ventillation / Blower Installation,GENERAL SERVICE,1,4,bi bi-fan
+Medical Equipment (IN-HOUSE REPAIR),BIOMEDICAL,1,4,bi bi-prescription2
+Medical Equipment (IN-HOUSE REPAIR & SUPPLY),BIOMEDICAL,1,4,bi bi-prescription
+Supply & Repair Of Medical Equipment (BIG TICKET),BIOMEDICAL,1,4,bi bi-hospital
+Basic Life Support,TRANSPORT,1,4,bi bi-heart-pulse
+Advance Life Support,TRANSPORT,1,4,bi bi-heart-pulse-fill
+Employee Transport,TRANSPORT,1,4,bi bi-car-front

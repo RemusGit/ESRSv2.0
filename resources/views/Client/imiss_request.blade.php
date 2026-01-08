@@ -3,13 +3,13 @@
   <div class="accordion-item  my-4 shadow">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#imiss" aria-expanded="false" aria-controls="imiss">
-        <p class=""><span class="fw-bold">IMISS</span> - Information Management Integrated System Section</p>
+        <p class=""><span class="fw-bold">IMISS</span> - Integrated Management Information System Section <i class="bi bi-caret-down-fill"></i></p>
       </button>
     </h2>
     <div id="imiss" class="accordion-collapse collapse" data-bs-parent="#accMain">
-      <div class="accordion-body">
+    <div class="accordion-body">
         
-    <div class="row mt-5 text-center mainIcon">
+    <!--div class="row mt-5 text-center mainIcon">
         <div class="col-md-3 col-sm-6">
             <a href="#" class="text-dark all_request_class" id="bioEnroll"
             data-bs-toggle="modal" data-bs-target="#all_request_modal"><i class="bi bi-fingerprint"></i>
@@ -37,9 +37,9 @@
                 <p>Repair IT Equipment</p>
             </a>
         </div>
-    </div>
+    </div-->
 
-        <div class="row mt-5 text-center mainIcon">
+        <!--div class="row mt-5 text-center mainIcon">
             <div class="col-md-3 col-sm-6">
             <a href="#" class="text-dark all_request_class" id="systemEnhance"
             data-bs-toggle="modal" data-bs-target="#all_request_modal">
@@ -71,9 +71,9 @@
                     <p>User Account Management</p>
                 </a>
             </div>
-        </div>
+        </div-->
 
-        <div class="row mt-5 text-center mainIcon">
+        <!--div class="row mt-5 text-center mainIcon">
             <div class="col-md-3 col-sm-6">
                 <a href="#" class="text-dark all_request_class" id="vmcID"
                 data-bs-toggle="modal" data-bs-target="#all_request_modal">
@@ -105,7 +105,41 @@
                     <p>Others</p>
                 </a>
             </div>
-        </div>
+        </div-->
+
+        <?php $rowCounter = 1; ?>
+        @foreach($imissData as $d)
+
+            @if($rowCounter==1)
+                <div class="row text-center mainIcon mt-4">
+            @endif
+
+            @if( $rowCounter == 5 )
+                <?php $rowCounter = 1; ?>
+                </div><!--EOF ROW-->
+
+                <div class="row text-center mainIcon mt-4">
+                    <div class="col-md-3 col-sm-6">
+                        <a href="#" class="text-dark all_request_class" id="{{ $d->category_id }},,{{ $d->main_category }},,{{ $d->category_value }},,{{ $d->repairtype_time }}"
+                        data-bs-toggle="modal" data-bs-target="#all_request_modal">
+                            <i class="{{ $d->category_icon }}"></i>
+                            <p>{{ $d->category_value }}</p>
+                        </a>
+                    </div>
+
+            @else
+                <div class="col-md-3 col-sm-6">
+                    <a href="#" class="text-dark all_request_class" id="{{ $d->category_id }},,{{ $d->main_category }},,{{ $d->category_value }},,{{ $d->repairtype_time }}"
+                    data-bs-toggle="modal" data-bs-target="#all_request_modal">
+                        <i class="{{ $d->category_icon }}"></i>
+                        <p>{{ $d->category_value }}</p>
+                    </a>
+                </div>
+            @endif
+
+        <?php $rowCounter++; ?>
+        @endforeach
+        </div><!--EOF ROW-->
 
       </div>
     </div>

@@ -197,7 +197,6 @@ class RequestClientController extends Controller
             //dd(Crypt::decrypt($getRefID));
             $getRefID = Crypt::decrypt($getRefID);
     
-
             $data = DB::table('idrequest_attach_tab')
             ->join('position_tab' , 'position_tab.position_id' , '=' , 'idrequest_attach_tab.position_id')
             ->join('employstatus_tab' , 'employstatus_tab.employstatus_id' , '=' , 'idrequest_attach_tab.employstatus_id')
@@ -377,11 +376,15 @@ class RequestClientController extends Controller
 
             // COMPLETE ADDRESS
             $pdf->SetFont('Arial', 'B', 9);
-            $pdf->SetXY(10, 115);
+            $pdf->SetXY(10, 112);
             $pdf->Write(1,'Complete Address: ');
-            $pdf->Line(41,117,200,117);
-            $pdf->SetXY(40, 115);
-            $pdf->Write(1 , $empAddress);
+            $pdf->Line(41,114,200,114);
+            $pdf->Line(41,120,200,120);
+
+            $pdf->SetXY(40 , 109);
+            $pdf->MultiCell(160,6, $empAddress , 0, 'L' , 0,);
+            //$pdf->SetXY(40, 115);
+            //$pdf->Write(1 , $empAddress);
 
             
 
@@ -449,26 +452,40 @@ class RequestClientController extends Controller
             $pdf->Write(1,'Address:');
             $pdf->Line(25,157,130,157);
             $pdf->SetXY(24 , 151);
-            $pdf->MultiCell(125,8, $emergencyAddress , 0, 'L' , 0,);
+            $pdf->MultiCell(110,8, $emergencyAddress , 0, 'L' , 0,);
 
             $pdf->Line(25,165,200,165);
 
             // SIGNATURE BOX
             $pdf->SetXY(10, 175);
-            $pdf->Cell(110,50, ' ' , 1 , 1 , 'C');
+            $pdf->Cell(110,60, ' ' , 1 , 1 , 'C');
             $pdf->SetFont('Arial', 'B', 11);
-            $pdf->SetXY(10, 228);
+            $pdf->SetXY(10, 238);
             $pdf->Write(1,"Please sign inside the box (Note: do not exceed on the line)");
+
+
 
             //TEMP SOLUTION IF FILE NOT EXIST (LARAVEL'S STORAGE::EXIST DOES NOT WORK)
             try {
-                $pdf->Image(public_path('uploads/VMC_ID_Sig/'.$empSignature), 31, 185, 68,0);
+
+                //IMAGE AUTO RESIZE FOR SIGNATURE
+                list($width, $height) = getimagesize(public_path('uploads/VMC_ID_Sig/'.$empSignature));
+                // Compute scale ratio
+                $maxWidth = 68;
+                $maxHeight = 40;
+                $ratio = min($maxWidth / $width, $maxHeight / $height);
+                $newW = $width * $ratio;
+                $newH = $height * $ratio;
+
+                //$pdf->Image(public_path('uploads/VMC_ID_Sig/'.$empSignature), 31, 185, 68,0);
+                $pdf->Image(public_path('uploads/VMC_ID_Sig/'.$empSignature), 30, 190, $newW,$newH);
             } catch (\Throwable $th) {
-                $pdf->Image(public_path('uploads/VMC_ID_Sig/na-sig2.png'), 31, 185, 68,0);
+                //$pdf->Image(public_path('uploads/VMC_ID_Sig/na-sig2.png'), 31, 185, 68,0);
+                $pdf->Image(public_path('uploads/VMC_ID_Sig/na-sig2.png'), 30, 190, 68,40);
             }
               
             $pdf->SetFont('Arial', 'BI', 11);
-            $pdf->SetXY(50, 233);
+            $pdf->SetXY(50, 243);
             $pdf->Write(1,"(Black ink only)");
 
             // EMPLOYEE PICTURE
@@ -476,13 +493,24 @@ class RequestClientController extends Controller
             $pdf->Cell(70,80, ' ' , 1 , 1 , 'C');
             $pdf->SetFont('Arial', 'BI', 11);
             $pdf->SetXY(115, 260);
-            $pdf->MultiCell(100,5,"Passport size colored picture with \n white background" , 0, 'C' , 0,);     
-            
+            $pdf->MultiCell(100,5,"Passport size colored picture with \n white background" , 0, 'C' , 0,);    
+
+
             //TEMP SOLUTION IF FILE NOT EXIST (LARAVEL'S STORAGE::EXIST DOES NOT WORK)
             try {
-                $pdf->Image(public_path('uploads/VMC_ID_Picture/'.$empPic),131, 178, 68,0);  
+
+                //IMAGE AUTO RESIZE FOR PICTURE
+                list($width, $height) = getimagesize(public_path('uploads/VMC_ID_Picture/'.$empPic));
+                // Compute scale ratio
+                $maxWidth = 65;
+                $maxHeight = 78;
+                $ratio = min($maxWidth / $width, $maxHeight / $height);
+                $newW = $width * $ratio;
+                $newH = $height * $ratio;
+
+                $pdf->Image(public_path('uploads/VMC_ID_Picture/'.$empPic),131, 176 ,$newW,$newH);  
             } catch (\Throwable $th) {
-                $pdf->Image(public_path('uploads/VMC_ID_Picture/na-pic1.png'),131, 178, 68,0);  
+                $pdf->Image(public_path('uploads/VMC_ID_Picture/na-pic1.png'),130, 176,65,78);  
             }
 
             return response($pdf->Output('S'))
@@ -495,16 +523,19 @@ class RequestClientController extends Controller
         $getUserID = session('account_empid');
 
             $sql = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->join('agentunit_tab' , 'agentunit_tab.agentunit_id' , '=' , 'request_tab.agentunit_id')
             ->leftJoin('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->selectRaw("
+                        category_tab_2.main_category as mainCategory ,
+                        category_tab_2.category_icon as categoryIcon ,
                         request_tab.request_by as requestBy , 
                         request_tab.agentunit_id as agentUnitID , 
+                        request_tab.agentacc_id as agentAccID ,
                         request_tab.request_refid as refID , 
                         request_tab.category_id as categoryId , 
-                        category_tab.category_value categoryVal ,
+                        category_tab_2.category_value categoryVal ,
                         request_tab.request_descript reqDesc , 
                         request_tab.request_date as reqDate ,
                         request_tab.request_duration as reqDuration ,
@@ -518,6 +549,9 @@ class RequestClientController extends Controller
             ->where('request_tab.status_id' , $getStatusID)
             ->where('request_tab.request_refid' , 'LIKE' , '%'.  $getRefNo . '%')
             ->groupBy('refID' , 
+            'agentAccID' ,
+            'mainCategory' ,
+            'categoryIcon' ,
             'requestBy' ,
             'agentUnitID' ,
             'categoryId' ,
@@ -640,8 +674,11 @@ class RequestClientController extends Controller
     public function ajaxShowAction(Request $req){
 
         $refID = $req->input('refID');
+        $viewDeleted = $req->input('viewDeleted');
+
         $data = DB::table('actiontaken_tab')
         ->where('request_refid' , $refID)
+        ->where('deleted' , $viewDeleted)
         ->orderBy('action_datetime' , 'DESC')
         ->get();
 
@@ -909,6 +946,7 @@ class RequestClientController extends Controller
 
         $accountID = session("account_empid");
         $sectionID = session('section_id');
+        $agentUnitID = session('agentunit_id');
 
         $refID = $req->getRefID;
         $newCategoryID = $req->newCategoryValId;
@@ -1164,12 +1202,12 @@ class RequestClientController extends Controller
         $editReqDetails = "Category was changed from ".$currentCategoryText." to ".$newCategoryText;
 
         // GET REPAIR ID TO CALCULATE REQUEST DURATION
-        $getRepairID = DB::table('category_tab')
+        $getRepairID = DB::table('category_tab_2')
         ->where('category_id' , $newCategoryID)
         ->first();
         $repairTypeID = $getRepairID->repairtype_id;
 
-        $requestDuration = $this->calculateRequestDuration($newCategoryID , $repairTypeID , $getRequestDate);
+        $requestDuration = $this->calculateRequestDuration($newCategoryID , $repairTypeID , $getRequestDate , $agentUnitID);
 
         // INSERT TO EDIT REQUEST TAB
         DB::table('editrequest_tab')
@@ -1262,7 +1300,7 @@ class RequestClientController extends Controller
     }
 
      /////////////////////////////////////////////////////////////////////////////////////// CHECK HOLIDAY.TXT
-    public function checkHoliday($requestDuration){
+    public function checkHoliday($requestDuration , $agentUnitID){
 
         $path = public_path('holiday.txt'); 
         $convertDate = date('Y-M-d',strtotime($requestDuration));
@@ -1282,18 +1320,21 @@ class RequestClientController extends Controller
         // GET NAME OF THE DAY
         $getNameOfDay = $requestDuration->format('l');
 
-        if($getNameOfDay == 'Saturday'){
-            $requestDuration = $requestDuration->addDays(2);
-        }
-        if($getNameOfDay == 'Sunday'){
-             $requestDuration = $requestDuration->addDays(1);
+        if($agentUnitID != 1){
+        
+            if($getNameOfDay == 'Saturday'){
+                $requestDuration = $requestDuration->addDays(2);
+            }
+            if($getNameOfDay == 'Sunday'){
+                $requestDuration = $requestDuration->addDays(1);
+            }
         }
 
         return $requestDuration;
     }
 
     //////////////////////////////////////// CALCULATE REQUEST DURATION BASED ON REPAIR ID
-    public function calculateRequestDuration($categoryID , $repairTypeID , $getRequestDate){
+    public function calculateRequestDuration($categoryID , $repairTypeID , $getRequestDate , $agentUnitID){
 
         $getRepairTime = DB::table('repairtype_tab')
         ->where('repairtype_id' , $repairTypeID)
@@ -1314,43 +1355,54 @@ class RequestClientController extends Controller
 
         $getHour = $requestDuration->hour;
         $getMinutes = $requestDuration->minute;
-        $currentHourMinutes = (int)$getHour + ((float)$getMinutes * 0.01);
+        //$currentHourMinutes = (int)$getHour + ((float)$getMinutes * 0.01);
 
         $hourToDay = $hour / 24;
+        $countDays = 0;
         if($hour >= 24){
 
             for($i = 1; $i <= $hourToDay; $i++){
 
-                if($getNameOfDay == 'Friday'){
-                    $requestDuration->addDays(2);
+                if($getNameOfDay == 'Friday' && $agentUnitID != 1){
+                    $requestDuration->addDays(3);
                 }
                 else{
                     $requestDuration->addDays(1);
                 }
                 // CHECK HOLIDAY
-                $requestDuration = $this->checkHoliday($requestDuration);
+                $requestDuration = $this->checkHoliday($requestDuration , $agentUnitID);
                 $getNameOfDay = $requestDuration->format('l');
+                $countDays++;
             }
-
-        }elseif($hour == 4){
-
-            if($currentHourMinutes > 13){
-
-                if($getNameOfDay == 'Friday'){
-                    $requestDuration->addDays(2);
-                }else{
-                    $requestDuration->addHours(15); // reset to 8am the next day
-                }
-                $requestDuration->addHours($hour);
-            }
-            else{
-                $requestDuration->addHours($hour);
-            }
-            // CHECK HOLIDAY
-            $requestDuration = $this->checkHoliday($requestDuration);
+        }
+        if($hour == 0){
+            $requestDuration = null;
         }
         else{
-            $requestDuration = null;
+
+            $hour = $hour - ($countDays * 24);
+
+            $calcuTime = $requestDuration;
+            $calcuTime->addHours($hour);
+            $currentHourMinutes = $calcuTime->hour + ((float)$getMinutes * 0.01);
+
+            if($currentHourMinutes > 17 && $agentUnitID != 1){
+
+                $timeDiff = $calcuTime->hour - 17;
+
+                if($getNameOfDay == 'Friday'){
+                    $requestDuration->addDays(3);
+                    $requestDuration->hour = 8; // reset HOUR to 8AM
+                }else{
+                    $requestDuration->addDays(1);
+                    $requestDuration->hour = 8; // reset HOUR to 8AM
+                }
+                $requestDuration->addHours($timeDiff);
+
+                // CHECK HOLIDAY
+                $requestDuration = $this->checkHoliday($requestDuration , $agentUnitID);
+                $getNameOfDay = $requestDuration->format('l');
+            }
         }
         
         return $requestDuration;
@@ -1364,16 +1416,17 @@ class RequestClientController extends Controller
 
 
         // GET REPAIR ID TO CALCULATE REQUEST DURATION
-        $getRepairID = DB::table('category_tab')
+        $getRepairID = DB::table('category_tab_2')
         ->where('category_id' , $categoryID)
         ->first();
         $repairTypeID = $getRepairID->repairtype_id;
 
         $sql = DB::table('request_tab')
-        ->select('request_refid');
+        ->select('request_refid')
+        ->where('request_refid' , 'LIKE' , date('Y').'%');
         
-        if($getAgentUnitID == 1){ // IF REQUEST IS UNDER EFMS
-            $sql->where('request_refid' , 'NOT LIKE' , '%IMISS%');
+        if($getAgentUnitID == 1){ // IF REQUEST IS UNDER EFMS (NEW CATEGORY)
+            $sql->where('request_refid' , 'LIKE' , '%EFMS%');
         }
         if($getAgentUnitID == 2){ // IF REQUEST IS UNDER  IMISS
             $sql->where('request_refid' , 'LIKE' , '%IMISS%');
@@ -1381,27 +1434,38 @@ class RequestClientController extends Controller
         
         $getLastData = $sql->orderBy('request_date' , 'DESC')->first();
 
-        //dd($getLastData->request_refid);
-
-        $result = $getLastData->request_refid;
         $generateRefNo = "";
         if($getAgentUnitID == 1){ //GENERATE REF ID BASED ON CURRENT YEAR + LAST RECORD FOR EFMS
 
             $efmsCategoryInitials = $req->getEfmsInitials; // GET FROM FORM
 
-            $lastRefNo = substr($result , 6 , strlen($result));
-            $lastRefNo = preg_replace("/[^0-9]/", "", $lastRefNo); // GET NUMBER ONLY FROM STRING
+            if(!$getLastData){
+                $lastRefNo = 0;
+            }
+            else{
+                $result = $getLastData->request_refid;
+                $lastRefNo = substr($result , 6 , strlen($result));
+                $lastRefNo = preg_replace("/[^0-9]/", "", $lastRefNo); // GET NUMBER ONLY FROM STRING
+            }
+
             $lastRefNo = $lastRefNo + 1;
-            $generateRefNo = date('y').'-'.date('m').'-'.$lastRefNo.' '.$efmsCategoryInitials; 
+            //$generateRefNo = date('y').'-'.date('m').'-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT).' '.$efmsCategoryInitials; // EFMS OLD REF ID
+            $generateRefNo = date('Y').'-EFMS-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT); 
         }
         if($getAgentUnitID == 2){ //GENERATE REF ID BASED ON CURRENT YEAR + LAST RECORD FOR IMISS
 
-            $lastRefNo = substr($result , 11 , strlen($result));
+            if(!$getLastData){
+                $lastRefNo = 0;
+            }
+            else{
+                $result = $getLastData->request_refid;
+                $lastRefNo = substr($result , 11 , strlen($result));
+            }
             $lastRefNo = $lastRefNo + 1;
-            $generateRefNo = date('Y').'-'.'IMISS-'.$lastRefNo; 
+            $generateRefNo = date('Y').'-IMISS-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT); 
         }
 
-        $requestDuration = $this->calculateRequestDuration($categoryID , $repairTypeID , null);
+        $requestDuration = $this->calculateRequestDuration($categoryID , $repairTypeID , null , $getAgentUnitID);
 
         // INSERT REQUEST TAB
         $requestDescript= $req->getDescription;
@@ -1435,7 +1499,7 @@ class RequestClientController extends Controller
             'status_id' => $statusID ,
             'request_by' => $requestBy ,
             'request_byempno' => $requestByEmpNo ,
-             'agentunit_id' => $agentUnitID ,
+            'agentunit_id' => $agentUnitID ,
             'section_id' => $requestorSection ,
             'request_telno' => $telNo ,
             'request_faxno' => $faxNo ,
@@ -1446,22 +1510,22 @@ class RequestClientController extends Controller
             'request_duration' => $requestDuration 
         ]);
 
-        $this->notifFromClient($agentUnitID , $requestDate , $generateRefNo , $categoryID , $requestBy , 'YOU HAVE NEW REQUEST!');
+        $this->notifFromClient($agentUnitID , $requestDate , $generateRefNo , $categoryID , $requestBy , 'NEW REQUEST!');
         
         return $generateRefNo;
     }
 
     //////////////////////////////////////////////////////////////////// NOTIFICATION - NEW REQUEST
-    public function notifFromClient($agentUnitID , $requestDate , $refNo , $categoryID , $requestBy , $notifTitle){
+    public function notifFromClient($accountToNotify , $requestDate , $refNo , $categoryID , $requestBy , $notifTitle){
 
-        $data = DB::table('category_tab')
+        $data = DB::table('category_tab_2')
         ->where('category_id' , $categoryID)
         ->select('category_value')
         ->first();
         $categoryName = $data->category_value;
 
         $link = '';
-        if($notifTitle == 'YOU HAVE NEW REQUEST!'){
+        if($notifTitle == 'NEW REQUEST!'){
             $link = '/officer_open_request';
         }
         if($notifTitle == 'REQUEST HAS BEEN ACKNOWLEDGED'){
@@ -1481,16 +1545,33 @@ class RequestClientController extends Controller
         Request by: ".$requestBy. "<br>
         Timestamp: ".date("M. d, Y - h:iA" , strtotime(now()));
 
-        $data = DB::table('accounts_tab')
-        ->where('agentunit_id' , $agentUnitID)
-        ->where('usertype_id' , 1)
-        ->get();
+        // NOTIF ALL AGENT UNIT ID IF REQUEST IS NEW OR CANCELLED BY THE USER
+        if($notifTitle == 'NEW REQUEST!' || $notifTitle == 'CLIENT HAS CANCELLED THE REQUEST!'){
 
-        //$accountIDs = array_map("trim", explode(',', $data->account_empid));
+            $data = DB::table('accounts_tab')
+            ->where('agentunit_id' , $accountToNotify)
+            //->where('usertype_id' , 1)
+            ->get();
         
-        foreach($data as $datas){
-            broadcast(new NotifyUser($datas->account_empid , $newRequestMsg))->toOthers();
+            // BETTER APPROARCH VS USING FOREACH LOOP
+            $data->unique('account_empid')->each(function ($user) use ($newRequestMsg) {
+                NotifyUser::dispatch($user->account_empid, $newRequestMsg);
+            });
+
+            /*
+            foreach($data as $datas){
+                broadcast(new NotifyUser($datas->account_empid , $newRequestMsg))->toOthers();
+            }
+            */
+
+
+
         }
+        else{ // ELSE NOTIF ONLY ASSIGNED ACTION OFFICER
+
+            broadcast(new NotifyUser($accountToNotify , $newRequestMsg))->toOthers();
+        }
+
     }
 
     //////////////////////////////////////////////////////////////////// ALL EFMS REQUEST EXCLUDING TRAVEL CONDUCTION ADD REQUEST  
@@ -1882,6 +1963,10 @@ class RequestClientController extends Controller
     //////////////////////////////////////////////////////////////////// ACKNOWLEDGE REQUEST
     public function acknowledgeRequest(Request $req){
 
+        $agentToNotify = $req->agentToNotify;
+        $requestDate = $req->requestDate;
+        $categoryID = $req->categoryID;
+        $requestBy = $req->requestBy;
 
         $refID = $req->refID;
         DB::table('request_tab')
@@ -1891,12 +1976,7 @@ class RequestClientController extends Controller
             'status_id' => 6 // COMPLETED
         ]);
 
-        $agentUnitID = $req->agentUnitID;
-        $requestDate = $req->requestDate;
-        $categoryID = $req->categoryID;
-        $requestBy = $req->requestBy;
-
-        $this->notifFromClient($agentUnitID , $requestDate , $refID , $categoryID , $requestBy , 'REQUEST HAS BEEN ACKNOWLEDGED');
+        $this->notifFromClient($agentToNotify , $requestDate , $refID , $categoryID , $requestBy , 'REQUEST HAS BEEN ACKNOWLEDGED');
         return back(); 
     }
 
@@ -1912,12 +1992,12 @@ class RequestClientController extends Controller
             'status_id' => 8 // ACKNOWLEDGED
         ]);
 
-        $agentUnitID = $req->agentUnitID;
+        $agentToNotify = $req->agentToNotify;
         $requestDate = $req->requestDate;
         $categoryID = $req->categoryID;
         $requestBy = $req->requestBy;
 
-        $this->notifFromClient($agentUnitID , $requestDate , $refID , $categoryID , $requestBy , 'ACKNOWLEDGEMENT HAS BEEN CANCELLED');
+        $this->notifFromClient($agentToNotify , $requestDate , $refID , $categoryID , $requestBy , 'ACKNOWLEDGEMENT HAS BEEN CANCELLED');
         return back();
     }
 
@@ -1928,16 +2008,19 @@ class RequestClientController extends Controller
         $getUserID = session('account_empid');
 
             $data = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->join('agentunit_tab' , 'agentunit_tab.agentunit_id' , '=' , 'request_tab.agentunit_id')
             ->leftJoin('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->selectRaw("
+                        category_tab_2.category_icon as categoryIcon ,
+                        category_tab_2.main_category as mainCategory ,
                         request_tab.request_by as requestBy , 
                         request_tab.agentunit_id as agentUnitID , 
+                        request_tab.agentacc_id as agentAccID , 
                         request_tab.request_refid as refID , 
                         request_tab.category_id as categoryId , 
-                        category_tab.category_value categoryVal ,
+                        category_tab_2.category_value categoryVal ,
                         request_tab.request_descript reqDesc , 
                         request_tab.request_date as reqDate ,
                         request_tab.request_duration as reqDuration ,
@@ -1950,6 +2033,9 @@ class RequestClientController extends Controller
             ->where('request_tab.account_id' , $getUserID)
             ->where('request_tab.status_id' , $getStatusID)
             ->groupBy('refID' , 
+            'agentAccID' ,
+            'categoryIcon' ,
+            'mainCategory' ,
             'agentUnitID' ,
             'requestBy' ,
             'categoryId' ,
@@ -1973,6 +2059,25 @@ class RequestClientController extends Controller
 
         return json_encode($data);
 
+    }
+
+    public function checkAcknowledge(Request $req){
+
+        $AccountID = $req->AccountID;
+        $agentUnitID = $req->agentUnitID;
+
+        $data = DB::table('request_tab')
+        ->where('account_id' , $AccountID)
+        ->where('agentunit_id' , $agentUnitID)
+        ->where('status_id' , 8)
+        ->first();
+
+        if($data){
+            return 1;
+        }else{
+            return 0;
+        }
+        
     }
 
 }

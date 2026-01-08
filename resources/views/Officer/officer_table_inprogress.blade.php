@@ -56,7 +56,7 @@
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
                         @if ($countDescription >= 20)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ $datas->reqDesc }},,{{ $datas->refNo }}'>See more</span>
+                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
                     </td>
 
@@ -77,20 +77,14 @@
                         @endif
                     </td>
 
-                    <?php $actionTaken = $datas->actionTaken  ?>
-                    <td style="max-width: 110px;">{{ Str::limit($actionTaken , 20 , '...') }}
-                        <?php  $countActionTaken = mb_strlen( $actionTaken ); ?>
-                        @if ($countActionTaken >= 20)
-                            <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Action Taken,,{{ $actionTaken }},,{{ $datas->refNo }}'>See more</span>
-                        @endif
-                        @if($countActionTaken == '' || $countActionTaken == null)
-                        N/A
-                        @endif
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill mt-2 pt-1 officerActionTaken" style="font-size: 8px;"
+                        id='{{ $datas->refNo }}' data-bs-toggle="modal" data-bs-target="#officerActionTakenModal">
+                            View Action
+                        </button>
                     </td>
 
-                    <td class="">
-
+                    <td>
                         <div class="btn-group dropstart " style="width:100%">
                             <button class="btn btn-outline-secondary btn-sm dropdown-toggle actionBtnForAutoHeight" 
                             data-bs-toggle="dropdown" aria-expanded="false">Actions</button>
@@ -106,10 +100,15 @@
                                 data-bs-toggle="modal" data-bs-target="#modalUpdateCategory"
                                 ><i class="bi bi-arrow-up-right-square-fill"></i> Update Category </a></li>
 
-
-                                <li><a class="dropdown-item officerCondemnRequestBtn" href="#" 
-                                id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }}"
-                                data-bs-toggle="modal" data-bs-target="#officerCondemnModal"><i class="bi bi-bell-slash-fill"></i> Condemn </a></li>
+                                @if(Auth::user()->agentunit_id == 1)
+                                    <li><a class="dropdown-item officerServiceReportBtn" href="#" 
+                                    id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }},,{{ $datas->reqDesc }}"
+                                    data-bs-toggle="modal" data-bs-target="#officerServiceReportModal"><i class="bi bi-folder-symlink"></i> Service Report </a></li>
+                                @else
+                                    <li><a class="dropdown-item officerCondemnRequestBtn" href="#" 
+                                    id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }}"
+                                    data-bs-toggle="modal" data-bs-target="#officerCondemnModal"><i class="bi bi-bell-slash-fill"></i> Condemn </a></li>
+                                @endif
 
 
                                     <form action="/done_request" method="POST" id="doneRequestForm_{{ preg_replace('/[^0-9]/', '', $datas->refNo) }}-{{ $datas->categoryId }}">
@@ -135,14 +134,14 @@
 
                                     <!-- VIEW ATTACHMENTS -->
                                     @if(
-                                    $datas->categoryVal == 'Biometrics Enrollment' 
-                                    || $datas->categoryVal == 'HOMIS Encoding Error'
-                                    || $datas->categoryVal == 'Network Installation / Internet Connection / Cable Transfer'
-                                    || $datas->categoryVal == 'Zoom Link'
-                                    || $datas->categoryVal == 'Website Uploads'
-                                    || $datas->categoryVal == 'System Enhancement / Modification / Homis / Other Installation'
-                                    || $datas->categoryVal == 'VMC ID Card Preparation'
-                                    || $datas->categoryVal == 'Travel Conduction'
+                                        $datas->categoryId == 12
+                                        || $datas->categoryId == 4
+                                        || $datas->categoryId == 6
+                                        || $datas->categoryId == 30
+                                        || $datas->categoryId == 7
+                                        || $datas->categoryId == 3
+                                        || $datas->categoryId == 13
+                                        || $datas->categoryId == 42
                                     )
                                         <li><a href="#" class="dropdown-item viewAttachment" id="{{ $datas->refNo }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refNo) }}"
                                         data-bs-toggle="modal" data-bs-target="#viewAttachmentModal"><i class="bi bi-paperclip"></i> View Attachment </a></li>
@@ -174,14 +173,5 @@
 
 @include('partials.officer_reopen_request')
 
-@include('officer.modals.modal_cancel_request')
-
-@include('client.modals.modal_view_attachment')
-
-@include('officer.modals.modal_new_action')
-
 @include('partials.officer_done_request')
 
-@include('officer.modals.modal_condemn_request')
-
-@include('officer.modals.modal_update_category')

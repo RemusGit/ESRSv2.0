@@ -348,8 +348,9 @@
                     <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline mb-2 form-floating">
                             <input type="file" id="idrequest_picture" class="form-control" 
-                            placeholder="Picture (max 1mb) / Must be formal" name="idrequest_picture" required />
+                            placeholder="Picture (max 1mb) / Must be formal" name="idrequest_picture" required accept="image/*" />
                             <label class="form-label" for="idrequest_picture"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Picture (max 1mb) / Must be formal</label>
+                            <p class="text-danger" id="maxFileSizeTextPicture" style="display: none;">Maximum File size is 1MB only</p>
                         </div>
                   </div>
             </div>      
@@ -358,15 +359,15 @@
                     <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline mb-2 form-floating">
                             <input type="file" id="idrequest_signature" class="form-control" 
-                            placeholder="Signature (max 1mb)" name="idrequest_signature" required />
+                            placeholder="Signature (max 1mb)" name="idrequest_signature" required accept="image/*" />
                             <label class="form-label" for="idrequest_signature"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Signature (max 1mb)</label>
+                            <p class="text-danger" id="maxFileSizeTextSignature" style="display: none;">Maximum File size is 1MB only</p>
                         </div>
                   </div>
             </div>     
 
           </div>
           <!-- EOF ROW / VMC ID DETAILS 7 -->
-
 
         <div class="clearfix" style="font-size: 14px;">
             <div class="float-start form-check">
@@ -378,21 +379,23 @@
             </div>
         </div>
 
-
 <script>
-
     $(document).ready(function(){
-
 
         $('#picSigBypass').click(function(){
 
             var checkVal = $('#picSigBypass:checked').val();
-
             if(checkVal == 'on'){
 
                 $('#picSigHide').slideUp();
                 $('#idrequest_picture').removeAttr("required");
                 $('#idrequest_signature').removeAttr("required");
+
+                $('#idrequest_picture').val("");
+                $('#idrequest_signature').val("");
+                $('#maxFileSizeTextPicture').hide();
+                $('#maxFileSizeTextSignature').hide();
+                $('#vmcIdSubmitBtn').removeAttr('disabled');
             }
             else{
                 $('#picSigHide').slideDown();
@@ -422,18 +425,55 @@
                 $('#vmcIdCardCityEmergency').attr("required","required");
                 $('#vmcIdCardBarangayEmergency').attr("required","required");
             }
-            /*
-            if(getStreet1 != '' && checkVal == 'on'){
-                $('#idrequest_emerstreet').val(getStreet1);
-            }
-            if(getCity1 != '' && checkVal == 'on'){
-                $('#vmcIdCardCityEmergency').val(getCity1).trigger('change');
-            }
-            if(getCity1 != '' && getBrgy1 != '' && checkVal == 'on'){
-                $('#vmcIdCardBarangayEmergency').val(getBrgy1).trigger('change');
-            }
-                */
+
         });
     });
+
+</script>
+
+<script>
+
+  $('#idrequest_picture , #idrequest_signature').on('change' , function(){
+    var files = this.files;
+    console.log(this.id);
+    let getID = this.id;
+
+        // Check if a file was selected
+        if (files && files.length > 0) {
+            // Get the first file object (since a single file input is used)
+            var file = files[0];
+
+            // GET FILESIZE IN MB
+            var fileSize = (file.size / 1024) / 1000;
+
+            console.log('File size in MB: ' + fileSize);
+
+            if(fileSize > 1){
+                if(getID == 'idrequest_picture'){
+                    $('#maxFileSizeTextPicture').show();
+                }
+                if(getID == 'idrequest_signature'){
+                    $('#maxFileSizeTextSignature').show();
+                }
+
+            }else{
+
+                if(getID == 'idrequest_picture'){
+                    $('#maxFileSizeTextPicture').hide();
+                }
+                if(getID == 'idrequest_signature'){
+                    $('#maxFileSizeTextSignature').hide();
+                }
+            }
+
+            if($('#maxFileSizeTextSignature').is(":visible") || $('#maxFileSizeTextPicture').is(":visible")){
+                $('#vmcIdSubmitBtn').attr('disabled' , 'disabled');
+            }
+            else{
+                $('#vmcIdSubmitBtn').removeAttr('disabled');
+            }
+            
+        }
+  });
 
 </script>

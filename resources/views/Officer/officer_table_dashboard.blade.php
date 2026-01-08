@@ -19,8 +19,8 @@
                     <th>Description</th>
                     <th>Equip-Details</th>
                     <th>Action-Officer</th>
-                    <th >Taken-Date</th>
-                    <th>Action-Taken</th>
+                    <th>Taken-Date</th>
+                    <th style="width: 85px;">Action-Taken</th>
                     <th>Attachments</th>
                     <th class="text-center">Status</th>
                 </tr>
@@ -60,7 +60,7 @@
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
                         @if ($countDescription >= 20)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ $datas->reqDesc }},,{{ $datas->refNo }}'>See more</span>
+                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
                     </td>
                     <td style="max-width: 100px;">
@@ -90,38 +90,41 @@
                         @endif
                     </td>
 
-                    <td style="max-width: 110px;">
+                    <td style="max-width: 100px;">
                         @if($datas->dateTaken == '' || $datas->dateTaken == null)
                             N/A
                         @else
                             {{ $datas->dateTaken }}
                         @endif
                     </td>
-                    <?php $actionTaken = $datas->actionTaken  ?>
-                    @if($actionTaken == '' || $actionTaken == null)
-                        <td>N/A</td>
-                    @else
-                        <td style="max-width: 110px;">{{ Str::limit($actionTaken , 20 , '...') }}
-                            <?php  $countActionTaken = mb_strlen( $actionTaken ); ?>
-                            @if ($countActionTaken >= 20)
-                                <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                                data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Action Taken,,{{ $actionTaken }},,{{ $datas->refNo }}'>See more</span>
-                            @endif
-                        </td>
-                    @endif
-
+                    <td style="width: 75px;">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill mt-2 pt-1 officerActionTaken w-100" style="font-size: 8px;"
+                        id='{{ $datas->refNo }}' data-bs-toggle="modal" data-bs-target="#officerActionTakenModal">
+                            View Action
+                        </button>
+                    </td>
+                    <?php
+                        // Biometrics Enrollment - 12
+                        // HOMIS Encoding Error - 4
+                        // Network Installation / Internet Connection / Cable Transfer - 6
+                        // Zoom Link - 30
+                        // Website Uploads - 7
+                        // System Enhancement / Modification / Homis / Other Installation - 3
+                        // VMC ID Card Preparation - 13
+                        // Travel Conduction - 42
+                    ?>
 
                     <td class="text-center">
                             <!-- VIEW ATTACHMENTS -->
                             @if(
-                            $datas->categoryVal == 'Biometrics Enrollment' 
-                            || $datas->categoryVal == 'HOMIS Encoding Error'
-                            || $datas->categoryVal == 'Network Installation / Internet Connection / Cable Transfer'
-                            || $datas->categoryVal == 'Zoom Link'
-                            || $datas->categoryVal == 'Website Uploads'
-                            || $datas->categoryVal == 'System Enhancement / Modification / Homis / Other Installation'
-                            || $datas->categoryVal == 'VMC ID Card Preparation'
-                            || $datas->categoryVal == 'Travel Conduction'
+                            $datas->categoryID == 12
+                            || $datas->categoryID == 4
+                            || $datas->categoryID == 6
+                            || $datas->categoryID == 30
+                            || $datas->categoryID == 7
+                            || $datas->categoryID == 3
+                            || $datas->categoryID == 13
+                            || $datas->categoryID == 42
                             )
                         <span class="text-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="View Attachments">
                         <a href="#" class="dropdown-item viewAttachment" id="{{ $datas->refNo }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refNo) }}"
@@ -133,7 +136,7 @@
                     </td>
 
 
-                    <td style="width: 90px; font-size: 10px;" class="adjustOnSmall">
+                    <td style="width: 90px; font-size: 10px;" class="adjustOnSmall py-3">
                         @if($datas->statusVal == 'For Approval')
                         <p class="bg-secondary text-white px-2 rounded-pill text-center">{{ $datas->statusVal }}</p>
                         @elseif($datas->statusVal == 'Acknowledge')
@@ -166,4 +169,3 @@
 
 </div> <!--EOF TABLE RESPONSIVE -->
 
-@include('client.modals.modal_view_attachment')

@@ -5,17 +5,57 @@
         $('.all_request_class').click(function(){
 
             var getClassIcon = $(this).find('i').attr('class');
-            let getRequestID = this.id;
+
+            let array = this.id.split(",,");
+            let getRequestID = array[0];
+            let mainCategory = array[1];
+            let categoryVal = array[2];
+            let durationVal = array[3];
+
+            let categoryID = "";
+            if(getRequestID == 'EFMS'){
+                categoryID = array[4];
+            }
+
+            //console.log(getRequestID);
+
+            let splitDuration = durationVal.split(":");
+            let getHours = splitDuration[0];
+            let getDays = 0;
+
+            if(getHours >= 24){
+                getDays = parseInt(getHours / 24);
+                getHours = parseInt(getHours - (getDays * 24));
+            }
+            let convertedDuration = "Indefinite";
+
+            if(getDays > 0){
+                if(getHours > 0){
+                    convertedDuration = getDays + ' Day(s) ' + getHours + ' Hour(s)'; 
+                }
+                else{
+                    convertedDuration = getDays + ' Day(s)'; 
+                }
+            }
+            else if(getHours > 0){
+                convertedDuration = getHours + ' Hour(s)'; 
+            }
 
             $('.allDivDetails').hide();
 
             //BIOMETRICS
-            if(getRequestID == "bioEnroll")
+            if(getRequestID == "12")
             {
                
                 $('#request_title , #contact_request_details_title').html("Biometrics Enrollment");
                 $('#request_desc').html("Biometric Enrollment means the process of collecting biometric data samples from a person and subsequently storing the data in our databases.");
-                $('#request_duration').html("Maximum of 5 working days");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
+                
 
 
                 let getSectionItems = $('#bioSectionSelect option').length;
@@ -69,7 +109,7 @@
                         url: "{{ route('loadEmpStatus') }}", 
                           type: 'GET', 
                           success: function(res) {
-                            console.log(res);
+                            //console.log(res);
                             
                               $.each(JSON.parse(res) , function(i , val){
 
@@ -86,17 +126,22 @@
             }
 
             //HOMIS ENCODE ERROR
-            if(getRequestID == "homisEncode")
+            if(getRequestID == "4")
             {
                 $('#request_title , #contact_request_details_title').html("HOMIS Encoding Error");
                 $('#request_desc').html("HOMIS Encoding Error is an amongst the most typical data entry problems is inputting the incorrect data.");
-                $('#request_duration').html("Maximum of 3 working days");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForHomisDetails').show();
             }            
 
             //NETWORK INSTALLATION
-            if(getRequestID == "networkInstall")
+            if(getRequestID == "6")
             {
                 $('#networkInstallConnectionId').empty();
                 $('#networkInstallConnectionId').append('<option></option>');
@@ -106,7 +151,7 @@
                 url: "{{ route('loadConnection') }}", 
                 type: 'GET', 
                 success: function(res) {
-                    console.log(res);
+                    //console.log(res);
                     
                     $.each(JSON.parse(res) , function(i , val){
 
@@ -120,23 +165,33 @@
 
                 $('#request_title , #contact_request_details_title').html("Network Installation / Internet Connection");
                 $('#request_desc').html("Computer networking refers to connected computing devices such as laptops, desktops, servers, smartphones, and tablets.");
-                $('#request_duration').html("Maximum of 3 working days");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForNetworkInstallDetails').show();
             }
 
             //REPAIR IT EQUIPMENT
-            if(getRequestID == "repairIT")
+            if(getRequestID == "1")
             {
                 $('#request_title , #contact_request_details_title').html("Repair of I.T Equipment");
                 $('#request_desc').html("Computer repair is the process of identifying, troubleshooting and resolving problems and issues in a faulty computer.");
-                $('#request_duration').html("Maximum of 3 working days");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForRepairItEquipmentDetails').show();
             }
 
             //SYSTEM ENHANCE
-            if(getRequestID == "systemEnhance")
+            if(getRequestID == "3")
             {
 
                 $('#systemEnhanceSelectSystemID').empty();
@@ -147,7 +202,7 @@
                 url: "{{ route('loadVmcSystem') }}", 
                 type: 'GET', 
                 success: function(res) {
-                    console.log(res);
+                    //console.log(res);
                     
                     $.each(JSON.parse(res) , function(i , val){
 
@@ -161,48 +216,73 @@
 
                 $('#request_title , #contact_request_details_title').html("System Enhancement / Modification");
                 $('#request_desc').html("A system enhancement is any application change or upgrade that increases application capabilities beyond original end-user specifications.");
-                $('#request_duration').html("Indefinite");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForSystemEnhanceDetails').show();
             }
 
             //TECHNICAL ASSIST
-            if(getRequestID == "techAssist")
+            if(getRequestID == "8")
             {
                 $('#request_title , #contact_request_details_title').html("Technical Assistance");
                 $('#request_desc').html("Providing technical support such as resolving technical issues in a timely manner using available resources.");
-                $('#request_duration').html("Maximum of 4 office hours");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForTechAssistDetails').show();
             }
 
             //TRAINING ORIENTATION
-            if(getRequestID == "trainingOrient")
+            if(getRequestID == "10")
             {
                 $('#request_title , #contact_request_details_title').html("Training - Orientation / Computer Literacy");
                 $('#request_desc').html("The ability to effectively use computer technology to solve problems and efficiently meet personal and professional needs.");
-                $('#request_duration').html("Indefinite");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForTrainingOrientationDetails').show();
             }
 
 
             //USER ACC MANAGEMENT
-            if(getRequestID == "userAccMngt")
+            if(getRequestID == "11")
             {
                 $('#request_title , #contact_request_details_title').html("User Account Management");
                 $('#request_desc').html("User Management role is authorized to create and delete user accounts, change user passwords, change roles assigned to other users.");
-                $('#request_duration').html("Maximum of 4 office hours");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForUserAccMngtDetails').show();
             }
 
             //VMC ID
-            if(getRequestID == "vmcID")
+            if(getRequestID == "13")
             {
                 $('#request_title , #contact_request_details_title').html("VMC ID Card Preparation");
                 $('#request_desc').html("I.D cards are your ultimate source of identification for easy introductions, whether you’re a contractual or permanent employee.");
-                $('#request_duration').html("Maximum of 3 working days");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForVMCIDDetails').show();
 
@@ -310,124 +390,63 @@
             }
 
             //WEB UPLOADS
-            if(getRequestID == "webUploads")
+            if(getRequestID == "7")
             {
                 $('#request_title , #contact_request_details_title').html("Website Uploads");
                 $('#request_desc').html("Website upload is the process of putting web pages, images and files onto a web server.");
-                $('#request_duration').html("Maximum of 1 working day");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForWebUploadsDetails').show();
             }
             
             //ZOOM LINK
-            if(getRequestID == "zoomLink")
+            if(getRequestID == "30")
             {
                 $('#request_title , #contact_request_details_title').html("Zoom Link");
                 $('#request_desc').html("Zoom meeting links are used to invite prospective participants to a meeting. These links may contain information like the meeting ID, password, and web address.");
-                $('#request_duration').html("Maximum of 4 office hours");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
 
                 $('#divForZoomLinkDetails').show();
             }
-            
-
-            //REPAIR MEDICAL EQUIPMENT
-            if(getRequestID == "repairMedEquipment")
-            {
-                $('#request_title , #contact_request_details_title').html("Repair of Medical Equipment");
-                $('#request_desc').html("Medical equipment repairers install, maintain, and repair patient care equipment.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairMedEQ').show();
-            }
-
-
-            //REPAIR OFFICE EQUIPMENT
-            if(getRequestID == "repairOfficeEquipment")
-            {
-                $('#request_title , #contact_request_details_title').html("Repair of Office Equipment");
-                $('#request_desc').html("This involves inspecting the machinery and making sure it works efficiently, and if necessary, replacing any worn out or faulty parts, or cleaning some equipment regularly with specialist tools.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairOfficeEQ').show();
-            }    
-         
-
-            //REPAIR ARCHITECTURAL WORKS
-            if(getRequestID == "repairArcWorks")
-            {
-                $('#request_title , #contact_request_details_title').html("Repair of Architectural Works");
-                $('#request_desc').html("The restoration of an asset or a component to such a condition that it may be effectively utilised for its designed purpose by the overhaul, reprocessing or replacement of constituent parts or materials that have deteriorated by action of the elements or usage and have not been corrected by maintenance.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairArchWorks').show();
-            } 
-
-
-            //REPAIR CIVIL WORKS
-            if(getRequestID == "repairCivilWorks")
-            {
-                $('#request_title , #contact_request_details_title').html("Repair of Civil Works");
-                $('#request_desc').html("The construction or reconstruction of road, sewer, water, bridge and other municipal services.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairCivilWorks').show();
-            }  
-            
-
-            //REPAIR ELECTRICAL WORKS
-            if(getRequestID == "repairElectricWorks")
-            {
-                $('#request_title , #contact_request_details_title').html("Repair of Electrical Works");
-                $('#request_desc').html("Fixing any sort of electrical device should it become out of working order or broken (known as repair, unscheduled, or casualty maintenance).");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairElecWorks').show();
-            } 
-            
-
-            //REPAIR PLUMBING WORKS
-            if(getRequestID == "repairPlumbingWorks")
-            {
-                $('#request_title , #contact_request_details_title').html("Repair of Plumbing Works");
-                $('#request_desc').html("Plumbing work means the design, installation, alteration, construction, reconstruction, or repair of plumbing, gas, and drainage systems.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairPlumbingWorks').show();
-            }
-
-            //TECHNICAL ASSISTANCE
-            if(getRequestID == "techAssist2")
-            {
-                $('#request_title , #contact_request_details_title').html("Technical Assistance");
-                $('#request_desc').html("Support Management and provision of technical support by suitably qualified and experienced engineers.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForRepairTechAssist').show();
-            }
-
-            //TRAVEL CONDUCTION
-            if(getRequestID == "travelConduct")
-            {
-                $('#request_title , #contact_request_details_title').html("Travel Conduction");
-                $('#request_desc').html("Support Management and provision of technical support by suitably qualified and experienced engineers.");
-                $('#request_duration').html("Indefinite");
-
-                $('#divForEfmsTC').show();
-            }
-
 
             //OTHERS for IMISSS
-            if(getRequestID == "othersIMISS")
+            if(getRequestID == "33")
             {
-                $('#request_title , #contact_request_details_title').html("Others (IMISS)");
+                $('#request_title , #contact_request_details_title').html("Others");
+                $('#request_desc').html("Other request for IMISS (Integrated Management Information System Section)");
+                
+                if(convertedDuration == "Indefinite"){
+                    $('#request_duration').html("Indefinite");
+                }else{
+                    $('#request_duration').html("Maximum of " + convertedDuration);
+                }
+
                 $('#divForOthersImissDetails').show();
             }
 
             //OTHERS for EFMS
-            if(getRequestID == "othersEFMS")
+            if(getRequestID == "EFMS")
             {
-                $('#request_title , #contact_request_details_title').html("Others (EFMS)");
-                $('#divForOthersEfmsDetails').show();
+                $('#request_title , #contact_request_details_title').html(categoryVal);
+
+                if(convertedDuration == "Indefinite"){
+                    $('#categoryDuration').html("Duration: Indefinite");
+                }else{
+                    $('#categoryDuration').html('Duration: Maximum of '+convertedDuration);
+                }
+
+                $('#addRequestCategoryID').val(categoryID);
+                $('#divAllEfms').show();
             }
             
             $('#request_icon , #contact_details_request_icon').removeClass();

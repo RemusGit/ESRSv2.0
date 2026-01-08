@@ -16,16 +16,19 @@ $(document).on('click', '.alert', function() {
 */
 let currentURL = "{{ Request::path() }}";
 let accountID = "{{ Auth::user()->account_empid }}";
+let agentUnitID = "{{ Auth::user()->agentunit_id }}";
 
 let socket;
 const RECONNECT_DELAY = 2000; // 2 seconds
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
-let appKey = "qefxx2lpwsoxttgzci9f";
+//let appKey = "qefxx2lpwsoxttgzci9f";
+let appKey = "TestKey1";
 
     function connectReverb(){
 
         ///////////////////////////////////////////////// INITIALIZING WEB SOCKET
-        socket = new WebSocket("ws://192.168.14.114:8080/app/"+appKey);
+        socket = new WebSocket("ws://127.0.0.1:8888/app/"+appKey);
+        //console.log(window.location.hostname);
 
         /////////////////////////////////////////////////SOCKET ON OPEN
         socket.onopen = function() {
@@ -40,9 +43,11 @@ let appKey = "qefxx2lpwsoxttgzci9f";
             }, HEARTBEAT_INTERVAL);
         };
 
+        
         ///////////////////////////////////////////////// SOCKET ON MESSAGE
         socket.onmessage = function(event){
             const msg = JSON.parse(event.data);
+            //console.log(msg.data);
 
             //const data = JSON.parse(msg.data);
             let data;
@@ -87,12 +92,48 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                 });
 
             }
-
-            ///////////////////////////////////////////////// FIRING NOTIFICATION
             
+
+            /////////////////////////////////////////////////////////////////////////////////// FIRING CHAT MESSAGE
+            if (msg.event === "ChatMessageSent") {
+                
+                const payload = JSON.parse(msg.data);
+                //console.log(payload);
+                let row = `<p class="fw-bold pt-2" font-size: 10px;">${payload.senderName}</p>
+                    <p><label style="background-color: #c9ccc9ff; border-radius: 50px;" class="p-2">${payload.msg}</label></p>`;
+                    $('#chatBody').append(row);
+                    /*
+                    $.ajax({
+                        url: "{{ route('displayChat') }}", 
+                        type: 'POST', 
+                        data: {
+                            receiverID: payload.receiverID ,
+                            senderID: "{{ Auth::user()->account_empid }}" ,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            //console.log(res);
+                            
+                            $('#chatBody').empty();
+                            $.each(JSON.parse(res) , function(i , item){
+
+                                let row = `<p style="bottom: 0; left: 0; position: relative;">${item.sender_id} : ${item.msg}</p>`;
+
+                                $('#chatBody').append(row);
+                            });
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });//EOF AJAX
+                    */
+            }
+
+
+            //////////////////////////////////////////////////////////////////////////////// FIRING NOTIFICATION
             if(msg.event === "UserNotification"){
 
-                console.log(msg.event);
+                //console.log(msg.event);
 
                 const payload = JSON.parse(msg.data);
                 let userTypeID = "{{ Auth::user()->usertype_id }}";
@@ -202,7 +243,7 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                             <th class="text-center">Actions</th></tr>`
                         );
                     }
-                    console.log(tableNameToUpdate);
+                    //console.log(tableNameToUpdate);
                     $.ajax({
                             url: "{{ route('ajaxOfficerRefreshTable') }}",
                             type: "POST",
@@ -239,18 +280,69 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                         equiDetails = item.eq1 +' '+ item.eq2+' '+ item.eq3 +' '+ item.eq4;
                                     }
 
+                                    let txtColor = "#000";
+                                    let yellowMin = 0;
+                                    let nowVsUntil = 0;
+
+
+                                    if(item.until != '' || item.until == null){
+
+                                        let dateUntil = new Date(item.until);
+                                        let dateDiff = dateUntil - Date.now();
+                                        nowVsUntil = dateDiff / (1000 * 60 * 60);
+
+                                        let array = item.repairTime.split(":");
+                                        let duration = array[0];
+
+                                        if(duration >= 24){
+                                            duration = duration / 24;
+                                            nowVsUntil = nowVsUntil / 24;
+                                        }
+                                        // GET 50% of DURATION
+                                        yellowMin = duration * 0.5;
+
+                                        if(yellowMin >= 24){
+                                            yellowMin = yellowMin / 24;
+                                            nowVsUntil = nowVsUntil / 24;
+                                        }
+                                        
+                                        if( nowVsUntil <= 0 ){
+                                            txtColor = "#ad1605ff";
+                                        }
+                                        else if( yellowMin >= nowVsUntil){
+                                            txtColor = "#4103b4ff";
+                                        }
+                                        else{
+                                            txtColor = "#000";
+                                        }
+                                    }
+
                                     let csrf = '{{ csrf_token() }}';
                                     let row =
                                         `<tr style="font-size: 12px;">
                                             <td class="fw-bold text-success" style="font-size: 11px;">${i+1}.</td>
-                                            <td>${item.refNo}</td>
-                                            <td>${item.reqDate}</td>
 
+                                            ${ currentURL == 'officer_open_request' ?
+                                             `<td style="color: ${txtColor};">${item.refNo}</td>`
+                                             :
+                                             `<td>${item.refNo}</td>`
+                                            }
+                                            
+                                            ${ currentURL == 'officer_open_request' ?
+                                             `<td style="color: ${txtColor};">${item.reqDate}</td>`
+                                             :
+                                             ` <td>${item.reqDate}</td>`
+                                            }
+                                           
 
                                             ${ currentURL == 'officer_cancelled_request' ?
                                                 `<td>${item.cancelledDate}</td>`
                                             :
+                                                `${ currentURL == 'officer_open_request' ?
+                                                `<td style="color: ${txtColor};">${item.until == '' || item.until == null ? 'Indefinite' : item.until}</td>`
+                                                :
                                                 `<td>${item.until == '' || item.until == null ? 'Indefinite' : item.until}</td>`
+                                                }`
                                             }
 
                                             ${ currentURL == 'officer_acknowledge_request' ?
@@ -265,44 +357,78 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                 ''
                                             }
 
-                                            <td style="max-width: 120px;">${item.categoryVal}</td>
-                                            <td>${item.requestBy}</td>
-                                            <td>${item.sectionName}</td>
+                                            ${ currentURL == 'officer_open_request' ?
+                                                `<td style="max-width: 120px; color: ${txtColor};">${item.categoryVal}</td>
+                                                <td style="color: ${txtColor};">${item.requestBy}</td>
+                                                <td style="color: ${txtColor};">${item.sectionName}</td>`
+                                            :
+                                                `<td style="max-width: 120px;">${item.categoryVal}</td>
+                                                <td>${item.requestBy}</td>
+                                                <td>${item.sectionName}</td>`
+                                            }
 
                                             ${ currentURL != 'officer_completed_request' && 
                                              currentURL != 'officer_acknowledge_request' &&
                                              currentURL != 'officer_cancelled_request' ?
-                                                `<td>${item.locationVal}</td>
-                                                <td>${item.bldgFloorVal}</td>`
+
+                                                `${ currentURL == 'officer_open_request' ?
+                                                    `<td style="color: ${txtColor};">${item.locationVal}</td>
+                                                    <td style="color: ${txtColor};">${item.bldgFloorVal}</td>`
+                                                :
+                                                    `<td>${item.locationVal}</td>
+                                                    <td>${item.bldgFloorVal}</td>`
+                                                }`
                                             :
                                                 ''
                                             }
 
-                                            <td>
-                                                ${
-                                                    shortDescription.length >= 18 
-                                                    ? 
-                                                    `${shortDescription.substr(0,18)}...<br>
-                                                    <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                                                    data-bs-toggle="modal" data-bs-target="#modalSeemore" 
-                                                    id='Description,,${item.reqDesc},,${item.refNo}'>See more</span>`
+                                            ${ currentURL == 'officer_open_request' ? 
+                                                `<td style="color: ${txtColor};">
+                                                    ${ shortDescription.length >= 18 
+                                                        ? 
+                                                        `${shortDescription.substr(0,18)}...<br>
+                                                        <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
+                                                        data-bs-toggle="modal" data-bs-target="#modalSeemore" 
+                                                        id='Description,,${item.reqDesc.replace(/,,/g , '..')},,${item.refNo}'>See more</span>`
+                                                        :
+                                                        shortDescription
+                                                    }
+                                                </td>
+                                                <td style="color: ${txtColor};">
+                                                    ${ equiDetails.length >= 18
+                                                    ?
+                                                        `${equiDetails.substr(0,18)}...<br>
+                                                        <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
+                                                        data-bs-toggle="modal" data-bs-target="#modalSeemore" 
+                                                        id='Equipment Details,,${equiDetails},,${item.refNo}'>See more</span>`
                                                     :
-                                                    shortDescription
-                                                }
-                                            </td>
-                                            <td>
-                                                ${
-                                                equiDetails.length >= 18
-                                                ?
-                                                    `${equiDetails.substr(0,18)}...<br>
-                                                    <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                                                    data-bs-toggle="modal" data-bs-target="#modalSeemore" 
-                                                    id='Equipment Details,,${equiDetails},,${item.refNo}'>See more</span>`
-                                                :
-                                                   equiDetails
-                                                }
-                                            </td>
-
+                                                    equiDetails
+                                                    }
+                                                </td>`
+                                            :
+                                                `<td>
+                                                    ${  shortDescription.length >= 18 
+                                                        ? 
+                                                        `${shortDescription.substr(0,18)}...<br>
+                                                        <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
+                                                        data-bs-toggle="modal" data-bs-target="#modalSeemore" 
+                                                        id='Description,,${item.reqDesc.replace(/,,/g , '..')},,${item.refNo}'>See more</span>`
+                                                        :
+                                                        shortDescription
+                                                    }
+                                                </td>
+                                                <td>
+                                                    ${ equiDetails.length >= 18
+                                                    ?
+                                                        `${equiDetails.substr(0,18)}...<br>
+                                                        <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
+                                                        data-bs-toggle="modal" data-bs-target="#modalSeemore" 
+                                                        id='Equipment Details,,${equiDetails},,${item.refNo}'>See more</span>`
+                                                    :
+                                                    equiDetails
+                                                    }
+                                                </td>`
+                                            }
 
                                             ${  currentURL == 'officer_completed_request' ||
                                                 currentURL == 'officer_acknowledge_request' ||
@@ -312,10 +438,10 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                 `${item.actionTaken == null || item.actionTaken == '' ? actionTakenVal = 'N/A' : actionTakenVal = item.actionTaken }
                                                 
                                                 <td style="max-width: 110px;">
-                                                    ${actionTakenVal.length >= 18 ?
-                                                        `${actionTakenVal.substr(0,18)}...<span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                                                        data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Action Taken,,${item.actionTaken},,${item.refNo}'>See more</span>`
-                                                    : actionTakenVal}
+                                                    <button class="btn btn-sm btn-outline-secondary rounded-pill mt-2 pt-1 officerActionTaken" style="font-size: 8px;"
+                                                    id='${item.refNo}' data-bs-toggle="modal" data-bs-target="#officerActionTakenModal">
+                                                        View Action
+                                                    </button>
                                                 </td>`
 
                                             : ''
@@ -331,14 +457,16 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                     
                                                     ${ currentURL == 'officer_open_request' ?
 
-                                                        `<li><a class="dropdown-item distributeRequestGetRefID" href="#" id="${item.refNo}"
+                                                        `<li><a class="dropdown-item distributeRequestGetRefID" href="#" id="${item.refNo},,${item.categoryVal}"
                                                         data-bs-toggle="modal" data-bs-target="#distributeRequest"><i class="bi bi-arrow-left-right"></i> Distribute Request </a></li>
 
                                                             <form action="/assign_staff" method="POST" id="takeRequestForm_${ item.refNo.replace(/[^0-9]/g,'') }-${ item.categoryId }">                                                                          
                                                                 @csrf
-                                                                <input type="hidden" name="getCategoryID" value="${item.categoryId}">
+                                                                <input type="hidden" name="getTakenByName" value="{{ Auth::user()->account_fname }} {{Auth::user()->account_lname}}">
+                                                                <input type="hidden" name="getCategoryVal" value="${item.categoryVal}">
                                                                 <input type="hidden" name="getRefID" value="${item.refNo}">
                                                                 <input type="hidden" name="getStaffID" value="{{ session('account_empid') }}">
+
                                                                 <li>
                                                                     <a class="dropdown-item takeRequest" href="#" id="${item.refNo}?${item.categoryId}"><i class="bi bi-hand-thumbs-up-fill"></i> Take Request 
                                                                     </a>
@@ -358,14 +486,21 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                             data-bs-toggle="modal" data-bs-target="#officerNewActionModal"><i class="bi bi-file-plus"></i> New Action </a></li>
 
                                                             <li><a class="dropdown-item updateCategoryClassBtn" href="#" 
-                                                            id="${item.refNo},,${item.categoryVal},,${item.reqDesc},,${item.categoryId},,${item.reqDate}"
+                                                            id="${item.refNo},,${item.categoryVal},,${item.reqDesc.replace(/,,/g , '..')},,${item.categoryId},,${item.reqDate}"
                                                             data-bs-toggle="modal" data-bs-target="#modalUpdateCategory"
                                                             ><i class="bi bi-arrow-up-right-square-fill"></i> Update Category </a></li>
 
 
-                                                            <li><a class="dropdown-item officerCondemnRequestBtn" href="#" 
-                                                            id="${item.refNo},,${item.eq1},,${item.eq2},,${item.eq3},,${item.eq4}"
-                                                            data-bs-toggle="modal" data-bs-target="#officerCondemnModal"><i class="bi bi-bell-slash-fill"></i> Condemn </a></li>
+                                                            ${ agentUnitID == 1 ?
+                                                                `<li><a class="dropdown-item officerServiceReportBtn" href="#" 
+                                                                id="${item.refNo},,${item.eq1},,${item.eq2},,${item.eq3},,${item.eq4},,${item.reqDesc}"
+                                                                data-bs-toggle="modal" data-bs-target="#officerServiceReportModal"><i class="bi bi-folder-symlink"></i> Service Report </a></li>`
+                                                            : 
+
+                                                                `<li><a class="dropdown-item officerCondemnRequestBtn" href="#" 
+                                                                id="${item.refNo},,${item.eq1},,${item.eq2},,${item.eq3},,${item.eq4}"
+                                                                data-bs-toggle="modal" data-bs-target="#officerCondemnModal"><i class="bi bi-bell-slash-fill"></i> Condemn </a></li>`
+                                                            }
 
 
                                                             <form action="/done_request" method="POST" id="doneRequestForm_${ item.refNo.replace(/[^0-9]/g,'') }-${item.categoryId}">
@@ -405,6 +540,14 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                         id="${item.refNo},,${item.categoryVal}" data-bs-toggle="modal" data-bs-target="#tagAgentModal">
                                                         <i class="bi bi-person-fill-add"></i> Tag Agents </a></li>
 
+                                                        ${ agentUnitID == 1 ?
+
+                                                            `<li><a class="dropdown-item" href="/service_report_form_pdf/${item.refNo}" target="blank">
+                                                            <i class="bi bi-folder-symlink-fill"></i> Service Report Form </a></li>`
+                                                        :
+                                                            ''
+                                                        }
+
                                                         <form action="/undo_request" method="POST" id="undoRequestForm_${ item.refNo.replace(/[^0-9]/g,'') }-${ item.categoryId }">
                                                             @csrf
                                                             <input type="hidden" name="categoryVal" value="${item.categoryVal}">
@@ -412,8 +555,14 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                             <input type="hidden" name="refID" value="${item.refNo}">
                                                             <input type="hidden" name="agentStaffID" value="{{ session('account_empid') }}">
                                                             <li><a class="dropdown-item undoRequest" href="#" id="${item.refNo}?${ item.categoryId }"><i class="bi bi-arrow-counterclockwise"></i> Undo </a></li>
-                                                        </form>`
-
+                                                        </form>
+                                                        
+                                                        ${ accountID  == '1990-0022' ?
+                                                        `<li><a class="dropdown-item editAccomplishedBtn" href="#"
+                                                        id="${item.refNo},,${item.accomplishedDate}" data-bs-toggle="modal" data-bs-target="#modalEditAccomplished">
+                                                        <i class="bi bi-calendar-check"></i> Edit Date Accomplished</a></li>`
+                                                        : ''
+                                                        }`   
                                                     :
 
                                                     currentURL == 'officer_completed_request' ? 
@@ -425,16 +574,14 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                             id="${item.refNo},,${item.categoryVal}" data-bs-toggle="modal" data-bs-target="#tagAgentModal">
                                                             <i class="bi bi-person-fill-add"></i> Tag Agents </a></li>
 
-                                                            <form action="/undo_request" method="POST" id="undoRequestForm_${ item.refNo.replace(/[^0-9]/g,'') }-${ item.categoryId }">
-                                                            @csrf
-                                                            <input type="hidden" name="categoryVal" value="${item.categoryVal}">
-                                                            <input type="hidden" name="officerFullName" value="{{ Auth::user()->account_fname }} {{ Auth::user()->account_lname }}">
-                                                            <input type="hidden" name="refID" value="${item.refNo}">
-                                                            <input type="hidden" name="agentStaffID" value="{{ session('account_empid') }}">
-                                                            <li><a class="dropdown-item undoRequest" href="#" id="${item.refNo}?${ item.categoryId }"><i class="bi bi-arrow-counterclockwise"></i> Undo </a></li>
-                                                            </form>
+                                                            ${ agentUnitID == 1 ?
+                                                                `<li><a class="dropdown-item" href="/service_report_form_pdf/${item.refNo}" target="blank">
+                                                                <i class="bi bi-folder-symlink-fill"></i> Service Report Form </a></li>`
+                                                            :
+                                                                ''
+                                                            }
 
-                                                            ${item.condemn == 1 ? 
+                                                            ${item.condemn == 1 && agentUnitID == 2 ? 
                                                                 `<li><a class="dropdown-item" href="/condemn_form/${item.refNo}" target="blank"><i class="bi bi-file-x-fill"></i> Show Condemn Form</a></li>`
                                                             : ''}`
                                                      
@@ -452,14 +599,14 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                     }
 
                                                             ${ 
-                                                                (item.categoryVal == 'Biometrics Enrollment' ||
-                                                                item.categoryVal == 'HOMIS Encoding Error' ||
-                                                                item.categoryVal == 'Network Installation / Internet Connection / Cable Transfer' ||
-                                                                item.categoryVal == 'Zoom Link' ||
-                                                                item.categoryVal == 'Website Uploads' ||
-                                                                item.categoryVal == 'System Enhancement / Modification / Homis / Other Installation' ||
-                                                                item.categoryVal == 'VMC ID Card Preparation' ||
-                                                                item.categoryVal == 'Travel Conduction') 
+                                                                (item.categoryId == 12 ||
+                                                                item.categoryId == 4 ||
+                                                                item.categoryId == 6 ||
+                                                                item.categoryId == 30 ||
+                                                                item.categoryId == 7 ||
+                                                                item.categoryId == 3 ||
+                                                                item.categoryId == 13 ||
+                                                                item.categoryId == 42) 
                                                                 ?
                                                                 `<li><a href="#" class="dropdown-item viewAttachment" id="${item.refNo}?${item.categoryVal}?${item.encryptedRefID}"
                                                                 data-bs-toggle="modal" data-bs-target="#viewAttachmentModal"><i class="bi bi-paperclip"></i> View Attachment </a></li>`
@@ -477,8 +624,8 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                 console.error(error);
                             }
                         });//EOF AJAX
-                }//EOF CURRENT URL officer_open
 
+                }//EOF CURRENT URL officer_open
 
                 if(currentURL != 'client_dashboard'){
 
@@ -534,6 +681,9 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <p><i class="${item.categoryIcon} display-6"></i> <span class="display-6">${item.categoryVal}</span>
+                                                        ${ 
+                                                            item.mainCategory != '' ? `<span class="text-secondary">(${item.mainCategory})</span>` : ''
+                                                         }
                                                         ${
                                                             item.reqCondemn == 1 ? `<span class="text-danger"> (Condemned)</span>` : ''
                                                         }
@@ -559,14 +709,14 @@ let appKey = "qefxx2lpwsoxttgzci9f";
 
                                                         ${
                                                             (
-                                                                item.categoryVal == 'Biometrics Enrollment' ||
-                                                                item.categoryVal == 'HOMIS Encoding Error' ||
-                                                                item.categoryVal == 'Network Installation / Internet Connection / Cable Transfer' ||
-                                                                item.categoryVal == 'Zoom Link' ||
-                                                                item.categoryVal == 'Website Uploads' ||
-                                                                item.categoryVal == 'System Enhancement / Modification / Homis / Other Installation' ||
-                                                                item.categoryVal == 'VMC ID Card Preparation' ||
-                                                                item.categoryVal == 'Travel Conduction'
+                                                                item.categoryId == 12 ||
+                                                                item.categoryId == 4 ||
+                                                                item.categoryId == 6 ||
+                                                                item.categoryId == 30 ||
+                                                                item.categoryId == 7 ||
+                                                                item.categoryId == 3 ||
+                                                                item.categoryId == 13 ||
+                                                                item.categoryId == 42
                                                             )
                                                             ?
                                                             `<button class="btn btn-secondary btn-sm ms-2 viewAttachment" 
@@ -587,6 +737,7 @@ let appKey = "qefxx2lpwsoxttgzci9f";
                                                                 @csrf
                                                                 <input type="hidden" name="refID" value="${item.refID}">
                                                                     <input type="hidden" name="agentUnitID" value="${item.agentUnitID}">
+                                                                    <input type="hidden" name="agentToNotify" value="${item.agentAccID}">
                                                                     <input type="hidden" name="requestDate" value="${item.reqDate}">
                                                                     <input type="hidden" name="categoryID" value="${item.categoryId}">
                                                                     <input type="hidden" name="requestBy" value="${item.requestBy}">

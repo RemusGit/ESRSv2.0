@@ -16,100 +16,11 @@
         </div>
    </div>
 
-    <?php 
-            $categoryIcon = "bi bi-question-diamond-fill"; // TEMP DEFAULT ICON
-            switch($datas->categoryId){
-                case 1:
-                    $categoryIcon = 'bi bi-hdd-network-fill';
-                    break;
-
-                case 3:
-                    $categoryIcon = 'bi bi-pc-display';
-                    break;
-
-                case 4:
-                        $categoryIcon = 'bi bi-keyboard-fill';
-                        break;
-
-                case 6:
-                        $categoryIcon = 'bi bi-wifi';
-                        break;
-
-                case 7:
-                        $categoryIcon = 'bi bi-cloud-arrow-up-fill';
-                        break;
-
-                case 8:
-                        $categoryIcon = 'bi bi-people-fill';
-                        break;
-
-                case 10:
-                        $categoryIcon = 'bi bi-person-badge';
-                        break;
-
-                case 11:
-                        $categoryIcon = 'bi bi-person-gear';
-                        break;
-
-                case 12:
-                        $categoryIcon = 'bi bi-fingerprint';
-                        break;
-
-                case 13:
-                        $categoryIcon = 'bi bi-person-vcard';
-                        break;
-
-                case 30:
-                        $categoryIcon = 'bi bi-wechat';
-                        break;
-
-                case 33:
-                        $categoryIcon = 'bi bi-patch-question';
-                        break;
-
-                case 34:
-                        $categoryIcon = 'bi bi-prescription2';
-                        break;
-
-                case 35:
-                        $categoryIcon = 'bi bi-pen-fill';
-                        break;
-
-                case 36:
-                        $categoryIcon = 'bi bi-buildings';
-                        break;
-
-                case 37:
-                        $categoryIcon = 'bi bi-motherboard';
-                        break;
-
-                case 38:
-                        $categoryIcon = 'bi bi-ev-station';
-                        break;
-
-                case 39:
-                        $categoryIcon = 'bi bi-wrench';
-                        break;
-
-                case 40:
-                        $categoryIcon = 'bi bi-people-fill';
-                        break;
-
-                case 41:
-                        $categoryIcon = 'bi bi-patch-question';
-                        break;
-
-                case 42:
-                        $categoryIcon = 'bi bi-airplane';
-                        break;
-                }
-    
-    ?>
-
    <!-- CATEGORY + DESCRIPTION -->
     <div class="row">
         <div class="col-lg-12">
-            <p ><i class="{{ $categoryIcon }} display-6"></i> <span class="display-6">{{ $datas->categoryVal }}</span>
+            <p ><i class="{{ $datas->categoryIcon }} display-6"></i> <span class="display-6">{{ $datas->categoryVal }} </span>
+            @if($datas->mainCategory != '')<span class="text-secondary"> ({{ $datas->mainCategory }})</span>@endif
             @if($datas->reqCondemn == 1)<span class="text-danger"> (Condemned)</span>@endif
             </p>
             <p style="font-size: 14px;" class="text-success ms-2 fw-bold">{{ $datas->agentAbbre }}</p>
@@ -135,14 +46,14 @@
 
             <!-- ATTACHMENTS -->
             @if(
-            $datas->categoryVal == 'Biometrics Enrollment' 
-            || $datas->categoryVal == 'HOMIS Encoding Error'
-            || $datas->categoryVal == 'Network Installation / Internet Connection / Cable Transfer'
-            || $datas->categoryVal == 'Zoom Link'
-            || $datas->categoryVal == 'Website Uploads'
-            || $datas->categoryVal == 'System Enhancement / Modification / Homis / Other Installation'
-            || $datas->categoryVal == 'VMC ID Card Preparation'
-            || $datas->categoryVal == 'Travel Conduction'
+                $datas->categoryId == 12
+                || $datas->categoryId == 4
+                || $datas->categoryId == 6
+                || $datas->categoryId == 30
+                || $datas->categoryId == 7
+                || $datas->categoryId == 3
+                || $datas->categoryId == 13
+                || $datas->categoryId == 42
             )
                 <button class="btn btn-secondary btn-sm ms-2 viewAttachment" id="{{ $datas->refID }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refID) }}"
                 data-bs-toggle="modal" data-bs-target="#viewAttachmentModal">View Attachment</button>
@@ -158,7 +69,8 @@
         <div class="col-lg-2 p-1 ms-auto">
             <form action="/acknowledge_request" method="POST" id="clientAcknowledge_{{ preg_replace('/[^0-9]/', '', $datas->refID) }}-{{ $datas->categoryId }}">
                 @csrf
-                <input type="hidden" name="agentUnitID" value="{{ $datas->agentUnitID }}">
+                <!--input type="hidden" name="agentUnitID" value="{{ $datas->agentUnitID }}"-->
+                <input type="hidden" name="agentToNotify" value="{{ $datas->agentAccID }}">
                 <input type="hidden" name="requestDate" value="{{ $datas->reqDate }}">
                 <input type="hidden" name="categoryID" value="{{ $datas->categoryId }}">
                 <input type="hidden" name="requestBy" value="{{ $datas->requestBy }}">
@@ -176,7 +88,8 @@
         <div class="col-lg-2 p-1 ms-auto">
             <form action="/undo_request_client" method="POST" id="clientUndo_{{ preg_replace('/[^0-9]/', '', $datas->refID) }}-{{ $datas->categoryId }}">
                 @csrf
-                <input type="hidden" name="agentUnitID" value="{{ $datas->agentUnitID }}">
+                <!--input type="hidden" name="agentUnitID" value="{{ $datas->agentUnitID }}"-->
+                <input type="hidden" name="agentToNotify" value="{{ $datas->agentAccID }}">
                 <input type="hidden" name="requestDate" value="{{ $datas->reqDate }}">
                 <input type="hidden" name="categoryID" value="{{ $datas->categoryId }}">
                 <input type="hidden" name="requestBy" value="{{ $datas->requestBy }}">
@@ -232,8 +145,6 @@
 <!---------------------------------------------------------------------------------------------------->
 
 @include('partials.cancel_request')
-
-@include('client.modals.modal_view_attachment')
 
 @include('partials.acknowledge_request')
 

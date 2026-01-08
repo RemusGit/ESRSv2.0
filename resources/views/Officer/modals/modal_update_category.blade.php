@@ -437,7 +437,14 @@
                 type: 'GET', 
                 success: function(res) {
                     $.each(JSON.parse(res) , function(i , val){
-                        $('#updateCategoryNewCategoryID').append('<option value='+val.category_id+'>'+val.category_value+'</option>');
+
+                        if(val.main_category != ''){
+                            $('#updateCategoryNewCategoryID').append('<option value='+val.category_id+'>('+val.main_category+') '+val.category_value+'</option>');
+                        }
+                        else{
+                            $('#updateCategoryNewCategoryID').append('<option value='+val.category_id+'>'+val.category_value+'</option>');
+                        }
+                        
                     });
                 },
                 error: function(error) {

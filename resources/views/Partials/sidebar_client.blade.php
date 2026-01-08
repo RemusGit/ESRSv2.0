@@ -15,8 +15,8 @@
         
         <a href="/client_dashboard" class="nav-link d-flex align-items-center text-light lead">
           <!--i class="bi bi-info-circle"></i> <span class="ms-2">About</span-->
-          <i class="bi bi-house-fill"
-          data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Dashboard"></i> <span class="hideOnSmallDevice ps-1">Dashboard</span>
+          <i class="bi bi-clipboard-plus-fill"
+          data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Create Request"></i> <span class="hideOnSmallDevice ps-1">Create Request</span>
         </a>
       </li>
       <li class="nav-item">

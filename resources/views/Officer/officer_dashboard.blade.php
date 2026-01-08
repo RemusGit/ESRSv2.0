@@ -2,13 +2,13 @@
 
 @include('partials.sidebar_officer')
 
-<main class="content  vh-100">
+<main class="content vh-100">
 <div class="container-fluid">
 
 @include('partials.officer_top_display')
 
 <!--Current PAGE-->
-<div class="row ">
+<div class="row">
     <div class="col-lg-12 ">
         <div class="lead fw-bold"><i class="bi bi-journal-richtext"></i> All Request</div>
     </div>
@@ -23,10 +23,11 @@
 
 @include('officer.officer_table_dashboard')
 
-@include('partials.modal_seemore')
-
 </div> <!--EOF CONTAINER FLUID-->
 </main>
+@include('officer.modals.modal_action_taken_officer')
+@include('client.modals.modal_view_attachment')
+@include('partials.modal_seemore')
 
 @include('partials.footer')
 
