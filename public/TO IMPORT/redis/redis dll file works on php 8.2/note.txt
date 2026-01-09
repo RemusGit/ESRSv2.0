@@ -1,0 +1,5 @@
+1.	put dll file to C:\xampp\php\ext
+2.	open php.ini add this -> extension=redis
+3. 	restart apache / php artisan optimize:clear
+4. 	RUN php artisan queue:work redis --sleep=1 --tries=3 --timeout=30 --max-jobs=0 --max-time=0
+5.	TEST!

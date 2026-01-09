@@ -13,9 +13,9 @@ Broadcast::channel('App.Models.AccountsTab.{account_empid}', function ($user, $a
 });
 */
 
-Broadcast::channel('user.{account_empid}', function ($user, $accountID) {
+Broadcast::channel('user.{account_empid}', function ($user, $account_empid) {
     //$removeDash = str_replace('-', '', $accountID); 
 
-    return (string) $user->account_empid === (string) $accountID;
+    return (string) $user->account_empid === (string) $account_empid;
 });
 

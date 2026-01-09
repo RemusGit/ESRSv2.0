@@ -22,12 +22,12 @@ let socket;
 const RECONNECT_DELAY = 2000; // 2 seconds
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 //let appKey = "qefxx2lpwsoxttgzci9f";
-let appKey = "TestKey1";
+let appKey = "TestKey3";
 
     function connectReverb(){
 
         ///////////////////////////////////////////////// INITIALIZING WEB SOCKET
-        socket = new WebSocket("ws://127.0.0.1:8888/app/"+appKey);
+        socket = new WebSocket("ws://127.0.0.1:9003/app/"+appKey);
         //console.log(window.location.hostname);
 
         /////////////////////////////////////////////////SOCKET ON OPEN
@@ -95,6 +95,7 @@ let appKey = "TestKey1";
             
 
             /////////////////////////////////////////////////////////////////////////////////// FIRING CHAT MESSAGE
+            /*
             if (msg.event === "ChatMessageSent") {
                 
                 const payload = JSON.parse(msg.data);
@@ -126,8 +127,8 @@ let appKey = "TestKey1";
                             console.error(error);
                         }
                     });//EOF AJAX
-                    */
             }
+            */
 
 
             //////////////////////////////////////////////////////////////////////////////// FIRING NOTIFICATION
@@ -285,7 +286,7 @@ let appKey = "TestKey1";
                                     let nowVsUntil = 0;
 
 
-                                    if(item.until != '' || item.until == null){
+                                    if(item.until != '' && item.until != null){
 
                                         let dateUntil = new Date(item.until);
                                         let dateDiff = dateUntil - Date.now();
@@ -336,12 +337,16 @@ let appKey = "TestKey1";
                                            
 
                                             ${ currentURL == 'officer_cancelled_request' ?
-                                                `<td>${item.cancelledDate}</td>`
+                                                `<td>${ item.cancelledDate != null && item.cancelledDate != '' ? item.cancelledDate : '-' }</td>`
                                             :
-                                                `${ currentURL == 'officer_open_request' ?
-                                                `<td style="color: ${txtColor};">${item.until == '' || item.until == null ? 'Indefinite' : item.until}</td>`
-                                                :
-                                                `<td>${item.until == '' || item.until == null ? 'Indefinite' : item.until}</td>`
+                                                `${item.until == '' || item.until == null ? 
+                                                    `<td>Indefinite</td>` 
+                                                : 
+                                                    `${ currentURL == 'officer_open_request' ?
+                                                    `<td style="color: ${txtColor};">${item.until}</td>`
+                                                    : 
+                                                    `<td>${item.until}</td>`
+                                                    }`
                                                 }`
                                             }
 
