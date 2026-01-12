@@ -11,6 +11,7 @@ use App\Http\Controllers\RequestClientController;
 Route::get('/' ,[AccountsTabController::class , 'login'])->name('login');
 
 Route::get('/register_account' , [AccountsTabController::class , 'registerAccount']);
+//Route::get('/invalid_credential' , [AccountsTabController::class , 'invalidCredential']);
 
 
 Route::get('/client_dashboard' , [AccountsTabController::class , 'clientDashboard'])->middleware('auth');

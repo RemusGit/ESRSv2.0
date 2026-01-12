@@ -498,7 +498,7 @@ let appKey = "TestKey3";
 
                                                             ${ agentUnitID == 1 ?
                                                                 `<li><a class="dropdown-item officerServiceReportBtn" href="#" 
-                                                                id="${item.refNo},,${item.eq1},,${item.eq2},,${item.eq3},,${item.eq4},,${item.reqDesc}"
+                                                                id="${item.refNo},,${item.eq1},,${item.eq2},,${item.eq3},,${item.eq4},,${item.reqDesc},,${item.categoryVal}"
                                                                 data-bs-toggle="modal" data-bs-target="#officerServiceReportModal"><i class="bi bi-folder-symlink"></i> Service Report </a></li>`
                                                             : 
 

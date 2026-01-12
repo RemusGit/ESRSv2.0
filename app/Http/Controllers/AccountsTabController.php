@@ -22,10 +22,48 @@ class AccountsTabController extends Controller
     public function login(){
 
         //return view('AccountsTab.account_login');
-
         //$users = AccountsTab::orderBy('account_fname')->get();
         //return view('AccountsTab.temp_account_list' , compact('users'));
-        return view('AccountsTab.temp_account_list');
+
+        $getAccountID = $this->decryptLink();
+        //dd($getAccountID);
+        $user = AccountsTab::where('account_empid' , $getAccountID)->first();
+
+        if($user){
+            Auth::login($user);
+
+            $getSection = DB::table('section_tab')
+            ->select('section_name' , 'section_abbre')
+            ->where('section_id' , $user->section_id)
+            ->first();
+
+            $sectionName = $getSection->section_name;
+            $sectionAbbre = $getSection->section_abbre;
+
+            session([
+                'usertype_id' => $user->usertype_id,
+                'account_empid' => $user->account_empid,
+                'agentunit_id' => $user->agentunit_id,
+                'section_id' => $user->section_id,
+                'section_name' => $sectionName,
+                'section_abbre' => $sectionAbbre,
+                'profile_pic' => $user->profile_pic,
+            ]);
+
+            //$req->session()->regenerate();
+
+            if($user->agentunit_id == 3){
+                return redirect()->intended('/client_dashboard');
+            }
+            else{
+                return redirect()->intended('/officer_open_request');
+            }
+        }
+        else{
+            //INVALID CREDENTIAL HERE
+            //return redirect('/logout');
+            return view('AccountsTab.invalid_credential');
+        }
     }
 
     public function registerAccount(){
@@ -45,8 +83,33 @@ class AccountsTabController extends Controller
         session()->regenerateToken(); // Regenerate the CSRF token
         //session()->flush();
 
-        return redirect('/'); // Redirect to a desired page, e.g., login
+        //return redirect('/'); // Redirect to a desired page, e.g., login
+        return view('AccountsTab.account_login');
     }
+
+    private function decryptLink()
+    {
+        $currentLink = url()->full();
+        $parsedUrl = parse_url($currentLink);
+
+        if (isset($parsedUrl['query']))
+        {
+            parse_str($parsedUrl['query'], $queryParams);
+            $encryptedValue = $queryParams['credentials_Base'];
+            $credentials_Obj = json_decode(base64_decode($encryptedValue), true);
+            try {
+                $empId = $credentials_Obj['account_id'];
+                return $empId;
+            } catch (\Throwable $th) {
+                return redirect("/logout");
+            }     
+
+        }else{
+            //return redirect('/logout');
+            return view('AccountsTab.invalid_credential');
+        }
+
+    }   
 
     //------------------------------------------------------------------AUTHENTICATE USER
     public function authUser(Request $req){
@@ -55,7 +118,7 @@ class AccountsTabController extends Controller
         session()->invalidate(); // Invalidate the session
         session()->regenerateToken(); // Regenerate the CSRF token
 
-       
+        
         $user = AccountsTab::where('account_empid' , $req->account_empid)->first();
         //$checkUser = AccountsTab::where('account_empid' , $req->account_empid)->exists();
         if($user){

@@ -2055,6 +2055,12 @@ class RequestOfficerController extends Controller
         $eqPartName = $req->input('eqPartName' , []);
         $eqPartAmt = $req->input('eqPartAmount' , []);
         */
+
+        //CLEAR ALL EQUIPMENT PARTS BEFORE INSERT -> TO PREVENT DUP AFTER UNDO ACTION
+        DB::table('equipmentparts_tab')
+        ->where('request_refid' , $getRefID)
+        ->delete();
+
         $getPartsCounter = (int)$req->getPartsCounter;
         for($i = 0; $i < $getPartsCounter; $i++){
 
@@ -2108,6 +2114,11 @@ class RequestOfficerController extends Controller
             ]);
         }
 
+        $requestDone = now();
+        $officerFullName = Auth::user()->account_fname.' '.Auth::user()->account_lname;
+        $categoryVal = $req->serviceReportCategoryVal;
+
+        $this->notifRequestStatusUpdate($officerFullName , $requestDone , $getRefID , $categoryVal , 8 , "Request Done via Service Report");
         return back();
     }
 

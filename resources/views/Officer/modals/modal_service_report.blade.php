@@ -108,6 +108,7 @@
 
                 <div class="d-flex flex-row-reverse mt-4">
                     <input type="hidden" name="getPartsCounter" id="getPartsCounter" value="0">
+                    <input type="hidden" name="serviceReportCategoryVal" id="serviceReportCategoryVal">
                     <button type="submit" class="btn btn-success">Create Service Report</button>
                 </div>
             </form>
@@ -125,40 +126,39 @@
 
 
 <script>
-    $(document).ready(function(){
-        $(document).on('click' , '.officerServiceReportBtn' , function(){
+    $(document).on('click' , '.officerServiceReportBtn' , function(){
 
-            let array = this.id.split(",,");
-            let getRefID = array[0];
-            let nameOfEquipment = array[1];
-            let serialNo = array[2];
-            let modelNo = array[3];
-            let propertyNo = array[4];
-            let desc = array[5];
+        let array = this.id.split(",,");
+        let getRefID = array[0];
+        let nameOfEquipment = array[1];
+        let serialNo = array[2];
+        let modelNo = array[3];
+        let propertyNo = array[4];
+        let desc = array[5];
+        let categoryVal = array[6];
 
-            if(nameOfEquipment == null){
-              nameOfEquipment = '';
-            } 
-            if(serialNo == null){
-              serialNo = '';
-            } 
-            if(modelNo == null){
-              modelNo = '';
-            } 
-            if(propertyNo == null || propertyNo == ''){
-              propertyNo = 'N/A';
-            } 
+        if(nameOfEquipment == null){
+            nameOfEquipment = '';
+        } 
+        if(serialNo == null){
+            serialNo = '';
+        } 
+        if(modelNo == null){
+            modelNo = '';
+        } 
+        if(propertyNo == null || propertyNo == ''){
+            propertyNo = 'N/A';
+        } 
 
-            $('#serviceReportDesc').html(desc);
-            $('#officerServiceReportRefID').val(getRefID);
-            $('#getNameOfEqSR').val(nameOfEquipment);
-            $('#getSerialNoSR').val(serialNo);
-            $('#getModelNoSR').val(modelNo);
-            $('#serviceReportPropNo').html(propertyNo);
+        $('#serviceReportDesc').html(desc);
+        $('#officerServiceReportRefID').val(getRefID);
+        $('#getNameOfEqSR').val(nameOfEquipment);
+        $('#getSerialNoSR').val(serialNo);
+        $('#getModelNoSR').val(modelNo);
+        $('#serviceReportPropNo').html(propertyNo);
 
-            $('#serviceReportRefID').html(getRefID);
-
-        });
+        $('#serviceReportRefID').html(getRefID);
+        $('#serviceReportCategoryVal').val(categoryVal);
     });
 </script>
 

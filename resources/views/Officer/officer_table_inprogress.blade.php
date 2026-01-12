@@ -102,7 +102,7 @@
 
                                 @if(Auth::user()->agentunit_id == 1)
                                     <li><a class="dropdown-item officerServiceReportBtn" href="#" 
-                                    id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }},,{{ $datas->reqDesc }}"
+                                    id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }},,{{ $datas->reqDesc }},,{{ $datas->categoryVal }}"
                                     data-bs-toggle="modal" data-bs-target="#officerServiceReportModal"><i class="bi bi-folder-symlink"></i> Service Report </a></li>
                                 @else
                                     <li><a class="dropdown-item officerCondemnRequestBtn" href="#" 
