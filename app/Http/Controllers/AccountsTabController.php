@@ -22,9 +22,12 @@ class AccountsTabController extends Controller
     public function login(){
 
         //return view('AccountsTab.account_login');
-        //$users = AccountsTab::orderBy('account_fname')->get();
-        //return view('AccountsTab.temp_account_list' , compact('users'));
+        //UNCOMMENT FOR TEMP LOGIN / TESTING
+        $users = AccountsTab::orderBy('account_fname')->get();
+        return view('AccountsTab.temp_account_list' , compact('users'));
 
+        //UNCOMMENT BELOW TO USE DECRYPT
+        /*
         $getAccountID = $this->decryptLink();
         //dd($getAccountID);
         $user = AccountsTab::where('account_empid' , $getAccountID)->first();
@@ -64,6 +67,7 @@ class AccountsTabController extends Controller
             //return redirect('/logout');
             return view('AccountsTab.invalid_credential');
         }
+            */
     }
 
     public function registerAccount(){
@@ -175,7 +179,7 @@ class AccountsTabController extends Controller
             $reqActionOfficer = $req->reqActionOfficer;
 
             $sql = DB::table('request_tab')
-                    ->join('category_tab_2', 'category_tab_2.category_id', '=', 'request_tab.category_id')
+                    ->join('category_tab', 'category_tab.category_id', '=', 'request_tab.category_id')
                     ->join('section_tab', 'section_tab.section_id', '=', 'request_tab.section_id')
                     ->join('status_tab', 'status_tab.status_id', '=', 'request_tab.status_id')
                     ->leftJoin('accounts_tab', 'accounts_tab.account_empid', '=', 'request_tab.agentacc_id')
@@ -183,11 +187,11 @@ class AccountsTabController extends Controller
                     ->leftJoin('idrequest_attach_tab' , 'idrequest_attach_tab.request_refid' , '=' , 'request_tab.request_refid')
                     ->leftJoin('biometric_attach_tab' , 'biometric_attach_tab.request_refid' , '=' , 'request_tab.request_refid')
                     ->selectRaw("
-                        category_tab_2.category_id AS categoryID,
+                        category_tab.category_id AS categoryID,
                         request_tab.request_refid AS refNo,
                         request_tab.request_date AS reqDate,
                         request_tab.request_duration AS until,
-                        category_tab_2.category_value AS categoryVal,
+                        category_tab.category_value AS categoryVal,
                         request_tab.request_by AS requestBy,
                         request_tab.request_byempno AS empNo,
                         section_tab.section_abbre AS sectionName,
@@ -209,11 +213,11 @@ class AccountsTabController extends Controller
                     //->where('category_tab_2.category_value', 'LIKE' , '%'.$getReqCategory.'%')
                     ->where('status_tab.status_value', 'LIKE', '%'.$getReqStatus.'%')
                     ->groupBy(
-                        'category_tab_2.category_id',
+                        'category_tab.category_id',
                         'request_tab.request_refid',
                         'request_tab.request_date',
                         'request_tab.request_duration',
-                        'category_tab_2.category_value',
+                        'category_tab.category_value',
                         'request_tab.request_by',
                         'request_tab.request_byempno',
                         'section_tab.section_abbre',
@@ -265,7 +269,7 @@ class AccountsTabController extends Controller
                     }
                     
                     if($getReqCategory != ''){
-                        $sql->where('category_tab_2.category_id',  $getReqCategory);
+                        $sql->where('category_tab.category_id',  $getReqCategory);
                     }
 
                     if($reqActionOfficer != ''){
@@ -276,7 +280,7 @@ class AccountsTabController extends Controller
 
             //return view('officer.officer_dashboard' , compact('data'));
 
-            $populateCategory = DB::table('category_tab_2')
+            $populateCategory = DB::table('category_tab')
             ->select('category_id' , 'category_value' , 'main_category')
             ->where('agentunit_id' , $accountEmpid)
             ->orderBy('category_id' , 'ASC')
@@ -295,16 +299,16 @@ class AccountsTabController extends Controller
     public function clientDashboard(){
 
         //SHOW IMISS REQUEST
-        $imissData = DB::table('category_tab_2')
-        ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'category_tab_2.repairtype_id')
+        $imissData = DB::table('category_tab')
+        ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'category_tab.repairtype_id')
         ->where('agentunit_id' , 2)
         ->where('active' , 1)
         ->orderBy('category_id' , 'ASC')
         ->get();
 
         // SHOW EFMS REQUEST
-        $efmsData = DB::table('category_tab_2')
-        ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'category_tab_2.repairtype_id')
+        $efmsData = DB::table('category_tab')
+        ->join('repairtype_tab' , 'repairtype_tab.repairtype_id' , '=' , 'category_tab.repairtype_id')
         ->where('agentunit_id' , 1)
         ->where('category_id' , '>=' , 43) // SHOW ALL NEW EFMS ONLY
         ->where('active' , 1)

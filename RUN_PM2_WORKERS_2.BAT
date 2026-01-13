@@ -5,7 +5,7 @@ REM Go to Laravel project root
 cd /d C:\laragon8.0\www\ESRSv2
 
 REM ---- START REVERB ----
-start /b pm2 start php --name laravel-reverb -- artisan reverb:start --no-interaction
+start /b pm2 start php --name laravel-reverb -- artisan reverb:start --host=0.0.0.0 --port=9003
 REM ---- START QUEUE WORKERS ----
 start /b pm2 start php --name queue-redis-1 -- artisan queue:work redis --sleep=0 --tries=1 --timeout=30
 start /b pm2 start php --name queue-redis-2 -- artisan queue:work redis --sleep=0 --tries=1 --timeout=30

@@ -22,12 +22,15 @@ let socket;
 const RECONNECT_DELAY = 2000; // 2 seconds
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 //let appKey = "qefxx2lpwsoxttgzci9f";
-let appKey = "TestKey3";
 
     function connectReverb(){
 
+    let appKey = "qefxx2lpwsoxttgzci9f";
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const wsHost = window.location.hostname;
+
         ///////////////////////////////////////////////// INITIALIZING WEB SOCKET
-        socket = new WebSocket("ws://127.0.0.1:9003/app/"+appKey);
+        socket = new WebSocket(`ws://${wsHost}:9003/app/`+appKey);
         //console.log(window.location.hostname);
 
         /////////////////////////////////////////////////SOCKET ON OPEN
@@ -35,12 +38,14 @@ let appKey = "TestKey3";
             console.log("Connected to Reverb");
 
             // Heartbeat to keep connection alive
+            /*
             setInterval(() => {
                 if(socket.readyState === WebSocket.OPEN){
                     socket.send(JSON.stringify({ event: "pusher:ping", data: {} })); // FOR RECONNECTING EVERY 30SEC
                     //console.log( "Pinging every 30sec" );
                 }
             }, HEARTBEAT_INTERVAL);
+            */
         };
 
         
@@ -67,10 +72,14 @@ let appKey = "TestKey3";
             if (msg.event === "pusher:connection_established") {
                 $.ajax({
                     url: "{{ url('/broadcasting/auth') }}",
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
+                            method: "POST",
+                            xhrFields: {
+                                withCredentials: true   //REQUIRED
+                            },
+                            headers: {
+                                "X-CSRF-TOKEN": csrfToken,
+                                "Accept": "application/json"
+                            },
                     contentType: "application/json",
                     data: JSON.stringify({
                         channel_name: "private-user." + accountID,

@@ -19,6 +19,7 @@ class NotifyUser implements ShouldBroadcast
 
     public function __construct($accountID , $msg)
     {
+
         $this->msg = $msg;
         $this->accountID = $accountID;
     }

@@ -31,7 +31,7 @@
     <!--SELECT2 JS-->
     <script src="{{ asset('js/select2.min.js') }}"></script>
 
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
 <?php use Illuminate\Support\Facades\Crypt; ?>

@@ -30,7 +30,7 @@
                   </div>
 
                   <div class="pt-1 mb-4">
-                    <button data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-lg btn-block" type="button">Login</button>
+                    <a href="/login" data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-lg btn-block" type="button">Login</a>
                   </div>
 
                   <!--a class="small text-muted" href="#!">Forgot password?</a-->

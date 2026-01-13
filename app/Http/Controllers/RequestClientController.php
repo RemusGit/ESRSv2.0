@@ -523,19 +523,19 @@ class RequestClientController extends Controller
         $getUserID = session('account_empid');
 
             $sql = DB::table('request_tab')
-            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->join('agentunit_tab' , 'agentunit_tab.agentunit_id' , '=' , 'request_tab.agentunit_id')
             ->leftJoin('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->selectRaw("
-                        category_tab_2.main_category as mainCategory ,
-                        category_tab_2.category_icon as categoryIcon ,
+                        category_tab.main_category as mainCategory ,
+                        category_tab.category_icon as categoryIcon ,
                         request_tab.request_by as requestBy , 
                         request_tab.agentunit_id as agentUnitID , 
                         request_tab.agentacc_id as agentAccID ,
                         request_tab.request_refid as refID , 
                         request_tab.category_id as categoryId , 
-                        category_tab_2.category_value categoryVal ,
+                        category_tab.category_value categoryVal ,
                         request_tab.request_descript reqDesc , 
                         request_tab.request_date as reqDate ,
                         request_tab.request_duration as reqDuration ,
@@ -1202,7 +1202,8 @@ class RequestClientController extends Controller
         $editReqDetails = "Category was changed from ".$currentCategoryText." to ".$newCategoryText;
 
         // GET REPAIR ID TO CALCULATE REQUEST DURATION
-        $getRepairID = DB::table('category_tab_2')
+        //$getRepairID = DB::table('category_tab_2')
+        $getRepairID = DB::table('category_tab')
         ->where('category_id' , $newCategoryID)
         ->first();
         $repairTypeID = $getRepairID->repairtype_id;
@@ -1416,7 +1417,8 @@ class RequestClientController extends Controller
 
 
         // GET REPAIR ID TO CALCULATE REQUEST DURATION
-        $getRepairID = DB::table('category_tab_2')
+        //$getRepairID = DB::table('category_tab_2')
+        $getRepairID = DB::table('category_tab')
         ->where('category_id' , $categoryID)
         ->first();
         $repairTypeID = $getRepairID->repairtype_id;
@@ -1518,7 +1520,8 @@ class RequestClientController extends Controller
     //////////////////////////////////////////////////////////////////// NOTIFICATION - NEW REQUEST
     public function notifFromClient($accountToNotify , $requestDate , $refNo , $categoryID , $requestBy , $notifTitle){
 
-        $data = DB::table('category_tab_2')
+        //$data = DB::table('category_tab_2')
+        $data = DB::table('category_tab')
         ->where('category_id' , $categoryID)
         ->select('category_value')
         ->first();
@@ -2008,19 +2011,19 @@ class RequestClientController extends Controller
         $getUserID = session('account_empid');
 
             $data = DB::table('request_tab')
-            ->join('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
+            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->join('agentunit_tab' , 'agentunit_tab.agentunit_id' , '=' , 'request_tab.agentunit_id')
             ->leftJoin('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->selectRaw("
-                        category_tab_2.category_icon as categoryIcon ,
-                        category_tab_2.main_category as mainCategory ,
+                        category_tab.category_icon as categoryIcon ,
+                        category_tab.main_category as mainCategory ,
                         request_tab.request_by as requestBy , 
                         request_tab.agentunit_id as agentUnitID , 
                         request_tab.agentacc_id as agentAccID , 
                         request_tab.request_refid as refID , 
                         request_tab.category_id as categoryId , 
-                        category_tab_2.category_value categoryVal ,
+                        category_tab.category_value categoryVal ,
                         request_tab.request_descript reqDesc , 
                         request_tab.request_date as reqDate ,
                         request_tab.request_duration as reqDuration ,
