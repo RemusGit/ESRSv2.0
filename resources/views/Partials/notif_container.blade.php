@@ -487,6 +487,11 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
                                                                 </li>
                                                             </form>
 
+                                                            <li><a class="dropdown-item updateCategoryClassBtn" href="#" 
+                                                            id="${item.refNo},,${item.categoryVal},,${item.reqDesc.replace(/,,/g , '..')},,${item.categoryId},,${item.reqDate}"
+                                                            data-bs-toggle="modal" data-bs-target="#modalUpdateCategory"
+                                                            ><i class="bi bi-arrow-up-right-square-fill"></i> Update Category </a></li>
+
                                                             <li>
                                                                 <a class="dropdown-item officerCancelReqBtn" href="#" id="${item.refNo}"
                                                                 data-bs-toggle="modal" data-bs-target="#officerCancelRequest"><i class="bi bi-x-square"></i> Cancel Request 
@@ -620,7 +625,11 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
                                                                 item.categoryId == 7 ||
                                                                 item.categoryId == 3 ||
                                                                 item.categoryId == 13 ||
-                                                                item.categoryId == 42) 
+                                                                item.categoryId == 42 ||
+                                                                item.categoryId == 73 ||
+                                                                item.categoryId == 74 ||
+                                                                item.categoryId == 75
+                                                            ) 
                                                                 ?
                                                                 `<li><a href="#" class="dropdown-item viewAttachment" id="${item.refNo}?${item.categoryVal}?${item.encryptedRefID}"
                                                                 data-bs-toggle="modal" data-bs-target="#viewAttachmentModal"><i class="bi bi-paperclip"></i> View Attachment </a></li>`
@@ -730,7 +739,10 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
                                                                 item.categoryId == 7 ||
                                                                 item.categoryId == 3 ||
                                                                 item.categoryId == 13 ||
-                                                                item.categoryId == 42
+                                                                item.categoryId == 42 ||
+                                                                item.categoryId == 73 ||
+                                                                item.categoryId == 74 ||
+                                                                item.categoryId == 75
                                                             )
                                                             ?
                                                             `<button class="btn btn-secondary btn-sm ms-2 viewAttachment" 

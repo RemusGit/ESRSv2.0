@@ -26,7 +26,21 @@
                     @include('client.modals.contact_request_details_others_efms')
                     <input type="hidden" name="categoryID" id="addRequestCategoryID" value=""> <!-- 41 = EFMS CATEGORY ID  -->
                     <input type="hidden" name="agentUnitID" value="1"> <!-- 1 = EFMS  -->
-                    <!--input type="hidden" name="getEfmsInitials" value="(OT)"--> <!-- 1 = EFMS  -->
+                    <div class="modal-footer mt-5">
+                      <button type="submit" class="btn btn-success">Submit Request</button>
+                    </div>
+                  </form>
+                </div>
+
+
+                <!-- ALL EFMS FOR TRANSPORT MAIN CATEGORY-->
+                <div id="divAllEfmsTravel" class="allDivDetails">
+                  <form action="/add_efms_tc" method="POST" id="efmsCategoryFormTravel">
+                    @csrf
+                    @include('client.modals.contact_request_details_tc')
+                    <input type="hidden" name="categoryID" id="addRequestCategoryIDTravel" value=""> <!-- 41 = EFMS CATEGORY ID  -->
+                    <input type="hidden" name="agentUnitID" value="1"> <!-- 1 = EFMS  -->
+                    @include('client.modals.travel_conduction_details')
                     <div class="modal-footer mt-5">
                       <button type="submit" class="btn btn-success">Submit Request</button>
                     </div>

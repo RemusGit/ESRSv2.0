@@ -445,8 +445,14 @@
                     $('#categoryDuration').html('Duration: Maximum of '+convertedDuration);
                 }
 
-                $('#addRequestCategoryID').val(categoryID);
-                $('#divAllEfms').show();
+                if(categoryID == 73 || categoryID == 74 || categoryID == 75){ // FOR EFMS TRANSPORT MAIN CATEGORY
+                    $('#divAllEfmsTravel').show();
+                    $('#addRequestCategoryIDTravel').val(categoryID);
+                }else{
+                    $('#divAllEfms').show();
+                    $('#addRequestCategoryID').val(categoryID);
+                }
+                
             }
             
             $('#request_icon , #contact_details_request_icon').removeClass();

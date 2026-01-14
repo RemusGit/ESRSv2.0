@@ -133,6 +133,9 @@
                                         || $datas->categoryId == 3
                                         || $datas->categoryId == 13
                                         || $datas->categoryId == 42
+                                        || $datas->categoryId == 73
+                                        || $datas->categoryId == 74
+                                        || $datas->categoryId == 75
                                     )
                                         <li><a href="#" class="dropdown-item viewAttachment" id="{{ $datas->refNo }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refNo) }}"
                                         data-bs-toggle="modal" data-bs-target="#viewAttachmentModal"><i class="bi bi-paperclip"></i> View Attachment </a></li>

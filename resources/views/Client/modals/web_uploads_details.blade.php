@@ -27,9 +27,9 @@
                 <div class="form-outline mb-2 form-floating  w-100">
                     <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline mb-2 form-floating">
-                            <input type="file" id="updateCatwebUploadFile" class="form-control" placeholder="Attachment (max 1mb)" name="webUploadFile" accept="image/*" required />
-                            <label class="form-label" for="updateCatwebUploadFile"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Attachment (max 1mb)</label>
-                            <p class="text-danger" id="maxFileSizeText" style="display: none;">Maximum File size is 1MB only</p>
+                            <input type="file" id="updateCatwebUploadFile" class="form-control" placeholder="Attachment" name="webUploadFile[]" accept="image/*" required multiple />
+                            <!--label class="form-label" for="updateCatwebUploadFile"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Attachment (max 1mb)</label-->
+                            <!--p class="text-danger" id="maxFileSizeText" style="display: none;">Maximum File size is 1MB only</p-->
                         </div>
                   </div>
                 </div>
@@ -40,9 +40,9 @@
      
 
 <script>
-
+   /*
   $('#updateCatwebUploadFile').on('change' , function(){
-
+ 
     var files = this.files;
 
         // Check if a file was selected
@@ -65,5 +65,5 @@
             
         }
   });
-
+*/
 </script>

@@ -494,7 +494,7 @@
                 $('#formVmcIdCard').show(); 
             }
 
-            if(getCategoryVal == 'Travel Conduction'){
+            if(getCategoryVal == 'Basic Life Support' || getCategoryVal == 'Advance Life Support' || getCategoryVal == 'Employee Transport' || getCategoryVal == 'Travel Conduction'){
 
                 $('#attachmentCategoryTitle').html("Travel Conduction");
                 $('#forEfmsTC').show(); 
@@ -516,7 +516,7 @@
 
                             $.each(JSON.parse(res) , function(i , val){
 
-                                if(getCategoryVal == 'Travel Conduction'){
+                                if(getCategoryVal == 'Basic Life Support' || getCategoryVal == 'Advance Life Support' || getCategoryVal == 'Employee Transport' || getCategoryVal == 'Travel Conduction'){
 
                                     $('#efmsTCDestination').html(val.travel_destination);
                                     $('#efmsTCPurpose').html(val.travel_purpose);

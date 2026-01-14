@@ -24,7 +24,8 @@
     $('#contactDetailsLocationRepairTA').empty();
     $('#contactDetailsLocationOthersEfms').empty();
     $('#contactDetailsLocationEfmsTC').empty();
-    
+    $('#contactDetailsLocationOthersEfmsTravel').empty();
+
 
     $('#contactDetailsLocationBio').append('<option></option>');
     $('#contactDetailsLocationHomis').append('<option></option>');
@@ -47,6 +48,7 @@
     $('#contactDetailsLocationRepairTA').append('<option></option>');
     $('#contactDetailsLocationOthersEfms').append('<option></option>');
     $('#contactDetailsLocationEfmsTC').append('<option></option>');
+    $('#contactDetailsLocationOthersEfmsTravel').append('<option></option>');
     
     $('#contactDetailsFloorBio').empty();
     $('#contactDetailsFloorHomis').empty();
@@ -69,6 +71,7 @@
     $('#contactDetailsFloorRepairTA').empty();
     $('#contactDetailsFloorOthersEfms').empty();
     $('#contactDetailsFloorEfmsTC').empty();
+    $('#contactDetailsFloorOthersEfmsTravel').empty();
     
     $('#contactDetailsFloorBio').append('<option></option>');
     $('#contactDetailsFloorHomis').append('<option></option>');
@@ -91,6 +94,7 @@
     $('#contactDetailsFloorRepairTA').append('<option></option>');
     $('#contactDetailsFloorOthersEfms').append('<option></option>');
     $('#contactDetailsFloorEfmsTC').append('<option></option>');
+    $('#contactDetailsFloorOthersEfmsTravel').append('<option></option>');
 
     // LOAD ALL LOCATION FROM location_tab
     $.ajax({
@@ -121,6 +125,7 @@
               $('#contactDetailsLocationRepairTA').append('<option value='+val.location_id+'>'+val.location_value+'</option>');
               $('#contactDetailsLocationOthersEfms').append('<option value='+val.location_id+'>'+val.location_value+'</option>');
               $('#contactDetailsLocationEfmsTC').append('<option value='+val.location_id+'>'+val.location_value+'</option>');
+              $('#contactDetailsLocationOthersEfmsTravel').append('<option value='+val.location_id+'>'+val.location_value+'</option>');
 
             });
         },
@@ -154,6 +159,7 @@
     $('#contactDetailsFloorRepairTA').empty();
     $('#contactDetailsFloorOthersEfms').empty();
     $('#contactDetailsFloorEfmsTC').empty();
+    $('#contactDetailsFloorOthersEfmsTravel').empty();
     
     $('#contactDetailsFloorBio').append('<option></option>');
     $('#contactDetailsFloorHomis').append('<option></option>');
@@ -176,6 +182,7 @@
     $('#contactDetailsFloorRepairTA').append('<option></option>');
     $('#contactDetailsFloorOthersEfms').append('<option></option>');
     $('#contactDetailsFloorEfmsTC').append('<option></option>');
+    $('#contactDetailsFloorOthersEfmsTravel').append('<option></option>');
 
     let getBuildingID = $(this).val();
           
@@ -206,6 +213,7 @@
             $('#contactDetailsFloorRepairPW').append('<option value='+val.bldgfloor_id+'>'+val.bldgfloor_abbre+'</option>');
             $('#contactDetailsFloorRepairTA').append('<option value='+val.bldgfloor_id+'>'+val.bldgfloor_abbre+'</option>');
             $('#contactDetailsFloorOthersEfms').append('<option value='+val.bldgfloor_id+'>'+val.bldgfloor_abbre+'</option>');
+            $('#contactDetailsFloorOthersEfmsTravel').append('<option value='+val.bldgfloor_id+'>'+val.bldgfloor_abbre+'</option>');
             $('#contactDetailsFloorEfmsTC').append('<option value='+val.bldgfloor_id+'>'+val.bldgfloor_abbre+'</option>');
             });
           },

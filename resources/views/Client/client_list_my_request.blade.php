@@ -54,6 +54,9 @@
                 || $datas->categoryId == 3
                 || $datas->categoryId == 13
                 || $datas->categoryId == 42
+                || $datas->categoryId == 73
+                || $datas->categoryId == 74
+                || $datas->categoryId == 75
             )
                 <button class="btn btn-secondary btn-sm ms-2 viewAttachment" id="{{ $datas->refID }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refID) }}"
                 data-bs-toggle="modal" data-bs-target="#viewAttachmentModal">View Attachment</button>

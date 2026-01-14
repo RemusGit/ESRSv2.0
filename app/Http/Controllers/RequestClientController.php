@@ -692,7 +692,7 @@ class RequestClientController extends Controller
 
         $categoryVal = $req->input('categoryVal');
 
-        if($categoryVal == 'Travel Conduction'){
+        if($categoryVal == 'Basic Life Support' || $categoryVal == 'Advance Life Support' || $categoryVal == 'Employee Transport' || $categoryVal == 'Travel Conduction'){
 
             $data = DB::table('travel_attach_tab')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'travel_attach_tab.section_id')
@@ -954,7 +954,7 @@ class RequestClientController extends Controller
         $getRequestDate = $req->getRequestDate;
 
         //////////////////////////////////////////////////// UPDATE CATEGORY - TRAVEL CONDUCTION
-        if($newCategoryText == 'Travel Conduction'){
+        if($newCategoryText == 'Travel Conduction' || $newCategoryID == 73 || $newCategoryID == 74 || $newCategoryID == 75){
 
             DB::table('travel_attach_tab')
             ->insert([
@@ -1125,8 +1125,9 @@ class RequestClientController extends Controller
 
             $webUploadDetails = $req->webUploadDetails;
 
-                $file = $req->file('webUploadFile');
+            foreach ($req->file('webUploadFile') as $file){
 
+                //$file = $req->file('webUploadFile');
                 // Optional: unique name
                 $filename = time() . '_' . $file->getClientOriginalName();
 
@@ -1152,6 +1153,8 @@ class RequestClientController extends Controller
 
                 // (Optional) delete original uploaded file
                 unlink(public_path($webUploadPath .'/' . $filename));
+
+            }//EOF FOREACH
 
                 DB::table('websiteupload_attach_tab')
                 ->insert([
@@ -1581,6 +1584,7 @@ class RequestClientController extends Controller
     public function addAllEFMS(Request $req){
 
         $requestRefID = $this->generateRefID($req);
+        
         return redirect('/client_open_request');
     }
 
@@ -1711,8 +1715,10 @@ class RequestClientController extends Controller
         $webUploadSectionID = session('section_id');
 
         if ($req->hasFile('webUploadFile')) {
-            $file = $req->file('webUploadFile');
 
+        foreach ($req->file('webUploadFile') as $file)
+        {
+            //$file = $req->file('webUploadFile');
             // Optional: unique name
             $filename = time() . '_' . $file->getClientOriginalName();
 
@@ -1735,9 +1741,11 @@ class RequestClientController extends Controller
                 $zip->addFile(public_path($webUploadPath .'/' . $filename), $filename);
                 $zip->close();
             }
+                // (Optional) delete original uploaded file
+                unlink(public_path($webUploadPath .'/' . $filename));
 
-            // (Optional) delete original uploaded file
-            unlink(public_path($webUploadPath .'/' . $filename));
+            }//EOF FOREACH
+            
         }
         DB::table('websiteupload_attach_tab')
         ->insert([

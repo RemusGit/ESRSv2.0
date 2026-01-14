@@ -138,10 +138,10 @@
             $('#showTCDetails').slideUp();
             $('#hrId').slideUp();
             
-            //console.log(categoryVal);
+            console.log(categoryVal);
 
             //////////////////////////////////////////////////////////////////////////////////// TRAVEL CONDUCTION
-            if(categoryVal == 'Travel Conduction'){
+            if(categoryVal == 'Travel Conduction' || categoryID == 73 || categoryID == 74 || categoryID == 75){
 
                 $('#showTCDetails').slideDown();
                 $('#hrId').slideDown();
@@ -395,7 +395,8 @@
         });
 
         ///////////////////////////////////////// GET ALL INFO AFTER CLICKING UPDATE CATEGORY BUTTON ON IN-PROGRESS TABLE
-        $('.updateCategoryClassBtn').click(function(){
+        //$('.updateCategoryClassBtn').click(function(){
+        $(document).on('click' , '.updateCategoryClassBtn' , function(){
 
             let array = this.id.split(",,");
             let refID = array[0];
@@ -415,7 +416,8 @@
         });//EOF ON CLICK
 
         ///////////////////////////////////////////////////////////// ON MODAL SHOW - VIEW ALL CATEOGRY UNDER AGENT ID
-        $('#modalUpdateCategory').on('show.bs.modal' , function(){
+        //$('#modalUpdateCategory').on('show.bs.modal' , function(){
+        $(document).on('show.bs.modal' , '#modalUpdateCategory' , function(){
 
                 $('#showBioDetails').hide();
                 $('#showHomisDetails').hide();
@@ -475,7 +477,7 @@
             let newCategoryValText = $('#newCategoryValText').val();
 
             ///////////////////////// TRAVEL CONDUCTION VALIDATION
-            if(newCategoryValText == 'Travel Conduction'){
+            if(newCategoryValText == 'Travel Conduction' || newCategoryValText == 'Basic Life Support' || newCategoryValText == 'Advance Life Support' || newCategoryValText == 'Employee Transport'){
                 if(
                     $('#EfmsTcDestination').val() == '' ||
                     $('#EfmsTcPurpose').val() == '' ||
