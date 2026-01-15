@@ -398,9 +398,9 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
                                             ${ currentURL == 'officer_open_request' ? 
                                                 `<td style="color: ${txtColor};">
-                                                    ${ shortDescription.length >= 18 
+                                                    ${ shortDescription.length >= 50
                                                         ? 
-                                                        `${shortDescription.substr(0,18)}...<br>
+                                                        `${shortDescription.substr(0,50)}...<br>
                                                         <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
                                                         data-bs-toggle="modal" data-bs-target="#modalSeemore" 
                                                         id='Description,,${item.reqDesc.replace(/,,/g , '..')},,${item.refNo}'>See more</span>`

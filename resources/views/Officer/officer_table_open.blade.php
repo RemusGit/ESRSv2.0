@@ -83,10 +83,10 @@
                     <td style="color: {{$txtColor}};">{{ $datas->locationVal }}</td>
                     <td style="color: {{$txtColor}};">{{ $datas->bldgFloorVal }}</td>
 
-                    <td style="max-width: 110px; color: {{$txtColor}};">
-                        {{ Str::limit($datas->reqDesc , 18 , '...') }}
+                    <td style="color: {{$txtColor}};">
+                        {{ Str::limit($datas->reqDesc , 50 , '...') }}
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
-                        @if ($countDescription >= 18)
+                        @if ($countDescription >= 50)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
                             data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif

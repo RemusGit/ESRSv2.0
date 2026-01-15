@@ -14,20 +14,22 @@ use App\Events\ChatMessageSent;
 class AccountsTabController extends Controller
 {
 
+    /*
     public function loginAccount(){
 
         return view('AccountsTab.account_login');
     }
+    */
 
     public function login(){
 
         //return view('AccountsTab.account_login');
         //UNCOMMENT FOR TEMP LOGIN / TESTING
-        $users = AccountsTab::orderBy('account_fname')->get();
-        return view('AccountsTab.temp_account_list' , compact('users'));
+        //$users = AccountsTab::orderBy('account_fname')->get();
+       // return view('AccountsTab.temp_account_list' , compact('users'));
 
         //UNCOMMENT BELOW TO USE DECRYPT
-        /*
+
         $getAccountID = $this->decryptLink();
         //dd($getAccountID);
         $user = AccountsTab::where('account_empid' , $getAccountID)->first();
@@ -66,8 +68,9 @@ class AccountsTabController extends Controller
             //INVALID CREDENTIAL HERE
             //return redirect('/logout');
             return view('AccountsTab.invalid_credential');
+
         }
-            */
+   
     }
 
     public function registerAccount(){
@@ -88,7 +91,8 @@ class AccountsTabController extends Controller
         //session()->flush();
 
         //return redirect('/'); // Redirect to a desired page, e.g., login
-        return view('AccountsTab.account_login');
+        //return view('AccountsTab.account_login');
+        return redirect()->away('http://192.168.12.6/VMC-Platform/Module%20Login/Pages/Page_Login.php');
     }
 
     private function decryptLink()
