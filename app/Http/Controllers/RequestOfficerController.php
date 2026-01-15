@@ -204,6 +204,7 @@ class RequestOfficerController extends Controller
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo ,
+            request_tab.agentacc_id as agentAccId ,
             repairtype_tab.repairtype_time as repairTime , 
             category_tab.category_id as categoryId ,
             request_tab.request_date as reqDate , 
@@ -229,6 +230,7 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->where('request_tab.request_refid' , 'LIKE' ,  '%'.$getRefNo.'%')
             ->groupBy(
+                'agentAccId' ,
                 'refNo',
                 'repairTime' ,
                 'categoryId',
@@ -2278,7 +2280,15 @@ class RequestOfficerController extends Controller
         $reqRemarks = "";
         $reqRecommendation = "";
 
-        $signatory1 = "FRANCISCO GUILALAS CAMPOSANO JR";
+        $getAgentAccID = DB::table('request_tab')
+        ->join('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
+        ->where('request_refid' , $refID)
+        ->first();
+
+        //dd($getAgentAccID->account_fname .' '.$getAgentAccID->account_lname);
+        $actionOfficer = $getAgentAccID->account_fname .' '.$getAgentAccID->account_lname;
+
+        $signatory1 = $actionOfficer;
         $signatory2 = "Engr. ZORAIDA S. CUADRA";
         $signatory3 = "";
 

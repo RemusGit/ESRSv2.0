@@ -372,10 +372,10 @@
         <div class="clearfix" style="font-size: 14px;">
             <div class="float-start form-check">
                 <label class="form-check-label" for="picSigBypass">
-                Already Uploaded Picture & Signature
-                </label>
-                <span class="text-danger fst-italic" style="font-size: 9px;">(Note: We use your Firstname and Lastname as Reference.)</span>
+                I Already Uploaded My Picture & Signature
+                <span class="text-danger fst-italic" style="font-size: 15px;">(Note: We use your Firstname and Lastname as Reference.) <br>Do not proceed unless you are SURE your Picture and Signature are already uploaded.</span>
                 <input class="form-check-input" type="checkbox" id="picSigBypass" name="picSigBypass">
+                </label>
             </div>
         </div>
 

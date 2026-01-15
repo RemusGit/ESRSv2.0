@@ -1830,6 +1830,8 @@ class RequestClientController extends Controller
         $idrequest_emercontactno = $req->idrequest_emercontactno;
 
 
+        $vmcIdCardPicFilename = '';
+        $vmcIdCardSignatureFilename = '';
 
         if($picSigBypass == 'on'){
 
@@ -1837,15 +1839,14 @@ class RequestClientController extends Controller
             ->select('idrequest_picture' , 'idrequest_signature')
             ->where('idrequest_fname' , 'LIKE' , '%'.$idrequest_fname.'%')
             ->where('idrequest_lname' , 'LIKE' , '%'.$idrequest_lname.'%')
+            ->where('idrequest_picture' , '<>' , '')
+            ->orderBy('request_refid' , 'DESC')
             ->first();
-
-            $vmcIdCardPicFilename = '';
-            $vmcIdCardSignatureFilename = '';
+            
             if($findPic != '' || $findPic != null){
                 $vmcIdCardPicFilename = $findPic->idrequest_picture;
                 $vmcIdCardSignatureFilename = $findPic->idrequest_signature;
             }
-
         }
         else{
 
@@ -1877,6 +1878,7 @@ class RequestClientController extends Controller
 
         }// EOF BYPASS PIC AND SIG
         
+        //dd($vmcIdCardPicFilename);
 
         DB::table('idrequest_attach_tab')
         ->insert([
