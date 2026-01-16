@@ -19,6 +19,7 @@
             <div class="input-group mb-3">
                 <span class="input-group-text">Status <i class="bi bi-bar-chart ps-1"></i></span>
                 <select class="form-select form-control-sm" name="reqStatus">
+                    <option value="All Request">All Request</option>
                     <option value="All Accomplished">All Accomplished</option>
                     <option value="In-Progress" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'In-Progress')>In-Progress</option>
                     <option value="Acknowledge" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Acknowledge')>Acknowledge</option>

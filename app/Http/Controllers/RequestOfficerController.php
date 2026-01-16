@@ -596,7 +596,7 @@ class RequestOfficerController extends Controller
             $sql = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
-            ->join('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
+            ->leftJoin('accounts_tab' , 'accounts_tab.account_empid' , '=' , 'request_tab.agentacc_id')
             ->join('status_tab' , 'status_tab.status_id' , '=' , 'request_tab.status_id')
             ->leftJoin('tagagent_tab' , 'tagagent_tab.request_refid' , '=' , 'request_tab.request_refid')
             ->selectRaw(
@@ -648,9 +648,12 @@ class RequestOfficerController extends Controller
 
                 $statusWhere = "request_tab.status_id IN (6,7,8) AND request_tab.request_condemn = 1";
             }
-            else{
+            elseif ($status == 'All Accomplished') {
                 $sql->whereIn('request_tab.status_id' , [6,7,8]);
                 $statusWhere = "request_tab.status_id IN (6,7,8)";
+            }else{
+                $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
             }
 
             if($accountEmpId != 'All Agents'){
@@ -674,15 +677,19 @@ class RequestOfficerController extends Controller
                         $sql->whereIn('request_tab.status_id' , [6,7,8])
                         ->where('request_tab.request_condemn' , 1);
                     }
-                    else{
+                    elseif ($status == 'All Accomplished') {
                         $sql->whereIn('request_tab.status_id' , [6,7,8]);
+                    }else{
+                        $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                        $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
                     }
 
                 $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
                 or tagagent_tab.agentacc_id = '".$accountEmpId."' and (request_tab.request_date between '".$dateFrom."' and '".$dateTo."'))  ";
             }
-
+            
             $data = $sql->get();
+            //dd($data);
         
             /*
             $summary = DB::table('request_tab')
@@ -703,7 +710,7 @@ class RequestOfficerController extends Controller
             ->get();
             */
 
-            $summary = DB::table('request_tab')
+            $sql2 = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
             ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
             ->select(
@@ -718,9 +725,14 @@ class RequestOfficerController extends Controller
             )
             ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
             ->where('category_tab.agentunit_id' , $agentUnitID)
-            ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
-            ->get();
+            ->orderBy('category_tab.category_id');
+
+
+            if($status != 'All Request'){
+               $sql2->where('request_tab.status_id' , '<>' , 2); 
+            }
+
+        $summary = $sql2->get();
 
             
         require_once(app_path('Services/MyPDF.php'));
@@ -865,7 +877,6 @@ class RequestOfficerController extends Controller
                 $pdf->SetXY(112, 74+$y);
                 $pdf->MultiCell(25,3, $datas->requestBy , 0, 'C' , 0,);
             }
-
 
 
             $pdf->SetFont('Arial', '', 7);
@@ -1478,6 +1489,7 @@ class RequestOfficerController extends Controller
             ->whereBetween('request_date' , [$dateFrom , $dateTo])
             ->orderBy('request_tab.request_date');
 
+
             if ($status == 'In-Progress') {
                 $sql->where('request_tab.status_id' , 5);
                 $statusWhere = "request_tab.status_id = 5 ";
@@ -1500,9 +1512,12 @@ class RequestOfficerController extends Controller
 
                 $statusWhere = "request_tab.status_id IN (6,7,8) AND request_tab.request_condemn = 1";
             }
-            else{
+            elseif ($status == 'All Accomplished') {
                 $sql->whereIn('request_tab.status_id' , [6,7,8]);
                 $statusWhere = "request_tab.status_id IN (6,7,8)";
+            }else{
+                $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
             }
 
                 if($accountEmpId != 'All Agents'){
@@ -1527,8 +1542,11 @@ class RequestOfficerController extends Controller
                         $sql->whereIn('request_tab.status_id' , [6,7,8])
                         ->where('request_tab.request_condemn' , 1);
                     }
-                    else{
+                    elseif ($status == 'All Accomplished') {
                         $sql->whereIn('request_tab.status_id' , [6,7,8]);
+                    }else{
+                        $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                        $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
                     }
                 
                 $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
@@ -1556,7 +1574,7 @@ class RequestOfficerController extends Controller
             ->get();
             */
 
-            $summary = DB::table('request_tab')
+            $sql = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
             ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
             ->select(
@@ -1571,9 +1589,13 @@ class RequestOfficerController extends Controller
             )
             ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
             ->where('category_tab.agentunit_id' , $agentUnitID)
-            ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab.category_id')
-            ->get();
+            ->orderBy('category_tab.category_id');
+
+            if($status != 'All Request'){
+               $sql->where('request_tab.status_id' , '<>' , 2); 
+            }
+
+            $summary = $sql->get();
 
             return view('officer.officer_log_report' , compact('agents' , 'data' , 'summary') , ['oldData' => $req->all()]);
         }
