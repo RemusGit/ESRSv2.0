@@ -516,8 +516,8 @@ class RequestOfficerController extends Controller
     //////////////////////////////////////////////////////////////////// NOTIFICATION - REQUEST STATUS UPDATE
     public function notifRequestStatusUpdate($takenByFullName , $dateTaken , $refNo , $categoryVal , $status , $actionDone){
 
-        $statusText;
-        $statusLink;
+        $statusText = '';
+        $statusLink = '';
 
         if($status == 5){
             $statusText = 'IN-PROGRESS';

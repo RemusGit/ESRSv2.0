@@ -153,6 +153,10 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
                 <button type="button" class="btn-close" data-bs-dismiss="alert" 
                 aria-label="Close"></button><p><i class="bi bi-info-circle-fill pe-2" style="font-size: 20px;"></i>${payload.msg}</p></div>`);
 
+                setTimeout(function() {
+                    $("#notifContainer").fadeOut('slow');
+                }, 5000);
+
                 if(
                     currentURL == 'officer_open_request' ||
                     currentURL == 'officer_inprogress_request' ||

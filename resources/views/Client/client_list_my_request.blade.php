@@ -24,6 +24,7 @@
             @if($datas->reqCondemn == 1)<span class="text-danger"> (Condemned)</span>@endif
             </p>
             <p style="font-size: 14px;" class="text-success ms-2 fw-bold">{{ $datas->agentAbbre }}</p>
+            <p><span class="text-dark lead ms-2" style="font-size: 16px;">Request by: {{ $datas->requestBy }}</span>
             <p style="font-size: 12px;" class="ms-2">{{ $datas->reqDesc }}</p>
         </div>
     </div>
