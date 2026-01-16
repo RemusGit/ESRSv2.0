@@ -12,7 +12,7 @@ Route::get('/' ,[AccountsTabController::class , 'login'])->name('login');
 
 Route::get('/register_account' , [AccountsTabController::class , 'registerAccount']);
 //Route::get('/invalid_credential' , [AccountsTabController::class , 'invalidCredential']);
-
+Route::get('/temp_login' , function() { return view('AccountsTab.temp_account_list'); }); //TEMP LOGIN FOR DEV
 
 Route::get('/client_dashboard' , [AccountsTabController::class , 'clientDashboard'])->middleware('auth');
 

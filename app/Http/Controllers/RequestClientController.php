@@ -521,6 +521,7 @@ class RequestClientController extends Controller
         public function viewClientRequest($getStatusID , $getRefNo , $getDateFrom , $getDateTo){
 
         $getUserID = session('account_empid');
+        $sectionID = session('section_id');
 
             $sql = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
@@ -545,7 +546,8 @@ class RequestClientController extends Controller
                         request_tab.request_condemn as reqCondemn , 
                         CONCAT( accounts_tab.account_fname , ' ' , accounts_tab.account_lname ) as actionOfficer
             ")
-            ->where('request_tab.account_id' , $getUserID)
+            //->where('request_tab.account_id' , $getUserID)
+            ->where('request_tab.section_id' , $sectionID)
             ->where('request_tab.status_id' , $getStatusID)
             ->where('request_tab.request_refid' , 'LIKE' , '%'.  $getRefNo . '%')
             ->groupBy('refID' , 
@@ -1492,7 +1494,7 @@ class RequestClientController extends Controller
         $others = $req->getOthers;
 
         DB::table('request_tab')
-        ->insert([
+        ->insertOrIgnore([
             'request_refid' => $generateRefNo ,
             'category_id' => $categoryID ,
             'repairtype_id' => $repairTypeID ,
