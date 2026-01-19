@@ -5,7 +5,7 @@ $(document).ready(function(){
 $.confirm({
             theme: 'supervan',
             icon: 'bi bi-exclamation-lg',
-            title: 'Authentication Failed',
+            title: 'Session Expired / Authentication Failed',
             content: 'Redirect to Login Page',
             type: 'red',
             draggable: true,
