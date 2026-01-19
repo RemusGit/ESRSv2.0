@@ -155,7 +155,7 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
                 setTimeout(function() {
                     $("#notifContainer").fadeOut('slow');
-                }, 5000);
+                }, 10000);
 
                 if(
                     currentURL == 'officer_open_request' ||

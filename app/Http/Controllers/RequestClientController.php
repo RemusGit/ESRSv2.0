@@ -888,7 +888,10 @@ class RequestClientController extends Controller
     //////////////////////////////////////////////////////////////////// LOAD DESIGNATION / POSITION
     public function loadDesignation(){
 
-        $data = DB::table('position_tab')->get();
+        $data = DB::table('position_tab')
+        ->select('position_name', 'position_id')
+        ->distinct()
+        ->get();
         return json_encode($data);
     }
 
@@ -1439,7 +1442,8 @@ class RequestClientController extends Controller
             $sql->where('request_refid' , 'LIKE' , '%IMISS%');
         }
         
-        $getLastData = $sql->orderBy('request_date' , 'DESC')->first();
+        //$getLastData = $sql->orderBy('request_date' , 'DESC')->first();
+        $getLastData = $sql->count();
 
         $generateRefNo = "";
         if($getAgentUnitID == 1){ //GENERATE REF ID BASED ON CURRENT YEAR + LAST RECORD FOR EFMS
@@ -1450,14 +1454,32 @@ class RequestClientController extends Controller
                 $lastRefNo = 0;
             }
             else{
+                /*
                 $result = $getLastData->request_refid;
                 $lastRefNo = substr($result , 6 , strlen($result));
                 $lastRefNo = preg_replace("/[^0-9]/", "", $lastRefNo); // GET NUMBER ONLY FROM STRING
+                */
+                $lastRefNo = $getLastData;
             }
 
             $lastRefNo = $lastRefNo + 1;
             //$generateRefNo = date('y').'-'.date('m').'-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT).' '.$efmsCategoryInitials; // EFMS OLD REF ID
             $generateRefNo = date('Y').'-EFMS-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT); 
+
+            $checkDup = true;
+            while($checkDup == true){
+
+                $checkRefId = DB::table('request_tab')
+                ->where('request_refid' , $generateRefNo)
+                ->count();
+
+                if($checkRefId == 0){
+                    $checkDup = false;
+                }else{
+                    $lastRefNo++;
+                    $generateRefNo = date('Y').'-EFMS-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT);
+                }
+            }
         }
         if($getAgentUnitID == 2){ //GENERATE REF ID BASED ON CURRENT YEAR + LAST RECORD FOR IMISS
 
@@ -1465,11 +1487,29 @@ class RequestClientController extends Controller
                 $lastRefNo = 0;
             }
             else{
+                /*
                 $result = $getLastData->request_refid;
                 $lastRefNo = substr($result , 11 , strlen($result));
+                */
+                $lastRefNo = $getLastData;
             }
             $lastRefNo = $lastRefNo + 1;
             $generateRefNo = date('Y').'-IMISS-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT); 
+
+            $checkDup = true;
+            while($checkDup == true){
+
+                $checkRefId = DB::table('request_tab')
+                ->where('request_refid' , $generateRefNo)
+                ->count();
+
+                if($checkRefId == 0){
+                    $checkDup = false;
+                }else{
+                    $lastRefNo++;
+                    $generateRefNo = date('Y').'-IMISS-'.str_pad($lastRefNo , 4 , '0' , STR_PAD_LEFT);
+                }
+            }
         }
 
         $requestDuration = $this->calculateRequestDuration($categoryID , $repairTypeID , null , $getAgentUnitID);
@@ -1494,7 +1534,7 @@ class RequestClientController extends Controller
         $others = $req->getOthers;
 
         DB::table('request_tab')
-        ->insertOrIgnore([
+        ->insert([
             'request_refid' => $generateRefNo ,
             'category_id' => $categoryID ,
             'repairtype_id' => $repairTypeID ,
