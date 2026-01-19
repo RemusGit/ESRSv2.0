@@ -21,7 +21,7 @@
 
                 <!-- ALL EFMS -->
                 <div id="divAllEfms" class="allDivDetails">
-                  <form action="/add_all_efms_request" method="POST" id="efmsCategoryForm">
+                  <form action="/add_all_efms_request" method="POST" id="efmsCategoryForm" class="efmsPreventFormSpam">
                     @csrf
                     @include('client.modals.contact_request_details_others_efms')
                     <input type="hidden" name="categoryID" id="addRequestCategoryID" value=""> <!-- 41 = EFMS CATEGORY ID  -->
@@ -35,7 +35,7 @@
 
                 <!-- ALL EFMS FOR TRANSPORT MAIN CATEGORY-->
                 <div id="divAllEfmsTravel" class="allDivDetails">
-                  <form action="/add_efms_tc" method="POST" id="efmsCategoryFormTravel">
+                  <form action="/add_efms_tc" method="POST" id="efmsCategoryFormTravel" class="efmsPreventFormSpam">
                     @csrf
                     @include('client.modals.contact_request_details_tc')
                     <input type="hidden" name="categoryID" id="addRequestCategoryIDTravel" value=""> <!-- 41 = EFMS CATEGORY ID  -->
@@ -232,55 +232,53 @@
     /////////////////////////////////////////////////////////// CHECK ACKNOWLEDGE ALL IMISS REQUEST
     $('.imissClassForm').on('submit' , function(e){
     
-    const form = this;
-
     e.preventDefault();
 
-      //var getFormID = $(this).closest('form').attr('id');
-      //var getFormID = this.id;
-      //console.log(getFormID);
+    const form = this;
+    const $form = $(form);
+    const $submitBtn = $form.find(':submit');
       
       let AccountID = "{{ Auth::user()->account_empid }}";
       let agentUnitID = 2;
 
       checkAcknowledge(AccountID , agentUnitID , function(res){
 
-      if(res == "OK"){
-          form.submit();
-        }
-      });
+          if (res === "OK") {
+              // disable ONLY when we are actually submitting
+              $submitBtn.prop('disabled', true);
 
-    });
+              // remove handler to prevent recursion
+              $form.off('submit');
 
-    /*
-    /////////////////////////////////////////////////////////// CHECK ACKNOWLEDGE OTHERS (IMISS)
-    $('#imissSubmit33').on('click' , function(e){
-
-        e.preventDefault();
-        let AccountID = "{{ Auth::user()->account_empid }}";
-        let agentUnitID = 2;
-
-        checkAcknowledge(AccountID , agentUnitID , '#imissForm33');
-    });
-    */
-
-    /////////////////////////////////////////////////////////// CHECK ACKNOWLEDGE ALL EFMS
-    $('#efmsCategoryForm').on('submit' , function(e){
-
-        const form = this;
-
-        e.preventDefault();
-        let AccountID = "{{ Auth::user()->account_empid }}";
-        let agentUnitID = 1;
-
-        checkAcknowledge(AccountID , agentUnitID , function(res){
-
-          if(res == "OK"){
-            form.submit();
+              // native submit
+              form.submit();
           }
-
-        });
+      });
     });
+
+
+/////////////////////////////////////////////////////////// CHECK ACKNOWLEDGE ALL EFMS
+$('.efmsPreventFormSpam').on('submit', function (e) {
+    e.preventDefault();
+
+    const form = this;
+    const $form = $(form);
+    const $submitBtn = $form.find(':submit');
+    const AccountID   = "{{ Auth::user()->account_empid }}";
+    const agentUnitID = 1;
+
+    checkAcknowledge(AccountID, agentUnitID, function (res) {
+
+        if (res === "OK") {
+            // disable ONLY when we are actually submitting
+            $submitBtn.prop('disabled', true);
+            // remove handler to prevent recursion
+            $form.off('submit');
+            // native submit
+            form.submit();
+        } 
+    });
+});
 
     function checkAcknowledge(AccountID , agentUnitID , callback){
 

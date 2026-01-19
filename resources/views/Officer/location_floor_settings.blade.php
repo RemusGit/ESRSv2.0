@@ -41,7 +41,11 @@
                 @foreach($data as $datas)
                     <tr>
                         <td class="fw-bold text-success" style="font-size: 11px;">{{ $counter }}.</td>
-                        <td>{{ $datas->locVal }}</td>
+                        <td>{{ $datas->locVal }}
+                            @if($datas->locID == 1 || $datas->locID == 2 || $datas->locID == 3 || $datas->locID == 5)
+                                <span class="text-secondary" style="font-size: 10px;">(Default)</span>
+                            @endif
+                        </td>
                         <?php array_push($arrayLocVal , $datas->locVal); ?>
 
                         <td class="text-center">{{ $datas->locAbbr }}</td>
@@ -55,14 +59,27 @@
 
                                     <ul class="dropdown-menu" style="font-size: 14px;">
 
-                                        <li><a class="dropdown-item getLocInfo" href="#" id="{{ $datas->locID }},,{{ $datas->locVal }},,{{ $datas->locAbbr }},,{{ $datas->totalFloor }}"
-                                        data-bs-toggle="modal" data-bs-target="#modalEditLoc"><i class="bi bi-pencil-square"></i> Edit </a></li>
+                                        @if($datas->locID == 1 || $datas->locID == 2 || $datas->locID == 3 || $datas->locID == 5)
+                                            <li><a class="dropdown-item getLocInfo disabled" href="#" id="{{ $datas->locID }},,{{ $datas->locVal }},,{{ $datas->locAbbr }},,{{ $datas->totalFloor }}"
+                                            data-bs-toggle="modal" data-bs-target="#modalEditLoc"><i class="bi bi-pencil-square"></i> Edit <span class="text-danger fst-italic" style="font-size: 10px;">(cannot modify)</span></a></li>
+                                        @else
+                                            <li><a class="dropdown-item getLocInfo" href="#" id="{{ $datas->locID }},,{{ $datas->locVal }},,{{ $datas->locAbbr }},,{{ $datas->totalFloor }}"
+                                            data-bs-toggle="modal" data-bs-target="#modalEditLoc"><i class="bi bi-pencil-square"></i> Edit </a></li>
+                                        @endif
 
                                         <form action="{{ route('officerDeleteLocation') }}" method="POST" id="deleteLocForm_{{ $datas->locID }}">
                                         @csrf
                                             <input type="hidden" name="locID" value="{{ $datas->locID }}">
-                                            <li><a class="dropdown-item text-danger deleteLocation" 
-                                            href="#" id="{{ $datas->locID }},,{{ $datas->locVal }}"><i class="bi bi-trash"></i> Delete </a></li>
+
+                                            @if($datas->locID == 1 || $datas->locID == 2 || $datas->locID == 3 || $datas->locID == 5)
+                                                <li><a class="dropdown-item text-secondary deleteLocation disabled" 
+                                                href="#" id="{{ $datas->locID }},,{{ $datas->locVal }}"><i class="bi bi-trash"></i> Delete 
+                                                <span class="text-danger fst-italic" style="font-size: 10px;">(prohibited)</span></a></li>
+                                            @else
+                                                <li><a class="dropdown-item text-danger deleteLocation" 
+                                                href="#" id="{{ $datas->locID }},,{{ $datas->locVal }}"><i class="bi bi-trash"></i> Delete </a></li>
+                                            @endif
+
                                         </form>
 
                                     </ul>

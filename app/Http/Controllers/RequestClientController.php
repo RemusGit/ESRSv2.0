@@ -889,8 +889,8 @@ class RequestClientController extends Controller
     public function loadDesignation(){
 
         $data = DB::table('position_tab')
-        ->select('position_name', 'position_id')
-        ->distinct()
+        ->select('position_name', DB::raw('MIN(position_id) as position_id'))
+        ->groupBy('position_name')
         ->get();
         return json_encode($data);
     }
@@ -906,7 +906,7 @@ class RequestClientController extends Controller
     public function loadLocation(){
 
         $data = DB::table('location_tab')
-        //->where('deleted' , 0)
+        ->where('deleted' , 0)
         ->get();
         return json_encode($data);
     }
@@ -2061,6 +2061,7 @@ class RequestClientController extends Controller
 
         $getStatusID = $req->status;
         $getUserID = session('account_empid');
+        $sectionID = session('section_id');
 
             $data = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
@@ -2085,7 +2086,8 @@ class RequestClientController extends Controller
                         request_tab.request_condemn as reqCondemn , 
                         CONCAT( accounts_tab.account_fname , ' ' , accounts_tab.account_lname ) as actionOfficer
             ")
-            ->where('request_tab.account_id' , $getUserID)
+            //->where('request_tab.account_id' , $getUserID)
+            ->where('request_tab.section_id' , $sectionID)
             ->where('request_tab.status_id' , $getStatusID)
             ->groupBy('refID' , 
             'agentAccID' ,

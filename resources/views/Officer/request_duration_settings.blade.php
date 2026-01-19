@@ -166,7 +166,7 @@
                                             <i class="bi bi-pencil-square"></i> Edit <span class="text-danger fst-italic" style="font-size: 10px;">(cannot modify)</span></a></li-->
 
                                             <li><a class="dropdown-item getDurationInfo disabled"
-                                            href="#" id=""><i class="bi bi-trash3-fill"></i> Delete <span class="text-danger fst-italic" style="font-size: 10px;">(cannot modify)</span></a></li>
+                                            href="#" id=""><i class="bi bi-trash3-fill"></i> Delete <span class="text-danger fst-italic" style="font-size: 10px;">(prohibited)</span></a></li>
                                         @else
                                             <!--li><a class="dropdown-item getDurationInfo" href="#" id=""
                                             data-bs-toggle="modal" data-bs-target="#"><i class="bi bi-pencil-square"></i> Edit</a></li-->

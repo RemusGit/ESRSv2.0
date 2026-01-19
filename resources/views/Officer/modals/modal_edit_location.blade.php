@@ -16,7 +16,7 @@
             <div class="col-md-12">
                 <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text" class="form-control form-control-lg" placeholder="Location Name" name="locationName" id="locationName" required />
+                            <input type="text" class="form-control form-control-lg" placeholder="Location Name" name="locationName" id="locationSettingLocName" required />
                             <label class="form-label"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Location Name</label>
                         </div>
                 </div>
@@ -27,7 +27,7 @@
             <div class="col-md-12">
                 <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text" class="form-control form-control-lg text-uppercase" placeholder="Location Abbreviation" name="locAbbr" id="locAbbr" required />
+                            <input type="text" class="form-control form-control-lg text-uppercase" placeholder="Location Abbreviation" name="locAbbr" id="locationSettingLocAbbr" required />
                             <label class="form-label"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Location Abbreviation</label>
                         </div>
                 </div>
@@ -69,12 +69,12 @@
             let locAbbre = array[2];
             let locTotalFloor = array[3];
 
+            //console.log('LOC VAL ' + locVal + ' LOC ABBREE ' + locAbbre);
+
             $('#editLocID').val(locID);
-            $('#locationName').val(locVal);
-            $('#locAbbr').val(locAbbre);
+            $('#locationSettingLocName').val(locVal);
+            $('#locationSettingLocAbbr').val(locAbbre);
             $('#floorNo').val(locTotalFloor);
-
-
             
         });
 
