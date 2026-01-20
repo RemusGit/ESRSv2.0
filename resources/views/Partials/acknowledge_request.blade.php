@@ -1,6 +1,8 @@
 <script>
+
     $(document).ready(function(){
 
+        var getSection = "{{ session('section_abbre') }}";
         //------------------------------------------------------------------ ACKNOWLEDGE CONFIRM
         //$('.acknowledgeRequest').click(function(e){
         $(document).on('click' , '.acknowledgeRequest' , function(e){
@@ -28,6 +30,7 @@
                             action: function(){
 
                                 $('#clientAcknowledge_'+numberOnly+'-'+categoryID).submit();
+                                window.open('https://hcss.valmed.ph/?unit='+window.btoa(getSection) , '_blank');
                             }
                         },
                         CANCEL: function () {
