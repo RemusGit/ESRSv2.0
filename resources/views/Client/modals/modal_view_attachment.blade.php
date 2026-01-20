@@ -320,7 +320,13 @@
                 </div>
             </div>
 
+            <hr class="border border-1 border-secondary">
             <div class="row">
+                <div class="col-md-12 lead fw-bold text-success" id="vmcIdCardEmpType">
+                </div>
+            </div>
+
+            <div class="row mt-2">
                 <div class="col-md-3">
                     Current Employee  ID
                 </div>
@@ -531,7 +537,7 @@
                                     }
 
                                     $('#vmcIdCardHref').attr("href" , "/vmc_card_form/"+encryptedRefID);
-                                   
+                                    $('#vmcIdCardEmpType').html(val.empType);
                                     $('#vmcIdCardEmpID').html(val.empID);
                                     $('#vmcIdCardEmpFullname').html(val.empLname + ' , ' + ' ' + val.empFname + ' ' + val.empMname + ' ' + getEmpSuffix);
                                     $('#vmcIdCardEmpPosition').html(val.empPosition);

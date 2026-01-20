@@ -1041,6 +1041,20 @@ class RequestClientController extends Controller
         if($newCategoryText == 'VMC ID Card Preparation'){
 
                 $requestRefID = $refID;
+                $empType = $req->emp_type;
+                $picSigBypass = $req->picSigBypass;
+                $saveAsAbove = $req->sameAsAboveAddress;
+                //dd($req->file('idrequest_picture'));
+
+                if($saveAsAbove == "on" || ($req->idrequest_emerstreet == '' && $req->emerctycode =='' && $req->emerbgycode == '')){
+                    $idrequest_emerstreet = strtoupper($req->idrequest_street);
+                    $emerctycode = $req->ctycode;
+                    $emerbgycode = $req->bgycode;
+                }else{
+                    $idrequest_emerstreet = strtoupper($req->idrequest_emerstreet);
+                    $emerctycode = $req->emerctycode;
+                    $emerbgycode = $req->emerbgycode;
+                }
 
                 $idrequest_empno = $req->idrequest_empno;
                 $position_id = $req->position_id;
@@ -1063,11 +1077,60 @@ class RequestClientController extends Controller
                 $idrequest_emerlname = strtoupper($req->idrequest_emerlname);
                 $idrequest_emersuffix = $req->idrequest_emersuffix;
                 $idrequest_emercontactno = $req->idrequest_emercontactno;
-                $idrequest_emerstreet = strtoupper($req->idrequest_emerstreet);
-                $emerctycode = $req->emerctycode;
-                $emerbgycode = $req->emerbgycode;
+                //$idrequest_emerstreet = strtoupper($req->idrequest_emerstreet);
+                //$emerctycode = $req->emerctycode;
+                //$emerbgycode = $req->emerbgycode;|| $req->file('idrequest_picture') == nullview
 
 
+                $vmcIdCardPicFilename = '';
+                $vmcIdCardSignatureFilename = '';
+
+                if($picSigBypass == 'on' || $req->file('idrequest_picture') == null || $req->file('idrequest_picture') == ''){
+
+                    $findPic = DB::table('idrequest_attach_tab')
+                    ->select('idrequest_picture' , 'idrequest_signature')
+                    ->where('idrequest_fname' , 'LIKE' , '%'.$idrequest_fname.'%')
+                    ->where('idrequest_lname' , 'LIKE' , '%'.$idrequest_lname.'%')
+                    ->where('idrequest_picture' , '<>' , '')
+                    ->orderBy('request_refid' , 'DESC')
+                    ->first();
+                    
+                    if($findPic != '' || $findPic != null){
+                        $vmcIdCardPicFilename = $findPic->idrequest_picture;
+                        $vmcIdCardSignatureFilename = $findPic->idrequest_signature;
+                    }
+                }
+                else{
+
+                    // CHANGE PICTURE FILENAME TO REFERENCE NUMBER
+                    $vmcIdCardPicture = $req->file('idrequest_picture');
+                    $getPictureExtension = $vmcIdCardPicture->extension();
+                    $vmcIdCardPicFilename = $requestRefID.'.'.$getPictureExtension;
+
+                    // CREATE FOLDER/PATH IF NOT EXIST
+                    if (!file_exists(public_path('uploads/VMC_ID_Picture'))) {
+                        mkdir(public_path('uploads/VMC_ID_Picture'), 0775, true);
+                    }
+
+                    // MOVE PICTURE TO public/uploads/VMC_ID_Picture
+                    $vmcIdCardPicture->move(public_path('uploads/VMC_ID_Picture'), $vmcIdCardPicFilename);
+
+                    // CHANGE SIGNATURE FILENAME TO REFERENCE NUMBER
+                    $vmcIdCardSignature = $req->file('idrequest_signature');
+                    $getSignatureExtension = $vmcIdCardSignature->extension();
+                    $vmcIdCardSignatureFilename = $requestRefID.'.'.$getSignatureExtension;
+
+                    // CREATE FOLDER/PATH IF NOT EXIST
+                    if (!file_exists(public_path('uploads/VMC_ID_Sig'))) {
+                        mkdir(public_path('uploads/VMC_ID_Sig'), 0775, true);
+                    }
+
+                    // MOVE PICTURE TO public/uploads/VMC_ID_Picture/VMC_ID_Sig
+                    $vmcIdCardSignature->move(public_path('uploads/VMC_ID_Sig'), $vmcIdCardSignatureFilename);
+
+                }// EOF BYPASS PIC AND SIG
+
+                /*
                 // CHANGE PICTURE FILENAME TO REFERENCE NUMBER
                 $vmcIdCardPicture = $req->file('idrequest_picture');
                 $getPictureExtension = $vmcIdCardPicture->extension();
@@ -1093,6 +1156,7 @@ class RequestClientController extends Controller
 
                 // MOVE PICTURE TO public/uploads/VMC_ID_Picture/VMC_ID_Sig
                 $vmcIdCardSignature->move(public_path('uploads/VMC_ID_Sig'), $vmcIdCardSignatureFilename);
+                */
 
                 DB::table('idrequest_attach_tab')
                 ->insert([
@@ -1122,7 +1186,8 @@ class RequestClientController extends Controller
                     'emerctycode' => $emerctycode,
                     'emerbgycode' => $emerbgycode,
                     'idrequest_picture' => $vmcIdCardPicFilename,
-                    'idrequest_signature' => $vmcIdCardSignatureFilename
+                    'idrequest_signature' => $vmcIdCardSignatureFilename,
+                    'idrequest_emptype' => $empType
                 ]);  
 
         }
@@ -1836,7 +1901,7 @@ class RequestClientController extends Controller
         $saveAsAbove = $req->sameAsAboveAddress;
         $picSigBypass = $req->picSigBypass;
         $empType = $req->emp_type;
-        dd($empType);
+        //dd($empType);
 
         if($saveAsAbove == "on"){
             $idrequest_emerstreet = strtoupper($req->idrequest_street);
@@ -1953,7 +2018,8 @@ class RequestClientController extends Controller
             'emerctycode' => $emerctycode,
             'emerbgycode' => $emerbgycode,
             'idrequest_picture' => $vmcIdCardPicFilename,
-            'idrequest_signature' => $vmcIdCardSignatureFilename
+            'idrequest_signature' => $vmcIdCardSignatureFilename,
+            'idrequest_emptype' => $empType
         ]);    
 
         return redirect('/client_open_request');

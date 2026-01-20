@@ -1,10 +1,31 @@
 
-          <!-- ROW / VMC ID DETAILS 1-->
-          <div class="row mt-2">
-          <p class="lead fw-semibold">Identification Card Details</p>
-          <hr class="border border-2 border-success">
+        <!-- ROW / VMC ID DETAILS 1-->
+        <p class="lead fw-semibold">Identification Card Details</p>
+
+        <hr class="border border-2 border-success">
+        <p class="lead text-success fw-bold" style="font-size: 12px;">Employment Details</p>
+
+        <div class="row mt-2">
+            <div class="col-lg-3">
+                <label for="">Employee Type</label>
+            </div>
+
+            <div class="col-lg-9">
+                <input class="form-check-input" type="radio" name="emp_type" id="emp_type_new" value="New Employee" checked>
+                <label class="form-check-label" for="emp_type_new">
+                    New Employee
+                </label>
+
+                <input class="form-check-input ms-5" type="radio" name="emp_type" id="emp_type_old" value="Old Employee">
+                <label class="form-check-label" for="emp_type_old">
+                    Old Employee
+                </label>
+            </div>
+
+        </div>
+
+        <div class="row mt-4">
           
-          <p class="lead text-success fw-bold" style="font-size: 12px;">Employment Details</p>
               <div class="col-lg-3">
                     <div class="form-outline mb-2 form-floating  w-100">
                         <div class="form-outline mb-2 form-floating">
@@ -372,62 +393,63 @@
         <div class="clearfix" style="font-size: 14px;">
             <div class="float-start form-check">
                 <label class="form-check-label" for="picSigBypass">
-                I Already Uploaded My Picture & Signature
-                <span class="text-danger fst-italic" style="font-size: 15px;">(Note: We use your Firstname and Lastname as Reference.) <br>Do not proceed unless you are SURE your Picture and Signature are already uploaded.</span>
+                <u>I Already Uploaded My Picture & Signature</u>
+                <span class="text-danger fst-italic" style="font-size: 15px;">(Note: We use your Firstname and Lastname as Reference.) <br>Do not click the CHECKBOX unless you are SURE your Picture and Signature are already uploaded.</span>
                 <input class="form-check-input" type="checkbox" id="picSigBypass" name="picSigBypass">
                 </label>
             </div>
         </div>
 
 <script>
-    $(document).ready(function(){
 
-        $('#picSigBypass').click(function(){
+//$('#picSigBypass').click(function(){
+$('#picSigBypass').on('click' ,function(){
 
-            var checkVal = $('#picSigBypass:checked').val();
-            if(checkVal == 'on'){
+    var checkVal = $('#picSigBypass:checked').val();
+    if(checkVal == 'on'){
 
-                $('#picSigHide').slideUp();
-                $('#idrequest_picture').removeAttr("required");
-                $('#idrequest_signature').removeAttr("required");
+        $('#picSigHide').slideUp();
+        $('#idrequest_picture').removeAttr("required");
+        $('#idrequest_signature').removeAttr("required");
 
-                $('#idrequest_picture').val("");
-                $('#idrequest_signature').val("");
-                $('#maxFileSizeTextPicture').hide();
-                $('#maxFileSizeTextSignature').hide();
-                $('#vmcIdSubmitBtn').removeAttr('disabled');
-            }
-            else{
-                $('#picSigHide').slideDown();
-                $('#idrequest_picture').attr("required" , "required");
-                $('#idrequest_signature').attr("required" , "required");
-            }
-        });
+        $('#idrequest_picture').val("");
+        $('#idrequest_signature').val("");
+        $('#maxFileSizeTextPicture').hide();
+        $('#maxFileSizeTextSignature').hide();
+        $('#vmcIdSubmitBtn').removeAttr('disabled');
+    }
+    else{
+        $('#picSigHide').slideDown();
+        $('#idrequest_picture').attr("required" , "required");
+        $('#idrequest_signature').attr("required" , "required");
+    }
 
-        $('#sameAsAboveAddress').click(function(){
+});
 
-            let getStreet1 = $('#idrequest_street').val();
-            let getCity1 = $('#vmcIdCardCity').val();
-            let getBrgy1 = $('#vmcIdCardBarangay').val();
+//$('#sameAsAboveAddress').click(function(){
+$('#sameAsAboveAddress').on('click' ,function(){
 
-            var checkVal = $('#sameAsAboveAddress:checked').val();
-            //console.log(checkVal);
-            //console.log('City:' + getCity1 + ' / BRGY:' + getBrgy1);
+    let getStreet1 = $('#idrequest_street').val();
+    let getCity1 = $('#vmcIdCardCity').val();
+    let getBrgy1 = $('#vmcIdCardBarangay').val();
 
-            if(checkVal == 'on'){
-                $('#emergencyAddress').slideUp();
-                $('#idrequest_emerstreet').removeAttr("required");
-                $('#vmcIdCardCityEmergency').removeAttr("required");
-                $('#vmcIdCardBarangayEmergency').removeAttr("required");
-            }else{
-                $('#emergencyAddress').slideDown();
-                $('#idrequest_emerstreet').attr("required","required");
-                $('#vmcIdCardCityEmergency').attr("required","required");
-                $('#vmcIdCardBarangayEmergency').attr("required","required");
-            }
+    var checkVal = $('#sameAsAboveAddress:checked').val();
+    //console.log(checkVal);
+    //console.log('City:' + getCity1 + ' / BRGY:' + getBrgy1);
 
-        });
-    });
+    if(checkVal == 'on'){
+        $('#emergencyAddress').slideUp();
+        $('#idrequest_emerstreet').removeAttr("required");
+        $('#vmcIdCardCityEmergency').removeAttr("required");
+        $('#vmcIdCardBarangayEmergency').removeAttr("required");
+    }else{
+        $('#emergencyAddress').slideDown();
+        $('#idrequest_emerstreet').attr("required","required");
+        $('#vmcIdCardCityEmergency').attr("required","required");
+        $('#vmcIdCardBarangayEmergency').attr("required","required");
+    }
+
+});
 
 </script>
 

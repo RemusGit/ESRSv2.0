@@ -577,6 +577,9 @@
 
             ///////////////////////// VMC ID CARD VALIDATION
             if(newCategoryValText == 'VMC ID Card Preparation'){
+
+                // if condition here for clicking checkbox of SAME AS ABOVE / ALREADY UPLOADED
+
                 if(
                     $('#vmcIdCardEmpStatus').val() == '' ||
                     $('#vmcIdCardPosition').val() == '' ||
@@ -593,12 +596,12 @@
                     $('#idrequest_weight').val() == '' ||
                     $('#idrequest_emerfname').val() == '' ||
                     $('#idrequest_emerlname').val() == '' ||
-                    $('#idrequest_emercontactno').val() == '' ||
+                    $('#idrequest_emercontactno').val() == '' /*||
                     $('#idrequest_emerstreet').val() == '' ||
                     $('#vmcIdCardCityEmergency').val() == '' ||
                     $('#vmcIdCardBarangayEmergency').val() == '' ||
                     $('#idrequest_picture')[0].files.length == 0 ||
-                    $('#idrequest_signature')[0].files.length == 0
+                    $('#idrequest_signature')[0].files.length == 0*/
                 ){
                     $('#showWarningRequiredAll').show();
                     return;
