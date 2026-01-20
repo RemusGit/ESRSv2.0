@@ -123,6 +123,11 @@
                                     <i class="bi bi-calendar-check"></i> Edit Date Accomplished </a></li>
                                 @endif
 
+
+                                @if($datas->condemn == 1 && Auth::user()->agentunit_id == 2)
+                                    <li><a class="dropdown-item" href="/condemn_form/{{ $datas->refNo }}" target="blank"><i class="bi bi-file-x-fill"></i> Show Condemn Form</a></li>
+                                @endif
+
                                     <!-- VIEW ATTACHMENTS -->
                                     @if(
                                         $datas->categoryId == 12

@@ -174,7 +174,7 @@ class RequestClientController extends Controller
 
             $pdf->SetFont('Arial', 'B', 10);
             $pdf->SetXY(1, 262);
-            $pdf->Cell(95,1, $signatory , 0 , 1 , 'C');
+            $pdf->Cell(95,1, Auth::user()->account_fname.' '.Auth::user()->account_lname , 0 , 1 , 'C');
 
 
             $pdf->SetFont('Arial', '', 10);
@@ -720,6 +720,7 @@ class RequestClientController extends Controller
             ->join('ph_locations.ph_provinces_tab as ph_loc_prov' , 'ph_loc_prov.provcode' , '=' , 'ph_loc_cities.ctyprovcod')
             ->selectRaw("
                 idrequest_attach_tab.idrequest_empno as empID ,
+                idrequest_attach_tab.idrequest_emptype as empType ,
                 idrequest_attach_tab.idrequest_fname as empFname ,
                 idrequest_attach_tab.idrequest_mname as empMname ,
                 idrequest_attach_tab.idrequest_lname as empLname ,
@@ -1834,6 +1835,8 @@ class RequestClientController extends Controller
 
         $saveAsAbove = $req->sameAsAboveAddress;
         $picSigBypass = $req->picSigBypass;
+        $empType = $req->emp_type;
+        dd($empType);
 
         if($saveAsAbove == "on"){
             $idrequest_emerstreet = strtoupper($req->idrequest_street);
