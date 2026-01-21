@@ -24,6 +24,8 @@ class RequestClientController extends Controller
 
         //////////////////////////////////////////////////////////////////// CONDEMN FORM PDF
         public function viewCondemnForm($getRefID){
+            
+            $getRefID = Crypt::decrypt($getRefID);
 
             $data = DB::table('request_tab')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
@@ -1867,13 +1869,13 @@ class RequestClientController extends Controller
 
     //////////////////////////////////////////////////////////////////// WEB UPLOAD DOWNLOAD ATTACHMENT
     public function webUploadDownload($filename){
-
+        
         $path = public_path('uploads/Web_Upload/' . $filename);
-
         if (file_exists($path)){
             return response()->download($path);
         }
         return abort(404);
+        
     }
 
     //////////////////////////////////////////////////////////////////// NETWORK INSTALL ADD REQUEST

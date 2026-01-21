@@ -101,12 +101,6 @@
                                 id="{{ $datas->refNo }},,{{ $datas->categoryVal }}" data-bs-toggle="modal" data-bs-target="#tagAgentModal">
                                 <i class="bi bi-person-fill-add"></i> Tag Agents </a></li>
 
-                                <!-- SERVICE REPORT FORM - EFMS ONLY -->
-                                @if(Auth::user()->agentunit_id == 1)
-                                    <li><a class="dropdown-item" href="/service_report_form_pdf/{{ $datas->refNo }}" target="blank">
-                                    <i class="bi bi-folder-symlink-fill"></i> Service Report Form </a></li>
-                                @endif
-
                                 <form action="/undo_request" method="POST" id="undoRequestForm_{{ preg_replace('/[^0-9]/', '', $datas->refNo) }}-{{ $datas->categoryId }}">
                                     @csrf
                                     <input type="hidden" name="categoryVal" value="{{ $datas->categoryVal }}">
@@ -124,8 +118,15 @@
                                 @endif
 
 
+                                <!-- SERVICE REPORT FORM - EFMS ONLY -->
+                                @if(Auth::user()->agentunit_id == 1)
+                                    <li><a class="dropdown-item" href="/service_report_form_pdf/{{ Crypt::encrypt($datas->refNo) }}" target="blank">
+                                    <i class="bi bi-folder-symlink-fill"></i> Service Report Form </a></li>
+                                @endif
+
+
                                 @if($datas->condemn == 1 && Auth::user()->agentunit_id == 2)
-                                    <li><a class="dropdown-item" href="/condemn_form/{{ $datas->refNo }}" target="blank"><i class="bi bi-file-x-fill"></i> Show Condemn Form</a></li>
+                                    <li><a class="dropdown-item" href="/condemn_form/{{ Crypt::encrypt($datas->refNo) }}" target="blank"><i class="bi bi-file-x-fill"></i> Show Condemn Form</a></li>
                                 @endif
 
                                     <!-- VIEW ATTACHMENTS -->

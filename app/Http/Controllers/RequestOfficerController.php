@@ -2265,7 +2265,8 @@ class RequestOfficerController extends Controller
 
     public function serviceReportFormPDF(Request $req){
 
-        $refID = $req->refID;
+        //$refID = $req->refID;
+        $refID = Crypt::decrypt($req->refID);
 
         $data = DB::table('request_tab')
         ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
