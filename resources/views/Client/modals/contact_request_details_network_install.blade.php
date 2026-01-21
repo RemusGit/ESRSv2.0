@@ -25,7 +25,7 @@
               <div class="col-lg-3 mb-4">
                     <div class="form-outline form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text"  class="form-control form-control-lg" placeholder="Requested By" name="getRequestBy" required />
+                            <input type="text"  class="form-control form-control-lg" placeholder="Requested By" name="getRequestBy" readonly style="font-size: 11px;" value="{{ Auth::user()->account_fname }} {{ Auth::user()->account_lname }}" />
                             <label class="form-label" ><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Requested By</label>
                         </div>
                   </div>
@@ -34,7 +34,7 @@
               <div class="col-lg-3 mb-4">
                     <div class="form-outline form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text"  class="form-control form-control-lg" placeholder="Employee No." name="getEmpNo" required />
+                            <input type="text"  class="form-control form-control-lg" placeholder="Employee No." name="getEmpNo" readonly style="font-size: 12px;" value="{{ Auth::user()->account_empid }}" />
                             <label class="form-label"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Employee No.</label>
                         </div>
                   </div>
