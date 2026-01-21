@@ -125,6 +125,9 @@
                             || $datas->categoryID == 3
                             || $datas->categoryID == 13
                             || $datas->categoryID == 42
+                            || $datas->categoryID == 73
+                            || $datas->categoryID == 74
+                            || $datas->categoryID == 75
                             )
                         <span class="text-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="View Attachments">
                         <a href="#" class="dropdown-item viewAttachment" id="{{ $datas->refNo }}?{{ $datas->categoryVal }}?{{ Crypt::encrypt($datas->refNo) }}"

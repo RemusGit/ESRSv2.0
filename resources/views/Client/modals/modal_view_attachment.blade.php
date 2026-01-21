@@ -526,8 +526,14 @@
 
                                     $('#efmsTCDestination').html(val.travel_destination);
                                     $('#efmsTCPurpose').html(val.travel_purpose);
-                                    $('#efmsTCTravelDate').html(val.travel_date);
+                                    //$('#efmsTCTravelDate').html(val.travel_date);
                                     $('#efmsTCTravelTime').html(val.travel_time);
+                                    //var monthArrays = ['Jan.' ,'Feb.' ,'Mar.' , 'Apr.' , 'May.' ,'Jun.' ,'Jul.' ,'Aug.' ,'Sep.' ,'Oct.' ,'Nov.' ,'Dec.'];
+                                    //var newTravelDate = monthArrays[new Date(val.travel_date).getMonth()] +' '+ new Date(val.travel_date).getDate() +', '+ new Date(val.travel_date).getFullYear();
+                                    var newTravelDate = new Date(val.travel_date);
+                                    var newTravelTime = new Date(val.travel_date+' '+val.travel_time);
+                                    $('#efmsTCTravelDate').html(newTravelDate.toDateString().substring(3,15));
+                                    $('#efmsTCTravelTime').html(newTravelTime.toLocaleTimeString());
                                 }
 
                                 if(getCategoryVal == 'VMC ID Card Preparation'){
