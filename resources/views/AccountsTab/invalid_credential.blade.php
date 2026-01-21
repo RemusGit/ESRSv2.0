@@ -5,8 +5,8 @@ $(document).ready(function(){
 $.confirm({
             theme: 'supervan',
             icon: 'bi bi-exclamation-lg',
-            title: 'Session Expired / Authentication Failed',
-            content: 'Redirect to Login Page',
+            title: 'Session Expired',
+            content: 'Please Re-login your account.',
             type: 'red',
             draggable: true,
             buttons: {
