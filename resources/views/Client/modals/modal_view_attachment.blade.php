@@ -604,8 +604,14 @@
                                     if(getCategoryVal == 'Zoom Link'){
 
                                         $('#VmTitle').html(val.vmTile);
-                                        $('#VmDate').html(val.vmDate);
-                                        $('#VmTime').html(val.vmTime);
+                                        //$('#VmDate').html(val.vmDate);
+                                        //$('#VmTime').html(val.vmTime);
+
+                                        var vmDate = new Date(val.vmDate);
+                                        var vmTime = new Date(val.vmDate+' '+val.vmTime);
+                                        $('#VmDate').html(vmDate.toDateString().substring(3,15));
+                                        $('#VmTime').html(vmTime.toLocaleTimeString());
+
                                         $('#VmHrsNo').html(val.vmHrs);
                                         $('#VmParticipants').html(val.vmParticipants);
                                         $('#VmEmail').html(val.vmEmail);
