@@ -5,7 +5,7 @@
         <form action="/officer_inprogress_request" method="POST">
             @csrf
             <input type="hidden" name="getStatus" value="5">
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text">Search</span>
                 <input type="search" class="form-control form-control-sm" placeholder="Reference No." name="refNo" required
                 value="{{ old('refNo', $oldData['refNo'] ?? '') }}">
@@ -20,7 +20,7 @@
     <form action="/officer_inprogress_request" method="POST">
     @csrf
         <input type="hidden" name="getStatus" value="5">
-        <div class="input-group mb-3">
+        <div class="input-group mb-1">
             <span class="input-group-text">From</span>
             <input type="date" class="form-control form-control-sm" name="reqDateFrom" 
             value="{{ old('reqDateFrom', $oldData['reqDateFrom'] ?? '') }}">
@@ -28,7 +28,7 @@
     </div>
 
     <div class="col-lg-3">
-        <div class="input-group mb-3">
+        <div class="input-group mb-1">
             <span class="input-group-text">To</i></span>
             <input type="date" class="form-control form-control-sm" name="reqDateTo" 
             value="{{ old('reqDateTo', $oldData['reqDateTo'] ?? '') }}">

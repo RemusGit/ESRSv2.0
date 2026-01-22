@@ -3,7 +3,7 @@
     <div class="row justify-content-center pt-2">
 
         <div class="col-lg-3">
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text">Status <i class="bi bi-bar-chart ps-1"></i></span>
                 <select class="form-select form-control-sm" name="reqStatus">
                     <option value="All Accomplished">All Accomplished</option>
@@ -17,7 +17,7 @@
         </div>
 
         <div class="col-lg-3">
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text">From</span>
                 <input type="date" class="form-control form-control-sm" name="reqDateFrom"
                 value="{{ old('reqDateFrom', $oldData['reqDateFrom'] ?? '') }}" required>
@@ -25,7 +25,7 @@
         </div>
 
         <div class="col-lg-3">
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text">To</i></span>
                 <input type="date" class="form-control form-control-sm" name="reqDateTo"
                 value="{{ old('reqDateTo', $oldData['reqDateTo'] ?? '') }}" required>
