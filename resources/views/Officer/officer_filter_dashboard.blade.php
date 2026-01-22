@@ -1,62 +1,26 @@
 
-<div class="row mt-2">
+<div class="row mt-2 toggleSearch"> <!--ROW FILTER 1-->
 
-    <div class="col-lg-4">
+    <div class="col-lg-12">
         <form action="{{ route('filter_request') }}" method="POST">
             @csrf
-            <div class="input-group mb-3">
+            <div class="input-group mb-2">
                 <span class="input-group-text">Search</span>
-                <input type="search" class="form-control form-control-sm" placeholder="Reference#, Description, Request By.. " name="searchAll" required
+                <input type="search"  class="form-control form-control-sm" placeholder="Reference Number, Description, Request By... (Press Enter) " name="searchAll" required
                 value="{{ old('searchAll', $oldData['searchAll'] ?? '') }}">
                 <button type="submit" class="btn btn-success"><i class="bi bi-search"></i></button>
             </div>
         </form>
     </div>
 
+</div> <!--EOF ROW FILTER 1-->
 
-    <div class="col-lg-4">
-            <form action="{{ route('filter_request') }}" method="POST">
-            @csrf
-            <div class="input-group mb-3">
-                <span class="input-group-text">A. Officer</span>
-                    <select class="form-select form-control-sm" name="reqActionOfficer">
+    <form action="{{ route('filter_request') }}" method="POST">
+    @csrf
+<div class="row toggleFilter" style="display:none;"> <!--ROW FILTER 2-->
 
-                        <option value="">All</option>
-                            @foreach($populateActionOfficer as $data)
-                                <option value="{{ $data->account_empid }}" 
-                                @selected(old('reqActionOfficer', $oldData['reqActionOfficer'] ?? '') == $data->account_empid)>
-                                {{ $data->account_fname }} {{ $data->account_lname }} {{ $data->account_suffix }}</option>
-                            @endforeach
-
-                    </select>
-            </div>
-
-    </div>
-
-
-    <div class="col-lg-2 ms-auto">
-
-        <div class="input-group mb-3">
-            <span class="input-group-text">From</span>
-            <input type="date" class="form-control form-control-sm" name="reqDateFrom"
-            value="{{ old('reqDateFrom', $oldData['reqDateFrom'] ?? '') }}">
-        </div>
-    </div>
-
-    <div class="col-lg-2">
-        <div class="input-group mb-3">
-            <span class="input-group-text">To</i></span>
-            <input type="date" class="form-control form-control-sm" name="reqDateTo"
-            value="{{ old('reqDateTo', $oldData['reqDateTo'] ?? '') }}">
-        </div>
-    </div>
-
-</div>
-
-<div class="row">
-
-    <div class="col-lg-5">
-        <div class="input-group mb-3">
+    <div class="col-lg-9">
+        <div class="input-group mb-2">
             <span class="input-group-text">Category</span>
                 <select class="form-select form-control-sm" name="reqCategory" id="selectCategory">
 
@@ -73,8 +37,30 @@
         </div>
     </div>
 
+
+    <div class="col-lg-3">
+            <div class="input-group mb-2">
+                <span class="input-group-text">A.Officer</span>
+                    <select class="form-select form-control-sm" name="reqActionOfficer">
+
+                        <option value="">All</option>
+                            @foreach($populateActionOfficer as $data)
+                                <option value="{{ $data->account_empid }}" 
+                                @selected(old('reqActionOfficer', $oldData['reqActionOfficer'] ?? '') == $data->account_empid)>
+                                {{ $data->account_fname }} {{ $data->account_lname }} {{ $data->account_suffix }}</option>
+                            @endforeach
+
+                    </select>
+            </div>
+
+    </div>
+
+</div> <!--EOF ROW FILTER 2-->
+
+<div class="row toggleFilter" style="display:none;"> <!--ROW FILTER 3-->
+
     <div class="col-xl-3 col-lg-3">
-        <div class="input-group mb-3">
+        <div class="input-group mb-2">
             <span class="input-group-text">Status</span>
             <select class="form-select form-control-sm" name="reqStatus">
 
@@ -88,21 +74,40 @@
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-3 col-md-3 ms-auto">
+
+    <div class="col-lg-3">
+
+        <div class="input-group mb-2">
+            <span class="input-group-text">From</span>
+            <input type="date" class="form-control form-control-sm" name="reqDateFrom"
+            value="{{ old('reqDateFrom', $oldData['reqDateFrom'] ?? '') }}">
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="input-group">
+            <span class="input-group-text">To</i></span>
+            <input type="date" class="form-control form-control-sm" name="reqDateTo"
+            value="{{ old('reqDateTo', $oldData['reqDateTo'] ?? '') }}">
+        </div>
+    </div>
+
+
+    <div class="col-xl-3 col-lg-3 col-md-1">
         <button class="btn btn-success  w-100 btn-sm mt-2">Filter <i class="bi bi-filter"></i></button>
     </div>
 
 </form>
 
 
-    <div class="row" id="searchForVmcCard" style="display: none;">
-        <div class="col-lg-6">
+    <div class="row mt-2" id="searchForVmcCard" style="display: none;">
+        <div class="col-lg-12 w-100">
             <form action="{{ route('filter_request') }}" method="POST">
                 @csrf
-                <div class="input-group mb-3">
+                <div class="input-group">
                     <span class="input-group-text">Custom Search</span>
                     <input type="hidden" id="customCategoryVal" name="customCategoryVal">
-                    <input type="search" class="form-control form-control-sm" placeholder="Search Employee First or Last Name" name="searchEmpName" required
+                    <input type="search" class="form-control form-control-sm" placeholder="Search Employee First or Last Name (Press Enter)" name="searchEmpName" required
                     value="{{ old('searchAll', $oldData['searchEmpName'] ?? '') }}">
                     <button type="submit" class="btn btn-secondary"><i class="bi bi-search"></i></button>
                 </div>
@@ -114,10 +119,16 @@
         <button class="btn btn-outline-secondary  w-100 btn-sm mt-2" id="clearFormButton">Clear <i class="bi bi-brush"></i></button>
     </div-->
 
-</div>
+</div> <!--EOF ROW FILTER 2-->
 
 <script>
     $(document).ready(function(){
+
+        $('#toggleFilterSwitch').on('click' , function(){
+
+            $('.toggleFilter').slideToggle('fast');
+            $('.toggleSearch').slideToggle('fast');
+        });
 
         $('#selectCategory').on("change click" , function(){
             let getCategoryID = $(this).val();
@@ -125,12 +136,12 @@
             $('#customCategoryVal').val(getCategoryID);
             //console.log(getCategory);
             if(getCategoryID == 13 || getCategoryID == 12){
-                $('#searchForVmcCard').show();
+                $('#searchForVmcCard').slideDown('fast');
             }
             else{
-                $('#searchForVmcCard').hide();
+                $('#searchForVmcCard').slideUp('fast');
             }
         });
 
-    });
+    });//EOF DOC READY
 </script>
