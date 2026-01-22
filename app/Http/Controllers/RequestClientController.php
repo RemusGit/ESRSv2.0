@@ -548,10 +548,12 @@ class RequestClientController extends Controller
                         request_tab.request_condemn as reqCondemn , 
                         CONCAT( accounts_tab.account_fname , ' ' , accounts_tab.account_lname ) as actionOfficer
             ")
-            //->where('request_tab.account_id' , $getUserID)
-            ->where('request_tab.section_id' , $sectionID)
-            ->where('request_tab.status_id' , $getStatusID)
-            ->where('request_tab.request_refid' , 'LIKE' , '%'.  $getRefNo . '%')
+            ->where(function ($query) use ($sectionID, $getUserID) {
+                $query->where('request_tab.section_id', $sectionID)
+                    ->orWhere('request_tab.account_id', $getUserID);
+            })
+            ->where('request_tab.status_id', $getStatusID)
+            ->where('request_tab.request_refid', 'LIKE', '%' . $getRefNo . '%')
             ->groupBy('refID' , 
             'agentAccID' ,
             'mainCategory' ,
@@ -2158,8 +2160,13 @@ class RequestClientController extends Controller
                         CONCAT( accounts_tab.account_fname , ' ' , accounts_tab.account_lname ) as actionOfficer
             ")
             //->where('request_tab.account_id' , $getUserID)
-            ->where('request_tab.section_id' , $sectionID)
-            ->where('request_tab.status_id' , $getStatusID)
+            //->where('request_tab.section_id' , $sectionID)
+            //->where('request_tab.status_id' , $getStatusID)
+            ->where(function ($query) use ($sectionID, $getUserID) {
+                $query->where('request_tab.section_id', $sectionID)
+                    ->orWhere('request_tab.account_id', $getUserID);
+            })
+            ->where('request_tab.status_id', $getStatusID)
             ->groupBy('refID' , 
             'agentAccID' ,
             'categoryIcon' ,
