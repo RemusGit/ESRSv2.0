@@ -44,9 +44,9 @@
                     <td style="max-width: 150px;">{{ $datas->sectionName }}</td>
 
                     <td style="max-width: 110px;">
-                        {{ Str::limit($datas->reqDesc , 20 , '...') }}
+                        {{ Str::limit($datas->reqDesc , 100 , '...') }}
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
-                        @if ($countDescription >= 20)
+                        @if ($countDescription >= 100)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
                             data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
