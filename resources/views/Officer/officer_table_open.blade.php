@@ -77,7 +77,7 @@
                         @else
                             Indefinite
                         @endif</td>
-                    <td style="max-width: 120px; color: {{$txtColor}};">{{ $datas->categoryVal }}</td>
+                    <td style="max-width: 120px; color: {{$txtColor}};">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ $datas->reqOthers }}) @endif</td>
                     <td style="color: {{$txtColor}};">{{ $datas->requestBy }}</td>
                     <td style="max-width: 150px; color: {{$txtColor}};">{{ $datas->sectionName }}</td>
                     <td style="color: {{$txtColor}};">{{ $datas->locationVal }}</td>

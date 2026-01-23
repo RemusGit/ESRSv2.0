@@ -537,6 +537,7 @@ class RequestClientController extends Controller
                         request_tab.agentunit_id as agentUnitID , 
                         request_tab.agentacc_id as agentAccID ,
                         request_tab.request_refid as refID , 
+                        request_tab.request_others as reqOthers , 
                         request_tab.category_id as categoryId , 
                         category_tab.category_value categoryVal ,
                         request_tab.request_descript reqDesc , 
@@ -555,6 +556,7 @@ class RequestClientController extends Controller
             ->where('request_tab.status_id', $getStatusID)
             ->where('request_tab.request_refid', 'LIKE', '%' . $getRefNo . '%')
             ->groupBy('refID' , 
+            'reqOthers' ,
             'agentAccID' ,
             'mainCategory' ,
             'categoryIcon' ,
@@ -962,6 +964,20 @@ class RequestClientController extends Controller
         $newCategoryID = $req->newCategoryValId;
         $newCategoryText = $req->newCategoryValText;
         $getRequestDate = $req->getRequestDate;
+
+        //////////////////////////////////////////////////// UPDATE CATEGORY - OTHERS IMISS
+        if($newCategoryText == 'Others'){
+            $reqOthers = $req->reqOthers;
+            $reqDesc = $req->reqDesc;
+
+            // UPDATE REQUEST TAB TABLE
+            DB::table('request_tab')
+            ->where('request_refid' , $refID)
+            ->update([
+                'request_others' => $reqOthers ,
+                'request_descript' => $reqDesc
+            ]);
+        }
 
         //////////////////////////////////////////////////// UPDATE CATEGORY - TRAVEL CONDUCTION
         if($newCategoryText == 'Travel Conduction' || $newCategoryID == 73 || $newCategoryID == 74 || $newCategoryID == 75){
@@ -1624,7 +1640,8 @@ class RequestClientController extends Controller
             'serialno' => $serialNo ,
             'modelno' => $modelNo ,
             'propertyno' => $propertyNo ,
-            'request_duration' => $requestDuration 
+            'request_duration' => $requestDuration ,
+            'request_others' => $others
         ]);
 
         $this->notifFromClient($agentUnitID , $requestDate , $generateRefNo , $categoryID , $requestBy , 'NEW REQUEST!');
@@ -2148,6 +2165,7 @@ class RequestClientController extends Controller
                         request_tab.agentunit_id as agentUnitID , 
                         request_tab.agentacc_id as agentAccID , 
                         request_tab.request_refid as refID , 
+                        request_tab.request_others as reqOthers ,
                         request_tab.category_id as categoryId , 
                         category_tab.category_value categoryVal ,
                         request_tab.request_descript reqDesc , 
@@ -2168,6 +2186,7 @@ class RequestClientController extends Controller
             })
             ->where('request_tab.status_id', $getStatusID)
             ->groupBy('refID' , 
+            'reqOthers' ,
             'agentAccID' ,
             'categoryIcon' ,
             'mainCategory' ,

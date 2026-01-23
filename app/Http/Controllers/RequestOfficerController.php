@@ -38,6 +38,7 @@ class RequestOfficerController extends Controller
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo , 
+            request_tab.request_others as reqOthers ,
             repairtype_tab.repairtype_time as repairTime , 
             category_tab.main_category as mainCategory ,
             category_tab.category_id as categoryId ,
@@ -64,6 +65,7 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->groupBy(
                 'refNo',
+                'reqOthers' ,
                 'repairTime' ,
                 'mainCategory',
                 'categoryId',
@@ -204,6 +206,7 @@ class RequestOfficerController extends Controller
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo ,
+            request_tab.request_others as reqOthers ,
             request_tab.agentacc_id as agentAccId ,
             repairtype_tab.repairtype_time as repairTime , 
             category_tab.category_id as categoryId ,
@@ -230,6 +233,7 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->where('request_tab.request_refid' , 'LIKE' ,  '%'.$getRefNo.'%')
             ->groupBy(
+                'reqOthers' ,
                 'agentAccId' ,
                 'refNo',
                 'repairTime' ,
@@ -1700,6 +1704,9 @@ class RequestOfficerController extends Controller
         ->get();
 
         //dd($data);
+        if(Auth::user()->usertype_id != 1){
+            return back();
+        }
         return view('officer.location_floor_settings' , compact('data')); // USE ON TEST
     }
 
@@ -1901,6 +1908,9 @@ class RequestOfficerController extends Controller
         //->orderBy('repairtype_time')
         ->get();
 
+        if(Auth::user()->usertype_id != 1){
+            return back();
+        }
         return view('officer.request_duration_settings' , compact('data' , 'durations'));
     }
 

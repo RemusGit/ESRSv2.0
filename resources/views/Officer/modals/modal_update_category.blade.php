@@ -13,6 +13,33 @@
             @csrf
 
 
+            <!------------------------------------OTHERS IMISS----------------------------------------->
+            <div id="showOthersImiss" class="mb-4" style="display: none;">
+                    <!-- ROW / REQUEST DETAILS 2-->
+                    <div class="row">
+                    
+                        <div class="col-lg-3 mb-4">
+                                <div class="form-outline form-floating  w-100">
+                                    <div class="form-outline form-floating">
+                                        <input type="text"  class="form-control form-control-lg" placeholder="Others please specify" name="reqOthers" id="othersImissSpecify" />
+                                        <label class="form-label" style="font-size: 13px;"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Others please specify</label>
+                                    </div>
+                            </div>
+                        </div>  
+                        <div class="col-lg-9">
+                                <div class="form-outline form-floating  w-100">
+                                <div class="form-floating ">
+                                    <textarea class="form-control" placeholder="Description (Detailed information eg. 'I.D for Juan Dela Cruz')" 
+                                    id="othersImissDesc" style="height: 200px" name="reqDesc"></textarea>
+                                    <label for="othersImissDesc"><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Description (Detailed information eg. 'I.D for Juan Dela Cruz')</label>
+                                </div>
+                            </div>
+                        </div>  
+
+                    </div>
+                    <!-- EOF ROW / REQUEST DETAILS 2-->
+            </div>
+
             <!------------------------------------TRAVEL CONDUCTION----------------------------------------->
             <div id="showTCDetails" class="mb-4" style="display: none;">
                 @include('client.modals.travel_conduction_details')
@@ -137,8 +164,14 @@
             $('#showNetworkInstallDetails').slideUp();
             $('#showTCDetails').slideUp();
             $('#hrId').slideUp();
+            $('#showOthersImiss').slideUp();
             
-            console.log(categoryVal);
+            
+            //console.log(categoryVal);
+            //////////////////////////////////////////////////////////////////////////////////// OTHERS IMISS
+            if(categoryVal == 'Others'){
+                $('#showOthersImiss').slideDown();
+            }
 
             //////////////////////////////////////////////////////////////////////////////////// TRAVEL CONDUCTION
             if(categoryVal == 'Travel Conduction' || categoryID == 73 || categoryID == 74 || categoryID == 75){
@@ -483,6 +516,20 @@
                     $('#EfmsTcPurpose').val() == '' ||
                     $('#EfmsTcDate').val() == '' ||
                     $('#EfmsTcTime').val() == '' 
+                ){
+                    $('#showWarningRequiredAll').show();
+                    return;
+                }else{
+                    $('#showWarningRequiredAll').hide();
+                }
+            }
+
+            ///////////////////////// OTHERS IMISS VALIDATION
+            if(newCategoryValText == 'Others'){
+
+                if(
+                    $('#othersImissSpecify').val() == '' ||
+                    $('#othersImissDesc').val() == '' 
                 ){
                     $('#showWarningRequiredAll').show();
                     return;

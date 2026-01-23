@@ -47,7 +47,7 @@
                         @endif
                     </td>
                     <td style="max-width: 110px;">{{ $datas->accomplishedDate }}</td>
-                    <td style="max-width: 120px;">{{ $datas->categoryVal }}</td>
+                    <td style="max-width: 120px;">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ $datas->reqOthers }}) @endif</td>
                     <td>{{ $datas->requestBy }}</td>
                     <td style="max-width: 120px;">{{ $datas->sectionName }}</td>
 

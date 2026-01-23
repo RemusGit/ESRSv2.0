@@ -45,7 +45,7 @@
                         @else
                             Indefinite
                         @endif</td>
-                    <td style="max-width: 120px;">{{ $datas->categoryVal }}</td>
+                    <td style="max-width: 120px;">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ $datas->reqOthers }}) @endif</td>
                     <td>{{ $datas->requestBy }}</td>
                     <td style="max-width: 150px;">{{ $datas->sectionName }}</td>
                     <td>{{ $datas->locationVal }}</td>

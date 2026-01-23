@@ -28,11 +28,14 @@
 
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/client_dashboard"><i class="bi-toggles2"></i> Switch to Client</a></li>
-                <li><a class="dropdown-item" href="/location_floor_settings"><i class="bi bi-geo-alt-fill"></i> Location/Floor Settings</a></li>
+                @if(Auth::user()->usertype_id == 1)
+                  <li><a class="dropdown-item" href="/location_floor_settings"><i class="bi bi-geo-alt-fill"></i> Location/Floor Settings</a></li>
+                
                 <!--li><a class="dropdown-item text-danger" href="/under_development_page"><i class="bi bi-geo-alt-fill"></i> Location/Floor Settings</a></li-->
                 
                 <li><a class="dropdown-item" href="/request_duration_settings"><i class="bi bi-gear-fill"></i> Request Duration Settings</a></li>
                 <!--li><a class="dropdown-item text-danger" href="/under_development_page"><i class="bi bi-gear-fill"></i> Request Duration Settings</a></li-->
+                @endif
               
                 <li><hr class="dropdown-divider"></li>
                 <li class=""><a class="dropdown-item text-success" href="#"

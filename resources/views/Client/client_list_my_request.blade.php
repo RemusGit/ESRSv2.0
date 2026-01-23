@@ -19,7 +19,7 @@
    <!-- CATEGORY + DESCRIPTION -->
     <div class="row">
         <div class="col-lg-12">
-            <p ><i class="{{ $datas->categoryIcon }} display-6"></i> <span class="display-6">{{ $datas->categoryVal }} </span>
+            <p ><i class="{{ $datas->categoryIcon }} display-6"></i> <span class="display-6">{{ $datas->categoryVal }} @if($datas->reqOthers != '')<span style="font-size: 20px;">({{ $datas->reqOthers }})<span> @endif</span>
             @if($datas->mainCategory != '')<span class="text-secondary"> ({{ $datas->mainCategory }})</span>@endif
             @if($datas->reqCondemn == 1)<span class="text-danger"> (Condemned)</span>@endif
             </p>
