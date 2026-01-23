@@ -101,11 +101,11 @@
 
 
     <div class="row mt-2" id="searchForVmcCard" style="display: none;">
-        <div class="col-lg-12 w-100">
+        <div class="col-lg-12">
             <form action="{{ route('filter_request') }}" method="POST">
                 @csrf
-                <div class="input-group">
-                    <span class="input-group-text">Custom Search</span>
+                <div class="input-group w-100">
+                    <span class="input-group-text">Custom Search for Biometrics / VMC ID</span>
                     <input type="hidden" id="customCategoryVal" name="customCategoryVal">
                     <input type="search" class="form-control form-control-sm" placeholder="Search Employee First or Last Name (Press Enter)" name="searchEmpName" required
                     value="{{ old('searchAll', $oldData['searchEmpName'] ?? '') }}">
