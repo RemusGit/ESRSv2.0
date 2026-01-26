@@ -16,7 +16,7 @@
                     <th>Request-By</th>
                     <th>Employee#</th>
                     <th>Section</th>
-                    <th>Description</th>
+                    <th style="width: 12%;">Description</th>
                     <th>Equip-Details</th>
                     <th>Action-Officer</th>
                     <th>Taken-Date</th>
@@ -50,19 +50,27 @@
                             Indefinite
                         @endif
                     </td>
-                    <td style="max-width: 120px;">{{ $datas->categoryVal }}</td>
+                    <td style="max-width: 120px;">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ substr($datas->reqOthers , 0, 40) }}) @endif</td>
                     <td>{{ $datas->requestBy }}</td>
                     <td>{{ $datas->empNo }}</td>
                     <td style="max-width: 150px;">{{ $datas->sectionName }}</td>
 
+                    <?php //SET MAX DESC CHAR
+                        $descMax = 55;
+                        if(Auth::user()->agentunit_id == 1){
+                            $descMax = 120;
+                        }
+                    ?>
+
                     <td style="max-width: 120px;">
-                        {{ Str::limit($datas->reqDesc , 100 , '...') }}
+                        {{ Str::limit($datas->reqDesc , $descMax , '...') }}
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
-                        @if ($countDescription >= 100)
+                        @if ($countDescription >= $descMax)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
                             data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
                     </td>
+
                     <td style="max-width: 100px;">
                         <?php $equipmentDetails = ''  ?>
                         @if($datas->eq1 == '' || $datas->eq2 == '' || $datas->eq3 == '' || $datas->eq4 == '')

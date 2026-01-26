@@ -1891,7 +1891,7 @@ class RequestOfficerController extends Controller
         'repairtype_tab.repairtype_value' , 
         'repairtype_tab.repairtype_time'
         )
-        ->orderBy('category_tab.category_id')
+        ->orderBy('category_tab.main_category')
         ->orderBy('category_tab.category_value');
 
         if($agentUnitID == 1){

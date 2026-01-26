@@ -15,7 +15,7 @@
                     <th>Section</th>
                     <th>Location</th>
                     <th>Floor</th>
-                    <th>Description</th>
+                    <th style="width: 12%;">Description</th>
                     <th>Equip-Details</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -77,16 +77,25 @@
                         @else
                             Indefinite
                         @endif</td>
-                    <td style="max-width: 120px; color: {{$txtColor}};">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ $datas->reqOthers }}) @endif</td>
+                    <td style="max-width: 120px; color: {{$txtColor}};">
+                        {{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ substr($datas->reqOthers , 0, 40) }}) @endif
+                    </td>
                     <td style="color: {{$txtColor}};">{{ $datas->requestBy }}</td>
                     <td style="max-width: 150px; color: {{$txtColor}};">{{ $datas->sectionName }}</td>
                     <td style="color: {{$txtColor}};">{{ $datas->locationVal }}</td>
                     <td style="color: {{$txtColor}};">{{ $datas->bldgFloorVal }}</td>
 
+                    <?php //SET MAX DESC CHAR
+                        $descMax = 55;
+                        if(Auth::user()->agentunit_id == 1){
+                            $descMax = 120;
+                        }
+                    ?>
+
                     <td style="color: {{$txtColor}};">
-                        {{ Str::limit($datas->reqDesc , 100 , '...') }}
+                        {{ Str::limit($datas->reqDesc , $descMax , '...') }}
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
-                        @if ($countDescription >= 100)
+                        @if ($countDescription >= $descMax)
                             <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
                             data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Description,,{{ str_replace(",," , ".." , $datas->reqDesc) }},,{{ $datas->refNo }}'>See more</span>
                         @endif
