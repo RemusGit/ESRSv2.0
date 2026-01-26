@@ -38,6 +38,8 @@ class RequestOfficerController extends Controller
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo , 
+            request_tab.request_findings as reqFindings , 
+            request_tab.request_recommendation as reqRecommendation , 
             request_tab.request_others as reqOthers ,
             repairtype_tab.repairtype_time as repairTime , 
             category_tab.main_category as mainCategory ,
@@ -65,6 +67,8 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->groupBy(
                 'refNo',
+                'reqFindings' ,
+                'reqRecommendation' ,
                 'reqOthers' ,
                 'repairTime' ,
                 'mainCategory',
@@ -206,6 +210,8 @@ class RequestOfficerController extends Controller
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
             ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo ,
+            request_tab.request_findings as reqFindings , 
+            request_tab.request_recommendation as reqRecommendation , 
             request_tab.request_others as reqOthers ,
             request_tab.agentacc_id as agentAccId ,
             repairtype_tab.repairtype_time as repairTime , 
@@ -233,6 +239,8 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->where('request_tab.request_refid' , 'LIKE' ,  '%'.$getRefNo.'%')
             ->groupBy(
+                'reqFindings' ,
+                'reqRecommendation' ,
                 'reqOthers' ,
                 'agentAccId' ,
                 'refNo',

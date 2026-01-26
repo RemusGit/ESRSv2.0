@@ -1,13 +1,13 @@
 
 <div class="row mt-2">
 
-    <div class="col-lg-3">
+    <div class="col-lg-5">
         <form action="/officer_completed_request" method="POST">
             @csrf
             <input type="hidden" name="getStatus" value="6">
             <div class="input-group mb-1">
                 <span class="input-group-text">Search</span>
-                <input type="search" class="form-control form-control-sm" placeholder="Reference No." name="refNo" 
+                <input type="search" class="form-control form-control-sm" placeholder="Reference No. (Press Enter)" name="refNo" 
                 required value="{{ old('refNo', $oldData['refNo'] ?? '') }}">
                 <button type="submit" class="btn btn-success"><i class="bi bi-search"></i></button>
             </div>
@@ -16,7 +16,7 @@
 
 
 
-    <div class="col-lg-3 ms-auto">
+    <div class="col-lg-2 ms-auto">
     <form action="/officer_completed_request" method="POST">
     @csrf
         <input type="hidden" name="getStatus" value="6">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <div class="col-lg-3">
+    <div class="col-lg-2">
         <div class="input-group mb-1">
             <span class="input-group-text">To</i></span>
             <input type="date" class="form-control form-control-sm" name="reqDateTo"

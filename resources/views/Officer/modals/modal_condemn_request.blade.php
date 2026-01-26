@@ -95,6 +95,8 @@
             let serialNo = array[2];
             let modelNo = array[3];
             let propertyNo = array[4];
+            let findings = array[5];
+            let recommendation = array[6];
 
             if(nameOfEquipment == null){
               nameOfEquipment = '';
@@ -108,12 +110,21 @@
             if(propertyNo == null){
               propertyNo = '';
             } 
+            if(findings == null){
+              findings = '';
+            } 
+            if(recommendation == null){
+              recommendation = '';
+            } 
 
             $('#officerCondemnId').val(getRefID);
             $('#getNameOfEq').val(nameOfEquipment);
             $('#getSerialNo').val(serialNo);
             $('#getModelNo').val(modelNo);
             $('#getPropertyNo').val(propertyNo);
+
+            $('#getFindings').val(findings);
+            $('#getRecommendation').val(recommendation);
 
             $('#condemnActionRefId').html(getRefID);
 

@@ -7,7 +7,7 @@
             <input type="hidden" name="getStatus" value="5">
             <div class="input-group mb-1">
                 <span class="input-group-text">Search</span>
-                <input type="search" class="form-control form-control-sm" placeholder="Reference No." name="refNo" required
+                <input type="search" class="form-control form-control-sm" placeholder="Reference No. (Press Enter)" name="refNo" required
                 value="{{ old('refNo', $oldData['refNo'] ?? '') }}">
                 <button type="submit" class="btn btn-success"><i class="bi bi-search"></i></button>
             </div>

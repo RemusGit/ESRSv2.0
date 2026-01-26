@@ -113,7 +113,7 @@
                                     data-bs-toggle="modal" data-bs-target="#officerServiceReportModal"><i class="bi bi-folder-symlink"></i> Service Report </a></li>
                                 @else
                                     <li><a class="dropdown-item officerCondemnRequestBtn" href="#" 
-                                    id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }}"
+                                    id="{{ $datas->refNo }},,{{ $datas->eq1 }},,{{ $datas->eq2 }},,{{ $datas->eq3 }},,{{ $datas->eq4 }},,{{ $datas->reqFindings }},,{{ $datas->reqRecommendation }}"
                                     data-bs-toggle="modal" data-bs-target="#officerCondemnModal"><i class="bi bi-bell-slash-fill"></i> Condemn </a></li>
                                 @endif
 
