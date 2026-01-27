@@ -390,11 +390,11 @@
           </div>
           <!-- EOF ROW / VMC ID DETAILS 7 -->
 
-        <div class="clearfix" style="font-size: 14px;">
+        <div class="clearfix" style="font-size: 14px;" id="useMyOldPicDiv">
             <div class="float-start form-check">
-                <label class="form-check-label" for="picSigBypass">
-                <u>I Already Uploaded My Picture & Signature</u>
-                <span class="text-danger fst-italic" style="font-size: 15px;">(Note: We use your Firstname and Lastname as Reference.) <br>Do not click the CHECKBOX unless you are SURE your Picture and Signature are already uploaded.</span>
+                <label class="form-check-label" for="picSigBypass" style="cursor:pointer;">
+                <u style="font-size: 16px;">Use My Old Picture & Signature.</u>
+                <span class="text-danger fst-italic" style="font-size: 14px;">(Note: We use your Firstname and Lastname as Reference.)</span>
                 <input class="form-check-input" type="checkbox" id="picSigBypass" name="picSigBypass">
                 </label>
             </div>
@@ -408,7 +408,7 @@ $('#picSigBypass').on('click' ,function(){
     var checkVal = $('#picSigBypass:checked').val();
     if(checkVal == 'on'){
 
-        $('#picSigHide').slideUp();
+        $('#picSigHide').slideUp('fast');
         $('#idrequest_picture').removeAttr("required");
         $('#idrequest_signature').removeAttr("required");
 
@@ -419,7 +419,7 @@ $('#picSigBypass').on('click' ,function(){
         $('#vmcIdSubmitBtn').removeAttr('disabled');
     }
     else{
-        $('#picSigHide').slideDown();
+        $('#picSigHide').slideDown('fast');
         $('#idrequest_picture').attr("required" , "required");
         $('#idrequest_signature').attr("required" , "required");
     }
@@ -438,12 +438,12 @@ $('#sameAsAboveAddress').on('click' ,function(){
     //console.log('City:' + getCity1 + ' / BRGY:' + getBrgy1);
 
     if(checkVal == 'on'){
-        $('#emergencyAddress').slideUp();
+        $('#emergencyAddress').slideUp('fast');
         $('#idrequest_emerstreet').removeAttr("required");
         $('#vmcIdCardCityEmergency').removeAttr("required");
         $('#vmcIdCardBarangayEmergency').removeAttr("required");
     }else{
-        $('#emergencyAddress').slideDown();
+        $('#emergencyAddress').slideDown('fast');
         $('#idrequest_emerstreet').attr("required","required");
         $('#vmcIdCardCityEmergency').attr("required","required");
         $('#vmcIdCardBarangayEmergency').attr("required","required");
@@ -459,6 +459,15 @@ $('#sameAsAboveAddress').on('click' ,function(){
     var files = this.files;
     console.log(this.id);
     let getID = this.id;
+
+    let getPicVal = $('#idrequest_picture')[0].files.length;
+    let getSigVal = $('#idrequest_signature')[0].files.length;
+
+    if(getPicVal == 1 || getSigVal == 1){
+        $('#useMyOldPicDiv').slideUp('fast');
+    }else{
+        $('#useMyOldPicDiv').slideDown('fast');
+    }
 
         // Check if a file was selected
         if (files && files.length > 0) {
