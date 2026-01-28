@@ -2355,7 +2355,6 @@ class RequestOfficerController extends Controller
         ->where('request_refid' , $refID)
         ->where('deleted' , 0)
         ->orderBy('action_datetime' , 'DESC')
-        ->limit(1)
         ->get();
 
         $eqParts = DB::table('equipmentparts_tab')
@@ -2469,6 +2468,7 @@ class RequestOfficerController extends Controller
         $pdf->Cell(50,1,'Work Done' , 0 , 1 , 'L');
         $pdf->Line(60,122,200,122);
 
+        /*
         $x = 0;
         $countLetters = 0;
         $workDone = "";
@@ -2483,43 +2483,65 @@ class RequestOfficerController extends Controller
             $pdf->Cell(1,1, $workDone , 0 , 1 , 'L');
             $x+=($countLetters*2);
         }
+        */
+        $y_workDone = 0;
+        $countLetters = 0;
+        $get_all_action_taken = '';
+        
+        foreach($actionTakens as $rows){
+            $get_all_action_taken = str_replace(array("\r", "\n", "\r\n"), '',$rows->action_taken) .', '. $get_all_action_taken; //replace new line
+        }
+        
+        $maxChar = 125;
+        $countLetters = strlen($get_all_action_taken);
+        if($countLetters >= $maxChar){
+            $countLetters = $countLetters / $maxChar;
+            for($i = 0; $i <= $countLetters; $i++){
+                $y_workDone += 5;
+                $pdf->Line(60,122+$y_workDone,200,122+$y_workDone);
+            }
+        }
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(59 , 117);
+        $pdf->MultiCell(143 , 5 , $get_all_action_taken, 0 , 'L' , 0);
 
 
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetXY(10, 125);
+        $pdf->SetXY(10, 125 + $y_workDone);
         $pdf->Cell(50,1,'Work Started (Date and Time)' , 0 , 1 , 'L');
-        $pdf->Line(60,127,200,127);
+        $pdf->Line(60,127+$y_workDone,200,127+$y_workDone);
 
         $pdf->SetFont('Arial', '', 9);
-        $pdf->SetXY(59, 124);
+        $pdf->SetXY(59, 124+$y_workDone);
         $pdf->Cell(50,1, date('M. d, Y - H:i:s' , strtotime($reqTaken)) , 0 , 1 , 'L');
 
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetXY(10, 130);
+        $pdf->SetXY(10, 130+$y_workDone);
         $pdf->Cell(50,1,'Work Finished (Date and Time)' , 0 , 1 , 'L');
-        $pdf->Line(60,132,200,132);
+        $pdf->Line(60,132+$y_workDone,200,132+$y_workDone);
 
         $pdf->SetFont('Arial', '', 9);
-        $pdf->SetXY(59, 129);
+        $pdf->SetXY(59, 129+$y_workDone);
         $pdf->Cell(50,1, date('M. d, Y - H:i:s' , strtotime($reqDone)) , 0 , 1 , 'L');
 
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetXY(10, 135);
+        $pdf->SetXY(10, 135+$y_workDone);
         $pdf->Cell(50,1,'Remarks' , 0 , 1 , 'L');
-        $pdf->Line(60,137,200,137);
+        $pdf->Line(60,137+$y_workDone,200,137+$y_workDone);
 
         $pdf->SetFont('Arial', '', 9);
-        $pdf->SetXY(59, 134);
+        $pdf->SetXY(59, 134+$y_workDone);
         $pdf->Cell(50,1, $reqRemarks , 0 , 1 , 'L');
 
-        $pdf->Line(10,150,200,150);
-        $pdf->Line(10,155,200,155);
+        $pdf->Line(10,150+$y_workDone,200,150+$y_workDone);
+        $pdf->Line(10,155+$y_workDone,200,155+$y_workDone);
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetXY(10, 152);
+        $pdf->SetXY(10, 152+$y_workDone);
         $pdf->Cell(10,1,'Equipment' , 0 , 1 , 'L');
-        $pdf->SetXY(80, 152);
+        $pdf->SetXY(80, 152+$y_workDone);
         $pdf->Cell(10,1,'Part Type' , 0 , 1 , 'L');
-        $pdf->SetXY(190, 152);
+        $pdf->SetXY(190, 152+$y_workDone);
         $pdf->Cell(10,1,'Cost' , 0 , 1 , 'R');
 
         $y = 0;
@@ -2527,13 +2549,13 @@ class RequestOfficerController extends Controller
         $pdf->SetFont('Arial', '', 9);
         foreach($eqParts as $rows){
 
-            $pdf->SetXY(10, 157 + $y);
+            $pdf->SetXY(10, 157 + $y+$y_workDone);
             $pdf->Cell(10,1, $rows->equipmentparts_name , 0 , 1 , 'L');
 
-            $pdf->SetXY(80, 157 + $y);
+            $pdf->SetXY(80, 157 + $y+$y_workDone);
             $pdf->Cell(10,1, $rows->equipmenttype_value , 0 , 1 , 'L');
 
-            $pdf->SetXY(190, 157 + $y);
+            $pdf->SetXY(190, 157 + $y+$y_workDone);
             $pdf->Cell(10,1, number_format($rows->equipmentparts_amount , 0) , 0 , 1 , 'R');
             $y+=5;
             $totalCost = $totalCost + $rows->equipmentparts_amount;
@@ -2545,33 +2567,33 @@ class RequestOfficerController extends Controller
             }
         }
 
-        $pdf->Line(10,155 +$y,200,155 +$y);
+        $pdf->Line(10,155 +$y+$y_workDone,200,155 +$y+$y_workDone);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->SetXY(150, 160 +$y);
+        $pdf->SetXY(150, 160 +$y+$y_workDone);
         $pdf->Cell(10,1,'TOTAL :' , 0 , 1 , 'L');
-        $pdf->SetXY(170, 160 +$y);
+        $pdf->SetXY(170, 160 +$y+$y_workDone);
         $pdf->Cell(30,1, number_format($totalCost , 0) , 0 , 1 , 'R');
 
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetXY(10, 160 +$y);
+        $pdf->SetXY(10, 160 +$y+$y_workDone);
         $pdf->Cell(10,1,'(   ) For Outside Repair' , 0 , 1 , 'L');
 
         if($reqWarranty == 1){
-            $pdf->Image(public_path('images\check2.png'), 11, 158+$y, 0,5);
+            $pdf->Image(public_path('images\check2.png'), 11, 158+$y+$y_workDone, 0,5);
         }
 
-        $pdf->SetXY(75, 160 +$y);
+        $pdf->SetXY(75, 160 +$y+$y_workDone);
         $pdf->Cell(165,1,'(   ) For Condemn' , 0 , 1 , 'L');
 
         if($reqCondemn == 1){
-            $pdf->Image(public_path('images\check2.png'), 76, 158 +$y, 0,5);
+            $pdf->Image(public_path('images\check2.png'), 76, 158 +$y+$y_workDone, 0,5);
         }
 
-        $pdf->SetXY(10, 170+$y);
+        $pdf->SetXY(10, 170+$y+$y_workDone);
         $pdf->Cell(165,1,'Reason :' , 0 , 1 , 'L');
 
         $pdf->SetFont('Arial', '', 9);
-        $pdf->SetXY(25, 172+$y);
+        $pdf->SetXY(25, 172+$y+$y_workDone);
         $pdf->MultiCell(175,5, $reqRecommendation , 0 , 'L' , 0,);
 
 

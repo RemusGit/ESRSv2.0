@@ -85,7 +85,11 @@
                     </td>
 
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary rounded-pill mt-2 pt-1 officerActionTaken" style="font-size: 8px;"
+                        <?php $btnClassColor = 'btn-outline-secondary'; ?>
+                        @if($datas->actionTaken != '' || $datas->actionTaken != null)
+                        <?php $btnClassColor = 'btn-outline-danger'; ?>
+                        @endif
+                        <button class="btn btn-sm {{ $btnClassColor }}  rounded-pill mt-2 pt-1 officerActionTaken" style="font-size: 8px;"
                         id='{{ $datas->refNo }}' data-bs-toggle="modal" data-bs-target="#officerActionTakenModal">
                             View Action
                         </button>
