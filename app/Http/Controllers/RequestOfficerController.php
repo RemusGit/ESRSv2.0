@@ -2492,11 +2492,11 @@ class RequestOfficerController extends Controller
             $get_all_action_taken = str_replace(array("\r", "\n", "\r\n"), '',$rows->action_taken) .', '. $get_all_action_taken; //replace new line
         }
         
-        $maxChar = 125;
+        $maxChar = 100;
         $countLetters = strlen($get_all_action_taken);
         if($countLetters >= $maxChar){
-            $countLetters = $countLetters / $maxChar;
-            for($i = 0; $i <= $countLetters; $i++){
+            $countLetters = floor($countLetters / $maxChar);
+            for($i = 0; $i < $countLetters; $i++){
                 $y_workDone += 5;
                 $pdf->Line(60,122+$y_workDone,200,122+$y_workDone);
             }
@@ -2504,6 +2504,7 @@ class RequestOfficerController extends Controller
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetXY(59 , 117);
+        //$pdf->MultiCell(143 , 5 , strlen($get_all_action_taken).'/'.$get_all_action_taken.' / '.floor($countLetters), 0 , 'L' , 0);
         $pdf->MultiCell(143 , 5 , $get_all_action_taken, 0 , 'L' , 0);
 
 
