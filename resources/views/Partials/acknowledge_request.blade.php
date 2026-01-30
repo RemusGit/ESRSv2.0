@@ -2,7 +2,7 @@
 
     $(document).ready(function(){
 
-        var getSection = "{{ session('section_abbre') }}";
+        //var getSection = "{{ session('section_abbre') }}";
         //------------------------------------------------------------------ ACKNOWLEDGE CONFIRM
         //$('.acknowledgeRequest').click(function(e){
         $(document).on('click' , '.acknowledgeRequest' , function(e){
@@ -12,6 +12,8 @@
                 let array = this.id.split("?");
                 let getRefID = array[0];
                 let categoryID = array[1];
+                let agentAbbre = array[2];
+                //console.log(agentUnitID);
 
 
                 numberOnly = getRefID.replace(/\D/g, '');
@@ -30,7 +32,8 @@
                             action: function(){
 
                                 $('#clientAcknowledge_'+numberOnly+'-'+categoryID).submit();
-                                window.open('https://hcss.valmed.ph/?unit='+window.btoa(getSection) , '_blank');
+                                //window.open('https://hcss.valmed.ph/?unit='+window.btoa(getSection) , '_blank');
+                                window.open('https://hcss.valmed.ph/?unit='+window.btoa(agentAbbre) , '_blank');
                             }
                         },
                         CANCEL: function () {

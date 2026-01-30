@@ -79,7 +79,7 @@
                 <input type="hidden" name="categoryID" value="{{ $datas->categoryId }}">
                 <input type="hidden" name="requestBy" value="{{ $datas->requestBy }}">
                 <input type="hidden" name="refID" value="{{ $datas->refID }}">
-                <button class="btn btn-sm btn-success w-100 acknowledgeRequest" id="{{ $datas->refID }}?{{ $datas->categoryId }}">Acknowledge</button>
+                <button class="btn btn-sm btn-success w-100 acknowledgeRequest" id="{{ $datas->refID }}?{{ $datas->categoryId }}?{{ $datas->agentAbbre }}">Acknowledge</button>
             </form>
         </div>
 
