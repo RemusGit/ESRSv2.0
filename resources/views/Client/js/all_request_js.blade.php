@@ -448,9 +448,26 @@
                 if(categoryID == 73 || categoryID == 74 || categoryID == 75){ // FOR EFMS TRANSPORT MAIN CATEGORY
                     $('#divAllEfmsTravel').show();
                     $('#addRequestCategoryIDTravel').val(categoryID);
-                }else{
+                }
+                else{
                     $('#divAllEfms').show();
                     $('#addRequestCategoryID').val(categoryID);
+                }
+
+                if(categoryID == 70 || categoryID == 71 || categoryID == 72){ // FOR EFMS MEDICAL EQUIPMENT MAIN CATEGORY
+                    $('#efmsNameOfEq').attr('required','required');
+                    $('#efmsSerialNo').attr('required','required');
+                    $('#efmsModelNo').attr('required','required');
+                    $('.efmsMedEqRequired').show();
+                }else{
+                    $('#efmsNameOfEq').val('');
+                    $('#efmsSerialNo').val('');
+                    $('#efmsModelNo').val('');
+
+                    $('#efmsNameOfEq').removeAttr('required');
+                    $('#efmsSerialNo').removeAttr('required');
+                    $('#efmsModelNo').removeAttr('required');
+                    $('.efmsMedEqRequired').hide();
                 }
                 
             }

@@ -80,8 +80,8 @@
               <div class="col-lg-3 mb-4">
                     <div class="form-outline form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text"  class="form-control form-control-lg" placeholder="Name of Equipment" name="getNameOfEquipment" />
-                            <label class="form-label" >Name of Equipment</label>
+                            <input type="text"  class="form-control form-control-lg" placeholder="Name of Equipment" name="getNameOfEquipment" id="efmsNameOfEq" />
+                            <label class="form-label" style="font-size: 13px;"><i class="bi bi-asterisk text-danger efmsMedEqRequired" style="font-size: 10px; display:none;"></i> Name of Equipment</label>
                         </div>
                   </div>
               </div>  
@@ -89,8 +89,8 @@
               <div class="col-lg-3 mb-4">
                     <div class="form-outline form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text"  class="form-control form-control-lg" placeholder="Serial No." name="getSerialNo" />
-                            <label class="form-label" >Serial No.</label>
+                            <input type="text"  class="form-control form-control-lg" placeholder="Serial No." name="getSerialNo" id="efmsSerialNo" />
+                            <label class="form-label" ><i class="bi bi-asterisk text-danger efmsMedEqRequired" style="font-size: 10px; display:none;"></i> Serial No.</label>
                         </div>
                   </div>
               </div>  
@@ -98,8 +98,8 @@
               <div class="col-lg-3 mb-4">
                     <div class="form-outline form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text"  class="form-control form-control-lg" placeholder="Model No." name="getModelNo" />
-                            <label class="form-label" >Model No.</label>
+                            <input type="text"  class="form-control form-control-lg" placeholder="Model No." name="getModelNo" id="efmsModelNo" />
+                            <label class="form-label"><i class="bi bi-asterisk text-danger efmsMedEqRequired" style="font-size: 10px; display:none;"></i> Model No.</label>
                         </div>
                   </div>
               </div>  
@@ -123,8 +123,8 @@
               <div class="col-lg-3 mb-4">
                     <div class="form-outline form-floating  w-100">
                         <div class="form-outline form-floating">
-                            <input type="text"  class="form-control form-control-lg" placeholder="Others please specify" name="getOthers" required />
-                            <label class="form-label" ><i class="bi bi-asterisk text-danger" style="font-size: 10px;"></i> Others please specify</label>
+                            <input type="text"  class="form-control form-control-lg" placeholder="Others please specify" name="getOthers" />
+                            <label class="form-label" style="font-size: 14px;">Others please specify</label>
                         </div>
                   </div>
               </div>  
