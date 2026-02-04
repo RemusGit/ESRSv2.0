@@ -866,6 +866,7 @@ class RequestOfficerController extends Controller
 
         $y = 0;
         $counter = 1;
+        $lastRow = $data->last();
         foreach($data as $datas){
 
         if($y == 0 && $accountEmpId != 'All Agents'){
@@ -875,8 +876,6 @@ class RequestOfficerController extends Controller
             $pdf->Write(1, $agentFullName);
             
         }
-
-
             /*
             $pdf->SetFont('Arial', '', 6);
             $pdf->SetXY(5, 76+$y);
@@ -891,6 +890,7 @@ class RequestOfficerController extends Controller
 
             $pdf->SetFont('Arial', '', 8);
             $pdf->SetXY(10, 74+$y);
+            //$pdf->MultiCell(30,5, $counter.'-'.$datas->refID , 0, 'L' , 0,);
             $pdf->MultiCell(30,5, $datas->refID , 0, 'L' , 0,);
 
             $pdf->SetXY(38, 74+$y);
@@ -942,13 +942,18 @@ class RequestOfficerController extends Controller
 
             $pdf->SetFont('Arial', '', 7);
             $pdf->SetXY(180, 74+$y);
+            //$pdf->MultiCell(25,3, $datas->statusVal.'-'.$y , 0, 'C' , 0,);
             $pdf->MultiCell(25,3, $datas->statusVal , 0, 'C' , 0,);
             
             
-            if($y >= 185){
+            if($y >= 189){
+
+                if($datas === $lastRow){
+                    $y+=8;
+                    break;
+                }else{
 
                 $pdf->Line(10,82+$y,200,82+$y);
-
                 $pdf->AliasNbPages();
                 $pdf->AddPage();
                 
@@ -1037,6 +1042,7 @@ class RequestOfficerController extends Controller
                 $pdf->SetFont('Arial', 'B', 8);
                 $pdf->SetXY(187, 67);
                 $pdf->Write(1,'Status');
+                }//EOF LAST ROW
             }else{
                 $y+=8;
             }
