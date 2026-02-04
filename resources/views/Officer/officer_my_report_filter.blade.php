@@ -8,7 +8,7 @@
                 <select class="form-select form-control-sm" name="reqStatus">
                     <option value="All Accomplished">All Accomplished</option>
                     <option value="In-Progress" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'In-Progress')>In-Progress</option>
-                    <option value="Acknowledge" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Acknowledge')>Acknowledge</option>
+                    <!--option value="Acknowledge" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Acknowledge')>Acknowledge</option-->
                     <option value="Completed"   @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Completed')>Completed</option>
                     <option value="Cancelled"   @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Cancelled')>Cancelled</option>
                     <option value="Condemned"   @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Condemned')>Condemned</option>

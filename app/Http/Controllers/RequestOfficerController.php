@@ -605,6 +605,19 @@ class RequestOfficerController extends Controller
         $status = $req->reqStatus;
         $accountEmpId = $req->reqAgent;
 
+        $agentFullName = "";
+        if($accountEmpId != 'All Agents'){
+            $getSelectedAgent = DB::table('accounts_tab')
+            ->select('account_fname as agentFname' , 'account_lname as agentLname')
+            ->where('account_empid' , $accountEmpId)
+            ->first();
+
+            $agentFullName = $getSelectedAgent->agentFname.' '.$getSelectedAgent->agentLname;
+        }
+
+
+        
+
             $sql = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
@@ -615,6 +628,7 @@ class RequestOfficerController extends Controller
                 "category_tab.category_value as categoryVal ,
                 request_tab.request_refid as refID , 
                 request_tab.request_date as requestDate ,
+                request_tab.request_cancelled as requestCancelled ,
                 request_tab.request_done as reqDone ,
                 category_tab.category_value as categoryVal , 
                 request_tab.request_by as requestBy ,
@@ -627,6 +641,7 @@ class RequestOfficerController extends Controller
                 'category_tab.category_id',
                 'refID' ,
                 'requestDate' ,
+                'requestCancelled' ,
                 'reqDone' ,
                 'categoryVal' ,
                 'requestBy' ,
@@ -634,110 +649,127 @@ class RequestOfficerController extends Controller
                 'actionOfficer' ,
                 'statusVal'
                 )
-            ->where('category_tab.agentunit_id' , $agentUnitID)
-            ->whereBetween('request_date' , [$dateFrom , $dateTo])
-            ->orderBy('request_tab.request_date');
+            ->where('category_tab.agentunit_id' , $agentUnitID);
+
+            if ($status == 'Completed'){
+                $sql->orderBy('request_tab.request_done');
+            }else{
+                $sql->orderBy('request_tab.request_date');
+            }
 
             if ($status == 'In-Progress') {
-                $sql->where('request_tab.status_id' , 5);
+                $sql->where('request_tab.status_id' , 5)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id = 5";
             }
             elseif ($status == 'Acknowledge') {
-                $sql->where('request_tab.status_id' , 8);
+                $sql->where('request_tab.status_id' , 8)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id = 8";
             }
             elseif ($status == 'Completed') {
-                $sql->where('request_tab.status_id' , 6);
-                $statusWhere = "request_tab.status_id = 6";
+                //$sql->where('request_tab.status_id' , 6); //RETAIN OLD QUERY FOR COMPLETED
+                //$statusWhere = "request_tab.status_id = 6"; //RETAIN OLD QUERY FOR COMPLETED
+                $sql->whereIn('request_tab.status_id' , [6,7,8]) //NEW QUERY FOR COMPLETED
+                    ->whereBetween('request_done' , [$dateFrom , $dateTo]);//NEW QUERY FOR COMPLETED
+                $statusWhere = "request_tab.status_id IN (6,7,8)";//NEW QUERY FOR COMPLETED
             }
             elseif ($status == 'Cancelled') {
-                $sql->where('request_tab.status_id' , 7);
+                $sql->where('request_tab.status_id' , 7)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id = 7";
             }
             elseif ($status == 'Condemned') {
                 $sql->whereIn('request_tab.status_id' , [6,7,8])
-                ->where('request_tab.request_condemn' , 1);
+                ->where('request_tab.request_condemn' , 1)->whereBetween('request_date' , [$dateFrom , $dateTo]);
 
                 $statusWhere = "request_tab.status_id IN (6,7,8) AND request_tab.request_condemn = 1";
             }
             elseif ($status == 'All Accomplished') {
-                $sql->whereIn('request_tab.status_id' , [6,7,8]);
+                $sql->whereIn('request_tab.status_id' , [6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id IN (6,7,8)";
             }else{
-                $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                $sql->whereIn('request_tab.status_id' , [2,5,6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
             }
 
             if($accountEmpId != 'All Agents'){
                 $sql->where('request_tab.agentacc_id' , $accountEmpId);
                 $sql->orWhere('tagagent_tab.agentacc_id' , $accountEmpId);
-                $sql->whereBetween('request_tab.request_date' , [$dateFrom , $dateTo]);
+                //$sql->whereBetween('request_tab.request_date' , [$dateFrom , $dateTo]);
                 
                     if ($status == 'In-Progress') {
-                        $sql->where('request_tab.status_id' , 5);
+                        $sql->where('request_tab.status_id' , 5)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'Acknowledge') {
-                        $sql->where('request_tab.status_id' , 8);
+                        $sql->where('request_tab.status_id' , 8)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'Completed') {
-                        $sql->where('request_tab.status_id' , 6);
+                        //$sql->where('request_tab.status_id' , 6);
+                            $sql->whereIn('request_tab.status_id', [6, 7, 8]) // NEW QUERY FOR COMPLETED
+                                ->where(function ($q) use ($dateFrom, $dateTo) {
+                                    $q->whereBetween('request_done', [$dateFrom, $dateTo])
+                                    ->orWhereBetween('request_cancelled', [$dateFrom, $dateTo]);
+                            });
                     }
                     elseif ($status == 'Cancelled') {
-                        $sql->where('request_tab.status_id' , 7);
+                        $sql->where('request_tab.status_id' , 7)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'Condemned') {
                         $sql->whereIn('request_tab.status_id' , [6,7,8])
-                        ->where('request_tab.request_condemn' , 1);
+                        ->where('request_tab.request_condemn' , 1)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'All Accomplished') {
-                        $sql->whereIn('request_tab.status_id' , [6,7,8]);
+                        $sql->whereIn('request_tab.status_id' , [6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }else{
-                        $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                        $sql->whereIn('request_tab.status_id' , [2,5,6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                         $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
                     }
 
-                $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
-                or tagagent_tab.agentacc_id = '".$accountEmpId."' and (request_tab.request_date between '".$dateFrom."' and '".$dateTo."'))  ";
+                    if($status == 'Completed'){
+                        $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
+                        or tagagent_tab.agentacc_id = '".$accountEmpId."') and 
+                        (request_tab.request_done between '".$dateFrom."' and '".$dateTo."' OR request_tab.request_cancelled between '".$dateFrom."' and '".$dateTo."') ";
+                    }
+                    else{
+                        $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
+                        or tagagent_tab.agentacc_id = '".$accountEmpId."') and request_tab.request_date between '".$dateFrom."' and '".$dateTo."' ";
+                    }
             }
-            
             $data = $sql->get();
-            //dd($data);
-        
-            /*
-            $summary = DB::table('request_tab')
-            ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
-            ->selectRaw(
-                "category_tab_2.category_value as categoryVal ,
-                (SELECT COUNT(*) FROM request_tab 
-                LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
-                WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab_2.category_id AND
-                $statusWhere
-                ) AS requestTaken
-                ")
-            ->groupBy('categoryVal' , 'category_tab_2.category_id')
-            ->where('category_tab_2.agentunit_id' , $agentUnitID)
-            ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab_2.category_id')
-            ->get();
-            */
 
-            $sql2 = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
-            ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
-            ->select(
-                'category_tab.category_value as categoryVal' ,
-                'request_tab.category_id',
-                DB::raw("
-                    COUNT(DISTINCT CASE 
-                            WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
-                            AND $statusWhere
-                        THEN request_tab.request_refid END) AS requestTaken
-                        ")
-            )
-            ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
-            ->orderBy('category_tab.category_id');
+            if($status == 'Completed'){
+                $sql2 = DB::table('request_tab')
+                ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+                ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
+                ->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("
+                        COUNT(DISTINCT CASE 
+                                WHEN request_tab.request_done BETWEEN '$dateFrom' AND '$dateTo'
+                                AND $statusWhere
+                            THEN request_tab.request_refid END) AS requestTaken
+                            ")
+                )
+                ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
+                ->where('category_tab.agentunit_id' , $agentUnitID)
+                ->orderBy('category_tab.category_id');
+            }else{
+                $sql2 = DB::table('request_tab')
+                ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+                ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
+                ->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("
+                        COUNT(DISTINCT CASE 
+                                WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
+                                AND $statusWhere
+                            THEN request_tab.request_refid END) AS requestTaken
+                            ")
+                )
+                ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
+                ->where('category_tab.agentunit_id' , $agentUnitID)
+                ->orderBy('category_tab.category_id');
+            }
 
 
             if($status != 'All Request'){
@@ -793,6 +825,10 @@ class RequestOfficerController extends Controller
         $pdf->SetXY(26 , 60);
         $pdf->Write(1, date('M. d, Y' ,strtotime($dateFrom)).' - '.date('M. d, Y' ,strtotime($req->reqDateTo)));
 
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(75 , 60);
+        $pdf->Write(1, '('.$status.')');
+
         $pdf->Line(10,65,200,65);
         $pdf->Line(10,73,200,73);
 
@@ -835,7 +871,9 @@ class RequestOfficerController extends Controller
         if($y == 0 && $accountEmpId != 'All Agents'){
             $pdf->SetFont('Arial', 'B', 10);
             $pdf->SetXY(9 , 55);
-            $pdf->Write(1, $datas->actionOfficer);
+            //$pdf->Write(1, $datas->actionOfficer);
+            $pdf->Write(1, $agentFullName);
+            
         }
 
 
@@ -859,10 +897,13 @@ class RequestOfficerController extends Controller
             $pdf->MultiCell(18,3, $datas->requestDate , 0, 'C' , 0,);
 
             $pdf->SetXY(55, 74+$y);
-            if($datas->reqDone == ''){
-                 $pdf->MultiCell(25,3, '-' , 0, 'C' , 0,);
-            }else{
+            if($datas->reqDone != ''){
                  $pdf->MultiCell(25,3, $datas->reqDone , 0, 'C' , 0,);
+            }
+            else if($datas->requestCancelled != ''){
+                $pdf->MultiCell(25,3, $datas->requestCancelled , 0, 'C' , 0,);
+            }else{
+                 $pdf->MultiCell(25,3, '-' , 0, 'C' , 0,);
             }
 
             if(strlen($datas->categoryVal) >= 25){
@@ -946,7 +987,8 @@ class RequestOfficerController extends Controller
                 if($y == 0 && $accountEmpId != 'All Agents'){
                     $pdf->SetFont('Arial', 'B', 10);
                     $pdf->SetXY(9 , 55);
-                    $pdf->Write(1, $datas->actionOfficer);
+                    //$pdf->Write(1, $datas->actionOfficer);
+                    $pdf->Write(1, $agentFullName);
                 }
 
                 $pdf->SetFont('Arial', '', 9);
@@ -956,6 +998,10 @@ class RequestOfficerController extends Controller
                 $pdf->SetFont('Arial', 'B', 10);
                 $pdf->SetXY(26 , 60);
                 $pdf->Write(1, date('M. d, Y' ,strtotime($dateFrom)).' - '.date('M. d, Y' ,strtotime($req->reqDateTo)));
+
+                $pdf->SetFont('Arial', '', 9);
+                $pdf->SetXY(75 , 60);
+                $pdf->Write(1, '('.$status.')');
 
                 $pdf->Line(10,65,200,65);
                 $pdf->Line(10,73,200,73);
@@ -1053,9 +1099,11 @@ class RequestOfficerController extends Controller
         }
 
         if($y == 0 && $accountEmpId != 'All Agents'){
+
             $pdf->SetFont('Arial', 'B', 10);
             $pdf->SetXY(9 , 55);
-            $pdf->Write(1, $datas->actionOfficer);
+            //$pdf->Write(1, $datas->actionOfficer);
+            $pdf->Write(1, $agentFullName);
         }
 
         $pdf->SetFont('Arial', '', 9);
@@ -1069,6 +1117,10 @@ class RequestOfficerController extends Controller
         $pdf->SetFont('Arial', 'B', 11);
         $pdf->SetXY(9, 67);
         $pdf->Write(1,'Summary');
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(28 , 67);
+        $pdf->Write(1, '('.$status.')');
 
         $pdf->Line(10,70,120,70);
         $pdf->Line(10,75,120,75);
@@ -1148,7 +1200,8 @@ class RequestOfficerController extends Controller
             $statusWhere = "request_tab.status_id = 8";
         }
         elseif ($status == 'Completed') {
-            $statusWhere = "request_tab.status_id = 6";
+                //$statusWhere = "request_tab.status_id = 6"; //RETAIN OLD QUERY FOR COMPLETED
+                $statusWhere = "request_tab.status_id IN (6,7,8)"; //NEW QUERY FOR COMPLETED
         }
         elseif ($status == 'Cancelled') {
             $statusWhere = "request_tab.status_id = 7";
@@ -1160,58 +1213,65 @@ class RequestOfficerController extends Controller
             $statusWhere = "request_tab.status_id IN (6,7,8)";
         }
 
-        /*
-        $data = DB::table('request_tab')
-        ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
-        ->selectRaw(
-            "category_tab_2.category_value as categoryVal ,
-            (SELECT COUNT(*) FROM request_tab 
-            LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
-            WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-            request_tab.category_id = category_tab_2.category_id AND
-            (request_tab.agentacc_id = '".$accountEmpId."' OR tagagent_tab.agentacc_id = '".$accountEmpId."')
-            AND $statusWhere
-            ) AS requestTaken ,
-            (SELECT COUNT(*) FROM request_tab 
-            WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-            request_tab.category_id = category_tab_2.category_id AND
-            request_tab.agentunit_id = '".$agentUnitID."' AND request_tab.status_id IN (2,5,6,7,8)
-            ) AS overAll 
-            ")
-        ->groupBy('categoryVal' , 'category_tab_2.category_id')
-        ->where('category_tab_2.agentunit_id' , $agentUnitID)
-        ->where('request_tab.status_id' , '<>' , 2)
-        ->orderBy('category_tab_2.category_id')
-        ->get();
-        */
 
-        $data = DB::table('request_tab')
-        ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
-        ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
-        ->select(
-            'category_tab.category_value as categoryVal' ,
-            'request_tab.category_id',
-            DB::raw("COUNT(CASE 
-                        WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
-                        AND (request_tab.agentacc_id = '$accountEmpId' 
-                            OR tagagent_tab.agentacc_id = '$accountEmpId')
-                        AND $statusWhere 
-                    THEN 1 END) AS requestTaken"),
-            DB::raw("
-                    COUNT(
-                        DISTINCT CASE
-                            WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
-                            AND request_tab.agentunit_id = '$agentUnitID'
-                            THEN request_tab.request_refid 
-                        END
-                    ) AS overAll
+        $sql = DB::table('request_tab')
+            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+            ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid');
+
+            if($status == 'Completed'){
+                $sql->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("COUNT(CASE 
+                                WHEN (request_tab.request_done BETWEEN '$dateFrom' AND '$dateTo' OR 
+                                request_tab.request_cancelled between '".$dateFrom."' AND '".$dateTo."')
+                                AND (request_tab.agentacc_id = '$accountEmpId' 
+                                    OR tagagent_tab.agentacc_id = '$accountEmpId')
+                                AND $statusWhere 
+                            THEN 1 END) AS requestTaken"),
+                    DB::raw("
+                        COUNT(
+                            DISTINCT CASE
+                                WHEN (request_tab.request_done BETWEEN '$dateFrom' AND '$dateTo' OR 
+                                request_tab.request_cancelled between '".$dateFrom."' AND '".$dateTo."')
+                                AND request_tab.agentunit_id = '$agentUnitID'
+                                THEN request_tab.request_refid 
+                            END
+                        ) AS overAll
                     ")
-        )
-        ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
-        ->where('category_tab.agentunit_id' , $agentUnitID)
-        ->where('request_tab.status_id' , '<>' , 2)
-        ->orderBy('category_tab.category_id')
-        ->get();
+                );
+
+            }else{
+                $sql->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("COUNT(CASE 
+                                WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
+                                AND (request_tab.agentacc_id = '$accountEmpId' 
+                                    OR tagagent_tab.agentacc_id = '$accountEmpId')
+                                AND $statusWhere 
+                            THEN 1 END) AS requestTaken"),
+                    DB::raw("
+                        COUNT(
+                            DISTINCT CASE
+                                WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
+                                AND request_tab.agentunit_id = '$agentUnitID'
+                                THEN request_tab.request_refid 
+                            END
+                        ) AS overAll
+                    ")
+                );
+            }
+
+            $data = $sql->groupBy(
+                'categoryVal' , 
+                'category_tab.category_id' , 
+                'request_tab.category_id'
+            )
+            ->where('category_tab.agentunit_id' , $agentUnitID)
+            ->where('request_tab.status_id' , '<>' , 2)
+            ->orderBy('category_tab.category_id')
+            ->get();
 
 
         $pdf = new \FPDF();
@@ -1373,7 +1433,8 @@ class RequestOfficerController extends Controller
                 $statusWhere = "request_tab.status_id = 8";
             }
             elseif ($status == 'Completed') {
-                $statusWhere = "request_tab.status_id = 6";
+                //$statusWhere = "request_tab.status_id = 6"; //RETAIN OLD QUERY FOR COMPLETED
+                $statusWhere = "request_tab.status_id IN (6,7,8)"; //NEW QUERY FOR COMPLETED
             }
             elseif ($status == 'Cancelled') {
                 $statusWhere = "request_tab.status_id = 7";
@@ -1384,54 +1445,57 @@ class RequestOfficerController extends Controller
             else{
                 $statusWhere = "request_tab.status_id IN (6,7,8)";
             }
-            /*
-            $data = DB::table('request_tab')
-            ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
-            ->leftJoin('tagagent_tab' , 'tagagent_tab.request_refid' , '=' , 'request_tab.request_refid')
-            ->selectRaw(
-                "category_tab_2.category_value as categoryVal ,
-                (SELECT COUNT(*) FROM request_tab 
-                LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
-                WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab_2.category_id AND
-                (request_tab.agentacc_id = '".$accountEmpId."' OR tagagent_tab.agentacc_id = '".$accountEmpId."' ) AND $statusWhere 
-                ) AS requestTaken ,
-                (SELECT COUNT(*) FROM request_tab 
-                WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab_2.category_id AND
-                request_tab.agentunit_id = '".$agentUnitID."'
-                ) AS overAll 
-                ")
-            ->groupBy('categoryVal' , 'category_tab_2.category_id')
-            ->where('category_tab_2.agentunit_id' , $agentUnitID)
-            ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab_2.category_id')
-            ->get();
-            */
 
-            $data = DB::table('request_tab')
+            $sql = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
-            ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
-            ->select(
-                'category_tab.category_value as categoryVal' ,
-                'request_tab.category_id',
-                DB::raw("COUNT(CASE 
-                            WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
-                            AND (request_tab.agentacc_id = '$accountEmpId' 
-                                OR tagagent_tab.agentacc_id = '$accountEmpId')
-                            AND $statusWhere 
-                        THEN 1 END) AS requestTaken"),
-                DB::raw("
-                    COUNT(
-                        DISTINCT CASE
-                            WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
-                            AND request_tab.agentunit_id = '$agentUnitID'
-                            THEN request_tab.request_refid 
-                        END
-                    ) AS overAll
-                ")
-            )
-            ->groupBy(
+            ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid');
+
+            if($status == 'Completed'){
+                $sql->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("COUNT(CASE 
+                                WHEN (request_tab.request_done BETWEEN '$dateFrom' AND '$dateTo' OR 
+                                request_tab.request_cancelled between '".$dateFrom."' AND '".$dateTo."')
+                                AND (request_tab.agentacc_id = '$accountEmpId' 
+                                    OR tagagent_tab.agentacc_id = '$accountEmpId')
+                                AND $statusWhere 
+                            THEN 1 END) AS requestTaken"),
+                    DB::raw("
+                        COUNT(
+                            DISTINCT CASE
+                                WHEN (request_tab.request_done BETWEEN '$dateFrom' AND '$dateTo' OR 
+                                request_tab.request_cancelled between '".$dateFrom."' AND '".$dateTo."')
+                                AND request_tab.agentunit_id = '$agentUnitID'
+                                THEN request_tab.request_refid 
+                            END
+                        ) AS overAll
+                    ")
+                );
+
+            }else{
+                $sql->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("COUNT(CASE 
+                                WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
+                                AND (request_tab.agentacc_id = '$accountEmpId' 
+                                    OR tagagent_tab.agentacc_id = '$accountEmpId')
+                                AND $statusWhere 
+                            THEN 1 END) AS requestTaken"),
+                    DB::raw("
+                        COUNT(
+                            DISTINCT CASE
+                                WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
+                                AND request_tab.agentunit_id = '$agentUnitID'
+                                THEN request_tab.request_refid 
+                            END
+                        ) AS overAll
+                    ")
+                );
+            }
+
+            $data = $sql->groupBy(
                 'categoryVal' , 
                 'category_tab.category_id' , 
                 'request_tab.category_id'
@@ -1442,14 +1506,12 @@ class RequestOfficerController extends Controller
             ->get();
 
             //dd($data);
-
             return view('officer.officer_my_report' , compact('data') , ['oldData' => $req->all()]);
 
         }//EOF DATE FROM ISSET
         else{
             return view('officer.officer_my_report');
         }
-        
     }
 
     public function officerLogReport(Request $req){
@@ -1478,6 +1540,7 @@ class RequestOfficerController extends Controller
                 "category_tab.category_value as categoryVal ,
                 request_tab.request_refid as refID , 
                 request_tab.request_date as requestDate ,
+                request_tab.request_cancelled as requestCancelled ,
                 request_tab.request_done as reqDone ,
                 category_tab.category_value as categoryVal , 
                 request_tab.request_by as requestBy ,
@@ -1490,6 +1553,7 @@ class RequestOfficerController extends Controller
                 'category_tab.category_id',
                 'refID' ,
                 'requestDate' ,
+                'requestCancelled' ,
                 'reqDone' ,
                 'categoryVal' ,
                 'requestBy' ,
@@ -1497,38 +1561,45 @@ class RequestOfficerController extends Controller
                 'actionOfficer' ,
                 'statusVal'
                 )
-            ->where('request_tab.agentunit_id' , $agentUnitID)
-            ->whereBetween('request_date' , [$dateFrom , $dateTo])
-            ->orderBy('request_tab.request_date');
+            ->where('request_tab.agentunit_id' , $agentUnitID);
 
+            if ($status == 'Completed'){
+                $sql->orderBy('request_tab.request_done');
+            }else{
+                $sql->orderBy('request_tab.request_date');
+            }
+            
 
             if ($status == 'In-Progress') {
-                $sql->where('request_tab.status_id' , 5);
+                $sql->where('request_tab.status_id' , 5)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id = 5 ";
             }
             elseif ($status == 'Acknowledge') {
-                $sql->where('request_tab.status_id' , 8);
+                $sql->where('request_tab.status_id' , 8)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id = 8";
             }
             elseif ($status == 'Completed') {
-                $sql->where('request_tab.status_id' , 6);
-                $statusWhere = "request_tab.status_id = 6";
+                //$sql->where('request_tab.status_id' , 6); //RETAIN OLD QUERY FOR COMPLETED
+                //$statusWhere = "request_tab.status_id = 6"; //RETAIN OLD QUERY FOR COMPLETED
+                $sql->whereIn('request_tab.status_id' , [6,7,8]) //NEW QUERY FOR COMPLETED
+                    ->whereBetween('request_done' , [$dateFrom , $dateTo]);//NEW QUERY FOR COMPLETED
+                $statusWhere = "request_tab.status_id IN (6,7,8)";//NEW QUERY FOR COMPLETED
             }
             elseif ($status == 'Cancelled') {
-                $sql->where('request_tab.status_id' , 7);
+                $sql->where('request_tab.status_id' , 7)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id = 7";
             }
             elseif ($status == 'Condemned') {
                 $sql->whereIn('request_tab.status_id' , [6,7,8])
-                ->where('request_tab.request_condemn' , 1);
+                ->where('request_tab.request_condemn' , 1)->whereBetween('request_date' , [$dateFrom , $dateTo]);
 
                 $statusWhere = "request_tab.status_id IN (6,7,8) AND request_tab.request_condemn = 1";
             }
             elseif ($status == 'All Accomplished') {
-                $sql->whereIn('request_tab.status_id' , [6,7,8]);
+                $sql->whereIn('request_tab.status_id' , [6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id IN (6,7,8)";
             }else{
-                $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                $sql->whereIn('request_tab.status_id' , [2,5,6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                 $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
             }
 
@@ -1536,72 +1607,92 @@ class RequestOfficerController extends Controller
 
                     $sql->where('request_tab.agentacc_id' , $accountEmpId);
                     $sql->orWhere('tagagent_tab.agentacc_id' , $accountEmpId);
-                    $sql->whereBetween('request_tab.request_date' , [$dateFrom , $dateTo]);
+                    //$sql->whereBetween('request_tab.request_date' , [$dateFrom , $dateTo]);
 
                     if ($status == 'In-Progress') {
-                        $sql->where('request_tab.status_id' , 5);
+                        $sql->where('request_tab.status_id' , 5)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'Acknowledge') {
-                        $sql->where('request_tab.status_id' , 8);
+                        $sql->where('request_tab.status_id' , 8)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'Completed') {
-                        $sql->where('request_tab.status_id' , 6);
+                        //$sql->where('request_tab.status_id' , 6); // RETAIN OLD QUERY FOR COMPLETED
+                            $sql->whereIn('request_tab.status_id', [6, 7, 8]) // NEW QUERY FOR COMPLETED
+                                ->where(function ($q) use ($dateFrom, $dateTo) {
+                                    $q->whereBetween('request_done', [$dateFrom, $dateTo])
+                                    ->orWhereBetween('request_cancelled', [$dateFrom, $dateTo]);
+                            });
                     }
                     elseif ($status == 'Cancelled') {
-                        $sql->where('request_tab.status_id' , 7);
+                        $sql->where('request_tab.status_id' , 7)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'Condemned') {
                         $sql->whereIn('request_tab.status_id' , [6,7,8])
-                        ->where('request_tab.request_condemn' , 1);
+                        ->where('request_tab.request_condemn' , 1)->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }
                     elseif ($status == 'All Accomplished') {
-                        $sql->whereIn('request_tab.status_id' , [6,7,8]);
+                        $sql->whereIn('request_tab.status_id' , [6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                     }else{
-                        $sql->whereIn('request_tab.status_id' , [2,5,6,7,8]);
+                        $sql->whereIn('request_tab.status_id' , [2,5,6,7,8])->whereBetween('request_date' , [$dateFrom , $dateTo]);
                         $statusWhere = "request_tab.status_id IN (2,5,6,7,8)";
                     }
+                    
                 
-                $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
-                or tagagent_tab.agentacc_id = '".$accountEmpId."') and request_tab.request_date between '".$dateFrom."' and '".$dateTo."' ";
+                    if($status == 'Completed'){
+                        $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
+                        or tagagent_tab.agentacc_id = '".$accountEmpId."') and 
+                        (request_tab.request_done between '".$dateFrom."' and '".$dateTo."' OR request_tab.request_cancelled between '".$dateFrom."' and '".$dateTo."') ";
+                    }
+                    else{
+                        $statusWhere = $statusWhere . " and  (request_tab.agentacc_id = '".$accountEmpId."' 
+                        or tagagent_tab.agentacc_id = '".$accountEmpId."') and request_tab.request_date between '".$dateFrom."' and '".$dateTo."' ";
+                    }
+
             }
+
+
 
             $data = $sql->get();
 
-            /*
-            $summary = DB::table('request_tab')
-            ->leftJoin('category_tab_2' , 'category_tab_2.category_id' , '=' , 'request_tab.category_id')
-            ->selectRaw(
-                "category_tab_2.category_value as categoryVal ,
-                (SELECT COUNT(*) FROM request_tab 
-                LEFT JOIN tagagent_tab ON tagagent_tab.request_refid = request_tab.request_refid
-                WHERE request_tab.request_date BETWEEN '".$dateFrom."' AND '".$dateTo."' AND
-                request_tab.category_id = category_tab_2.category_id AND
-                $statusWhere
-                ) AS requestTaken
-                ")
-            ->groupBy('categoryVal' , 'category_tab_2.category_id')
-            ->where('category_tab_2.agentunit_id' , $agentUnitID)
-            ->where('request_tab.status_id' , '<>' , 2)
-            ->orderBy('category_tab_2.category_id')
-            ->get();
-            */
+            if($status == 'Completed'){
 
-            $sql = DB::table('request_tab')
-            ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
-            ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
-            ->select(
-                'category_tab.category_value as categoryVal' ,
-                'request_tab.category_id',
-                DB::raw("
-                    COUNT(DISTINCT CASE 
-                            WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
-                            AND $statusWhere
-                        THEN request_tab.request_refid END) AS requestTaken
-                        ")
-            )
-            ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
-            ->where('category_tab.agentunit_id' , $agentUnitID)
-            ->orderBy('category_tab.category_id');
+                $sql = DB::table('request_tab')
+                ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+                ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
+                ->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("
+                        COUNT(DISTINCT CASE 
+                                WHEN request_tab.request_done BETWEEN '$dateFrom' AND '$dateTo'
+                                AND $statusWhere
+                            THEN request_tab.request_refid END) AS requestTaken
+                            ")
+                )
+                ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
+                ->where('category_tab.agentunit_id' , $agentUnitID)
+                ->orderBy('category_tab.category_id');
+
+            }else{
+
+                $sql = DB::table('request_tab')
+                ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
+                ->leftJoin('tagagent_tab', 'tagagent_tab.request_refid', '=', 'request_tab.request_refid')
+                ->select(
+                    'category_tab.category_value as categoryVal' ,
+                    'request_tab.category_id',
+                    DB::raw("
+                        COUNT(DISTINCT CASE 
+                                WHEN request_tab.request_date BETWEEN '$dateFrom' AND '$dateTo'
+                                AND $statusWhere
+                            THEN request_tab.request_refid END) AS requestTaken
+                            ")
+                )
+                ->groupBy('categoryVal' , 'category_tab.category_id' , 'request_tab.category_id')
+                ->where('category_tab.agentunit_id' , $agentUnitID)
+                ->orderBy('category_tab.category_id');
+
+            }
 
             if($status != 'All Request'){
                $sql->where('request_tab.status_id' , '<>' , 2); 
@@ -2492,7 +2583,7 @@ class RequestOfficerController extends Controller
             $get_all_action_taken = str_replace(array("\r", "\n", "\r\n"), '',$rows->action_taken) .', '. $get_all_action_taken; //replace new line
         }
         
-        $maxChar = 100;
+        $maxChar = 77;
         $countLetters = strlen($get_all_action_taken);
         if($countLetters >= $maxChar){
             $countLetters = floor($countLetters / $maxChar);

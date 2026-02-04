@@ -36,7 +36,7 @@
                 <th>#</th>
                 <th>Reference No.</th>
                 <th>Date Request</th>
-                <th>Date Accomplised</th>
+                <th>Date Accomplished</th>
                 <th>Category</th>
                 <th>Request By</th>
                 <th>Section #</th>
@@ -54,6 +54,8 @@
 
                 @if($datas->reqDone != '')
                     <td>{{ $datas->reqDone }}</td>
+                @elseif($datas->requestCancelled != '')
+                    <td>{{ $datas->requestCancelled }}</td>
                 @else
                     <td>-</td>
                 @endif

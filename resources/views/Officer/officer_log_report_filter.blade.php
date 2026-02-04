@@ -19,10 +19,10 @@
             <div class="input-group mb-1">
                 <span class="input-group-text">Status <i class="bi bi-bar-chart ps-1"></i></span>
                 <select class="form-select form-control-sm" name="reqStatus">
-                    <option value="All Request">All Request</option>
-                    <option value="All Accomplished">All Accomplished</option>
+                    <option value="All Request" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'All Request')>All Request</option>
+                    <option value="All Accomplished" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'All Accomplished')>All Accomplished</option>
                     <option value="In-Progress" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'In-Progress')>In-Progress</option>
-                    <option value="Acknowledge" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Acknowledge')>Acknowledge</option>
+                    <!--option value="Acknowledge" @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Acknowledge')>Acknowledge</option-->
                     <option value="Completed"   @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Completed')>Completed</option>
                     <option value="Cancelled"   @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Cancelled')>Cancelled</option>
                     <option value="Condemned"   @selected(old('reqStatus', $oldData['reqStatus'] ?? '') == 'Condemned')>Condemned</option>
