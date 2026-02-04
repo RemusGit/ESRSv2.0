@@ -945,7 +945,7 @@ class RequestOfficerController extends Controller
             $pdf->MultiCell(25,3, $datas->statusVal , 0, 'C' , 0,);
             
             
-            if($y >= 188){
+            if($y >= 185){
 
                 $pdf->Line(10,82+$y,200,82+$y);
 
