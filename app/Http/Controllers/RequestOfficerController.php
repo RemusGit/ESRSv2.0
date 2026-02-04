@@ -946,7 +946,7 @@ class RequestOfficerController extends Controller
             $pdf->MultiCell(25,3, $datas->statusVal , 0, 'C' , 0,);
             
             
-            if($y >= 189){
+            if($y >= 188){
 
                 if($datas === $lastRow){
                     $y+=8;
@@ -1176,11 +1176,13 @@ class RequestOfficerController extends Controller
         }
 
         $pdf->SetFont('Arial', 'B', 11);
-        $pdf->SetXY(1, 130+$y);
+        //$pdf->SetXY(1, 130+$y);
+        $pdf->SetXY(1, 265);
         $pdf->MultiCell(200,5, $signatory , 0, 'C' , 0,);
 
         $pdf->SetFont('Arial', '', 8);
-        $pdf->SetXY(1, 134+$y);
+        //$pdf->SetXY(1, 134+$y);
+        $pdf->SetXY(1, 270);
         $pdf->MultiCell(200,5, $signatoryTitle , 0, 'C' , 0,);
 
         return response($pdf->Output('S'), 200, [
