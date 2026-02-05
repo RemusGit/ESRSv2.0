@@ -16,8 +16,8 @@
                     <th>Request-By</th>
                     <th>Employee#</th>
                     <th>Section</th>
-                    <th style="width: 12%;">Description</th>
-                    <th>Equip-Details</th>
+                    <th style="width: 20%;">Description</th>
+                    <th style="width: 7%;">Equip-Details</th>
                     <th>Action-Officer</th>
                     <th>Taken-Date</th>
                     <th style="width: 85px;">Action-Taken</th>
@@ -56,7 +56,7 @@
                     <td style="max-width: 150px;">{{ $datas->sectionName }}</td>
 
                     <?php //SET MAX DESC CHAR
-                        $descMax = 55;
+                        $descMax = 75;
                         if(Auth::user()->agentunit_id == 1){
                             $descMax = 120;
                         }

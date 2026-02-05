@@ -14,8 +14,8 @@
                     <th>Section</th>
                     <th>Location</th>
                     <th>Floor</th>
-                    <th style="width: 12%;">Description</th>
-                    <th>Equip-Details</th>
+                    <th style="width: 20%;">Description</th>
+                    <th style="width: 7%;">Equip-Details</th>
                     <th>Action Taken</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -52,7 +52,7 @@
                     <td>{{ $datas->bldgFloorVal }}</td>
 
                     <?php //SET MAX DESC CHAR
-                        $descMax = 55;
+                        $descMax = 75;
                         if(Auth::user()->agentunit_id == 1){
                             $descMax = 120;
                         }
