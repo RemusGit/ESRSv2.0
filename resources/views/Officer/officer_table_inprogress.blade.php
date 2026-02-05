@@ -16,7 +16,7 @@
                     <th>Floor</th>
                     <th style="width: 20%;">Description</th>
                     <th style="width: 7%;">Equip-Details</th>
-                    <th>Action Taken</th>
+                    <th style="width: 7%;">Action Taken</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
