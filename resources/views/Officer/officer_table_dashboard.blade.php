@@ -72,21 +72,31 @@
                     </td>
 
                     <td style="max-width: 100px;">
-                        <?php $equipmentDetails = ''  ?>
-                        @if($datas->eq1 == '' || $datas->eq2 == '' || $datas->eq3 == '' || $datas->eq4 == '')
+                        <?php $equipmentDetails = '';  ?>
+
+                        @if($datas->eq1 != '')
+                            <?php $equipmentDetails = 'Name of Equipment: <span class="text-success fw-bold">'.$datas->eq1.'</span><br>'; ?>
+                        @endif
+                        @if($datas->eq2 != '')
+                            <?php $equipmentDetails = $equipmentDetails.'Serial #: <span class="text-success fw-bold">'.$datas->eq2.'</span><br>';  ?>
+                        @endif
+                        @if($datas->eq3 != '')
+                            <?php $equipmentDetails = $equipmentDetails.'Model #: <span class="text-success fw-bold">'.$datas->eq3.'</span><br>'; ?>
+                        @endif
+                        @if($datas->eq4 != '')
+                            <?php $equipmentDetails = $equipmentDetails.'Property #: <span class="text-success fw-bold">'.$datas->eq4.'</span><br>'; ?>
+                        @endif
+
+                        @if($equipmentDetails == '')
                             Not included
                         @else
-                            <?php $equipmentDetails = 'Equipment: '. $datas->eq1 . '<br> Serial: ' . $datas->eq2 . '<br> Model: ' . $datas->eq3 . '<br> Property No. ' . $datas->eq4; ?>
-
-                            {{ Str::limit($equipmentDetails , 20 , '...') }}
-                            <?php  $countDescription = mb_strlen( $equipmentDetails ); ?>
-                            @if ($countDescription >= 20)
-                                <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
-                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Equipment Details,,{{ $equipmentDetails }},,{{ $datas->refNo }}'>See more</span>
-                            @endif
-
+                            <span class="cursorPointer text-success text-decoration-underline seeMoreClass"
+                            data-bs-toggle="modal" data-bs-target="#modalSeemore" id='Equipment Details,,{{ $equipmentDetails }},,{{ $datas->refNo }}'>
+                            View Details</span>
                         @endif
+
                     </td>
+                    
                     <td>
                         @if($datas->officerFname != '')
                             {{ $datas->officerFname }} 
