@@ -264,15 +264,43 @@ class RequestClientController extends Controller
             
             $empPic = $data->empPic;
             $empSignature = $data->empSignature;
+            
 
             $empPic = 'na-pic1.png';
             if($data->empPic != '' || $data->empPic != null){
+
                 $empPic = $data->empPic;
+                $filename = $empPic;
+                $destinationPath = public_path('uploads/VMC_ID_Picture');
+                $fullPath = $destinationPath.'/'.$filename;
+                if (function_exists('imagecreatefrompng')) {
+                    try {
+                        $img = imagecreatefrompng($fullPath);
+                        imageinterlace($img, false);
+                        imagepng($img, $fullPath);
+                        imagedestroy($img);
+                    } catch (\Throwable $th) {
+                    }
+                }
             }
             
             $empSignature = 'na-sig2.png';
+
             if($data->empSignature != '' || $data->empSignature != null){
+
                 $empSignature = $data->empSignature;
+                $filename = $empSignature;
+                $destinationPath = public_path('uploads/VMC_ID_Sig');
+                $fullPath = $destinationPath.'/'.$filename;
+                if (function_exists('imagecreatefrompng')) {
+                    try {
+                        $img = imagecreatefrompng($fullPath);
+                        imageinterlace($img, false);
+                        imagepng($img, $fullPath);
+                        imagedestroy($img);
+                    } catch (\Throwable $th) {
+                    }
+                }
             }
 
             $pdf = new \FPDF();
@@ -465,8 +493,6 @@ class RequestClientController extends Controller
             $pdf->SetXY(10, 238);
             $pdf->Write(1,"Please sign inside the box (Note: do not exceed on the line)");
 
-
-
             //TEMP SOLUTION IF FILE NOT EXIST (LARAVEL'S STORAGE::EXIST DOES NOT WORK)
             try {
 
@@ -478,12 +504,11 @@ class RequestClientController extends Controller
                 $ratio = min($maxWidth / $width, $maxHeight / $height);
                 $newW = $width * $ratio;
                 $newH = $height * $ratio;
-
                 //$pdf->Image(public_path('uploads/VMC_ID_Sig/'.$empSignature), 31, 185, 68,0);
                 $pdf->Image(public_path('uploads/VMC_ID_Sig/'.$empSignature), 30, 190, $newW,$newH);
             } catch (\Throwable $th) {
-                //$pdf->Image(public_path('uploads/VMC_ID_Sig/na-sig2.png'), 31, 185, 68,0);
-                $pdf->Image(public_path('uploads/VMC_ID_Sig/na-sig2.png'), 30, 190, 68,40);
+                $pdf->Image(public_path('uploads/VMC_ID_Sig/na-sig2.png'), 31, 185, 68,0);
+                //$pdf->Image(public_path('uploads/VMC_ID_Sig/'.$empSignature), 30, 190, 68,40);
             }
               
             $pdf->SetFont('Arial', 'BI', 11);
@@ -496,8 +521,6 @@ class RequestClientController extends Controller
             $pdf->SetFont('Arial', 'BI', 11);
             $pdf->SetXY(115, 260);
             $pdf->MultiCell(100,5,"Passport size colored picture with \n white background" , 0, 'C' , 0,);    
-
-
             //TEMP SOLUTION IF FILE NOT EXIST (LARAVEL'S STORAGE::EXIST DOES NOT WORK)
             try {
 
