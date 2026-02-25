@@ -270,6 +270,7 @@ class RequestClientController extends Controller
             if($data->empPic != '' || $data->empPic != null){
 
                 $empPic = $data->empPic;
+                /*
                 $filename = $empPic;
                 $destinationPath = public_path('uploads/VMC_ID_Picture');
                 $fullPath = $destinationPath.'/'.$filename;
@@ -281,7 +282,7 @@ class RequestClientController extends Controller
                         imagedestroy($img);
                     } catch (\Throwable $th) {
                     }
-                }
+                }*/
             }
             
             $empSignature = 'na-sig2.png';
@@ -289,6 +290,7 @@ class RequestClientController extends Controller
             if($data->empSignature != '' || $data->empSignature != null){
 
                 $empSignature = $data->empSignature;
+                /* NOT RECOMMENDED -> SOME PNG FILE BECOMES REVERTED (BACKGROUND BLACK + TEXT WHITE)
                 $filename = $empSignature;
                 $destinationPath = public_path('uploads/VMC_ID_Sig');
                 $fullPath = $destinationPath.'/'.$filename;
@@ -300,7 +302,7 @@ class RequestClientController extends Controller
                         imagedestroy($img);
                     } catch (\Throwable $th) {
                     }
-                }
+                }*/
             }
 
             $pdf = new \FPDF();
