@@ -43,7 +43,7 @@
                 <!--li class=""><a class="dropdown-item text-success" href="#" data-bs-toggle="modal" data-bs-target="#modalChat"><i class="bi bi-chat"></i> Chat</a></li-->
 
                 <li><hr class="dropdown-divider"></li>
-                <li class=""><a class="dropdown-item text-danger logoutConfirm" href="#"><i class="bi bi-box-arrow-left"></i> Logout</a></li>
+                <li class=""><a class="dropdown-item text-danger logoutConfirm" href="#"><i class="bi bi-box-arrow-left"></i> Exit</a></li>
             </ul>
         </div>
   </div>

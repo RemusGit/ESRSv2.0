@@ -6,8 +6,8 @@
 
             $.confirm({
                 icon: 'bi bi-box-arrow-in-left',
-                title: 'LOGOUT',
-                content: 'Are you sure you want to Logout?',
+                title: 'EXIT',
+                content: 'Are you sure you want to Exit ESRS?',
                 type: 'red',
                 draggable: true,
                 buttons: {

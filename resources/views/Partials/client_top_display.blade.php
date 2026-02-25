@@ -39,7 +39,7 @@
                 <!--li><a class="dropdown-item" href="#"><i class="bi bi-gear-fill"></i> Account Settings</a></li-->
                 
                 <li><hr class="dropdown-divider"></li>
-                <li class=""><a class="dropdown-item text-danger logoutConfirm" href="#"><i class="bi bi-box-arrow-left"></i> Logout</a></li>
+                <li class=""><a class="dropdown-item text-danger logoutConfirm" href="#"><i class="bi bi-box-arrow-left"></i> Exit</a></li>
             </ul>
         </div>
   </div>
