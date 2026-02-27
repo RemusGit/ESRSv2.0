@@ -1,5 +1,5 @@
 
-<div class="row mt-2 toggleSearch" @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) ) style="display: none;" @else style="display: flex;" @endif> <!--ROW FILTER 1-->
+<div class="row mt-2 toggleSearch" @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) || isset($oldData['searchEmpName']) ) style="display: none;" @else style="display: flex;" @endif> <!--ROW FILTER 1-->
 
     <div class="col-lg-12">
         <form action="{{ route('filter_request') }}" method="POST">
@@ -17,7 +17,7 @@
 
 <form action="{{ route('filter_request') }}" method="POST">
 @csrf
-<div class="row toggleFilter" @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) ) style="display: flex;" @else style="display: none;" @endif> <!--ROW FILTER 2-->
+<div class="row toggleFilter" @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) || isset($oldData['searchEmpName']) ) style="display: flex;" @else style="display: none;" @endif> <!--ROW FILTER 2-->
 
     <div class="col-lg-9">
         <div class="input-group mb-2">
@@ -57,7 +57,7 @@
 
 </div> <!--EOF ROW FILTER 2-->
 
-<div class="row toggleFilter" @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) ) style="display: flex;" @else style="display: none;" @endif> <!--ROW FILTER 3-->
+<div class="row toggleFilter" @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) || isset($oldData['searchEmpName'])) style="display: flex;" @else style="display: none;" @endif> <!--ROW FILTER 3-->
 
     <div class="col-xl-3 col-lg-3">
         <div class="input-group mb-2">
@@ -100,7 +100,7 @@
 </form>
 
 
-    <div class="row mt-2" id="searchForVmcCard" style="display: none;">
+    <div class="row mt-2" id="searchForVmcCard" @if(isset($oldData['searchEmpName'])) style="display: flex;" @else style="display: none;" @endif>
         <div class="col-lg-12">
             <form action="{{ route('filter_request') }}" method="POST">
                 @csrf
