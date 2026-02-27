@@ -16,7 +16,8 @@
     <div class="col-lg-6 ms-auto">
         <!--button class="btn btn-sm btn-outline-secondary mb-1">Toggle Filter</button-->
         <div class="form-check form-switch float-end fw-bold" style="font-size: 12px;">
-        <input class="form-check-input" type="checkbox" role="switch" id="toggleFilterSwitch"  style="cursor: pointer;">
+        <input class="form-check-input" type="checkbox" role="switch" id="toggleFilterSwitch" 
+        @if(isset($oldData['reqCategory']) || isset($oldData['reqActionOfficer']) || isset($oldData['reqStatus']) ) checked @endif style="cursor: pointer;">
         <label class="form-check-label text-success" for="toggleFilterSwitch" style="cursor: pointer;">Toggle Filter/Search</label>
         </div>
     </div>

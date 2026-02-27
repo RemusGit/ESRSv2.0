@@ -768,6 +768,7 @@ class RequestClientController extends Controller
                 idrequest_attach_tab.idrequest_height as empHeight ,
                 idrequest_attach_tab.idrequest_weight as empWeight ,
                 idrequest_attach_tab.idrequest_picture as empPic ,
+                idrequest_attach_tab.idrequest_signature as empSig ,
                 idrequest_attach_tab.idrequest_emerfname as emergencyFname ,
                 idrequest_attach_tab.idrequest_emermname as emergencyMname ,
                 idrequest_attach_tab.idrequest_emerlname as emergencyLname ,

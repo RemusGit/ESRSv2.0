@@ -317,6 +317,15 @@
                 <div class="col-md-3">
                     <img src="{{ asset('uploads\VMC_ID_Picture\na-pic1.png') }}"
                      class="img-fluid img-thumbnail float-end" alt="" id="vmcIdCardPic">
+
+                     <img src="{{ asset('uploads\VMC_ID_Sig\na-sig4.jpg') }}"
+                     class="img-fluid float-end" alt="" id="vmcIdCardSig" style="height: 55px; width: 165px;">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+
                 </div>
             </div>
 
@@ -507,6 +516,7 @@
             }
 
             let imgPath = "{{ asset('uploads/VMC_ID_Picture/') }}/";
+            let imgPathSig = "{{ asset('uploads/VMC_ID_Sig/') }}/";
             
             //console.log(getCategoryVal);
 
@@ -558,6 +568,11 @@
                                     $('#vmcIdCardPic').attr('src', imgPath + val.empPic);
                                     $('#vmcIdCardPic').on('error' , function(){
                                         $('#vmcIdCardPic').attr('src', imgPath + 'na-pic1.png');
+                                    });
+
+                                    $('#vmcIdCardSig').attr('src', imgPathSig + val.empSig);
+                                    $('#vmcIdCardSig').on('error' , function(){
+                                        $('#vmcIdCardSig').attr('src', imgPathSig + 'na-sig4.jpg');                                        
                                     });
            
                                     $('#vmcIdCardEmergencyFullname').html(val.emergencyFname + ' ' + val.emergencyMname + ' ' + val.emergencyLname) + ' ' + val.emergencySuffix;
