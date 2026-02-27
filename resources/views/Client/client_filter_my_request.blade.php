@@ -1,7 +1,7 @@
 
 <div class="row mt-2">
 
-    <div class="col-lg-4">
+    <div class="col-lg-6">
     @if($getStatus == 2)
         <form action="/client_open_request" method="POST"> <!--OPEN-->
     @endif
@@ -21,14 +21,14 @@
             @csrf
             <div class="input-group mb-3">
                 <span class="input-group-text">Search</span>
-                <input type="search" class="form-control form-control-sm" placeholder="Reference No." name="refNo" 
+                <input type="search" class="form-control form-control-sm" placeholder="Reference No. / Description / Request By (Press Enter)" name="refNo" 
                 required value="{{ old('refNo', $oldData['refNo'] ?? '') }}">
                 <button type="submit" class="btn btn-success"><i class="bi bi-search"></i></button>
             </div>
         </form>
     </div>
 
-    <div class="col-lg-3 ms-auto">
+    <div class="col-lg-2 ms-auto">
 
     @if($getStatus == 2)
         <form action="/client_open_request" method="POST"> <!--OPEN-->
@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="col-lg-3">
+    <div class="col-lg-2">
         <div class="input-group mb-3">
             <span class="input-group-text">To</i></span>
             <input type="date" class="form-control form-control-sm" name="reqDateTo"

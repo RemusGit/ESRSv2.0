@@ -549,6 +549,7 @@ class RequestClientController extends Controller
 
         $getUserID = session('account_empid');
         $sectionID = session('section_id');
+        $refNoReqByDesc = $getRefNo;
 
             $sql = DB::table('request_tab')
             ->join('category_tab' , 'category_tab.category_id' , '=' , 'request_tab.category_id')
@@ -579,7 +580,12 @@ class RequestClientController extends Controller
                     ->orWhere('request_tab.account_id', $getUserID);
             })
             ->where('request_tab.status_id', $getStatusID)
-            ->where('request_tab.request_refid', 'LIKE', '%' . $getRefNo . '%')
+            //->where('request_tab.request_refid', 'LIKE', '%' . $getRefNo . '%')
+            ->where(function ($query) use ($refNoReqByDesc) {
+                $query->where('request_tab.request_refid', 'LIKE', '%' . $refNoReqByDesc . '%')
+                    ->orWhere('request_tab.request_by', 'LIKE', '%' . $refNoReqByDesc . '%')
+                    ->orWhere('request_tab.request_descript', 'LIKE', '%' . $refNoReqByDesc . '%');
+            })
             ->groupBy('refID' , 
             'reqOthers' ,
             'agentAccID' ,
