@@ -1,6 +1,7 @@
-   <?php 
-   use Illuminate\Support\Str;
-   ?>
+<?php 
+    use Illuminate\Support\Str;
+    use Carbon\Carbon;
+?>
    
 
    <div class="table-responsive-xl mt-2">
@@ -38,22 +39,56 @@
             ?>
 
             @foreach($data as $datas)
+
+                <?php 
+                    $txtColor = "#000";
+                    $yellowMin = 0;
+
+                    if($datas->until != '' && ($datas->statusVal == 'Open' || $datas->statusVal == 'In-Progress')){
+
+                        $nowVsUntil = now()->diffInHours(Carbon::parse($datas->until));
+
+                        list($hour, $minute, $second) = explode(':', $datas->repairTime);
+                        $duration = (int)$hour;
+                        if($duration >= 24){
+                            $duration = $duration / 24;
+                            $nowVsUntil = $nowVsUntil / 24;
+                        }
+                        // GET 50% of DURATION
+                        $yellowMin = $duration * 0.5;
+                        if($yellowMin >= 24){
+                            $yellowMin = $yellowMin / 24;
+                            $nowVsUntil = $nowVsUntil / 24;
+                        }
+                        
+                        if( $nowVsUntil <= 0 ){
+                            $txtColor = "#ad1605ff";
+                        }
+                        elseif( $yellowMin >= $nowVsUntil){
+                            $txtColor = "#4103b4ff";
+                        }
+                        else{
+                            $txtColor = "#000";
+                        }
+                    }
+                ?>
+
                 <tr style="font-size: 12px;" class="text-sm-start">
                     <td class="fw-bold text-success" style="font-size: 11px;">{{ $counter }}.</td>
                     <?php $counter++; ?>
-                    <td class="">{{ $datas->refNo }}</td>
-                    <td style="max-width: 110px;">{{ $datas->reqDate }}</td>
-                    <td style="max-width: 110px;">
+                    <td class="" style="color: {{$txtColor}};">{{ $datas->refNo }}</td>
+                    <td style="max-width: 110px; color: {{$txtColor}};">{{ $datas->reqDate }}</td>
+                    <td style="max-width: 110px; color: {{$txtColor}};">
                         @if($datas->until != '')
                             {{ $datas->until }}
                         @else
                             Indefinite
                         @endif
                     </td>
-                    <td style="max-width: 120px;">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ substr($datas->reqOthers , 0, 40) }}) @endif</td>
-                    <td>{{ $datas->requestBy }}</td>
-                    <td>{{ $datas->empNo }}</td>
-                    <td style="max-width: 150px;">{{ $datas->sectionName }}</td>
+                    <td style="max-width: 120px; color: {{$txtColor}};">{{ $datas->categoryVal }} @if($datas->reqOthers != '')({{ substr($datas->reqOthers , 0, 40) }}) @endif</td>
+                    <td style="color: {{$txtColor}};">{{ $datas->requestBy }}</td>
+                    <td style="color: {{$txtColor}};">{{ $datas->empNo }}</td>
+                    <td style="max-width: 150px; color: {{$txtColor}};">{{ $datas->sectionName }}</td>
 
                     <?php //SET MAX DESC CHAR
                         $descMax = 75;
@@ -62,7 +97,7 @@
                         }
                     ?>
 
-                    <td style="max-width: 120px;">
+                    <td style="max-width: 120px; color: {{$txtColor}};">
                         {{ Str::limit($datas->reqDesc , $descMax , '...') }}
                         <?php  $countDescription = mb_strlen( $datas->reqDesc ); ?>
                         @if ($countDescription >= $descMax)
@@ -71,7 +106,7 @@
                         @endif
                     </td>
 
-                    <td style="max-width: 100px;">
+                    <td style="max-width: 100px; color: {{$txtColor}};">
                         <?php $equipmentDetails = '';  ?>
 
                         @if($datas->eq1 != '')
@@ -97,7 +132,7 @@
 
                     </td>
                     
-                    <td>
+                    <td style="color: {{$txtColor}};">
                         @if($datas->officerFname != '')
                             {{ $datas->officerFname }} 
                             {{ $datas->officerMname }} 
@@ -108,14 +143,13 @@
                         @endif
                     </td>
 
-                    <td style="max-width: 100px;">
+                    <td style="max-width: 100px; color: {{$txtColor}};">
                         @if($datas->dateTaken == '' || $datas->dateTaken == null)
                             N/A
                         @else
                             {{ $datas->dateTaken }}
                         @endif
                     </td>
-
 
                     <td>
                         <?php $btnClassColor = 'btn-outline-secondary'; ?>
@@ -190,10 +224,8 @@
         </table>
     </div>
 
-
     <nav class="">{{ $data->links()  }}</nav>
     <!-- PAGINATION -->
-
 
 </div> <!--EOF TABLE RESPONSIVE -->
 
