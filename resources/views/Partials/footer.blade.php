@@ -25,6 +25,22 @@
 
     $(document).ready(function(){
 
+    $('.toAnimate').click(function(){
+        $('.toAnimate').addClass('animate__animated animate__swing');
+
+          setTimeout(function() {
+            $('.toAnimate').removeClass("animate__animated animate__swing");
+        }, 1000); // The delay in milliseconds
+    });
+
+    $('.toAnimate2').hover(function(){
+        $('.toAnimate2').addClass('animate__animated animate__jackInTheBox');
+
+          setTimeout(function() {
+            $('.toAnimate2').removeClass("animate__animated animate__jackInTheBox");
+        }, 1000); // The delay in milliseconds
+    });
+    
         //$('.actionBtnForAutoHeight').click(function(){
         $(document).on("click" , ".actionBtnForAutoHeight" , function(){
 
@@ -70,3 +86,4 @@
     });
 
 </script>
+

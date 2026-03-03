@@ -15,6 +15,7 @@
      <!--MYCSS custom style -->
     <link href="{{ asset('css/mycss.css') }}" rel="stylesheet"/>
 
+    <link href="{{ asset('css/animate.css') }}" rel="stylesheet"/>
     
     <!--POPPER for tooltip JS-->
     <script src="{{ asset('js/popper.min.js') }}"></script>
