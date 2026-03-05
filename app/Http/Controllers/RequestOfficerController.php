@@ -37,7 +37,7 @@ class RequestOfficerController extends Controller
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
             ->join('location_tab' , 'location_tab.location_id' , '=' , 'request_tab.location_id')
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
-            ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
+            //->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo , 
             request_tab.request_findings as reqFindings , 
             request_tab.request_recommendation as reqRecommendation , 
@@ -58,7 +58,7 @@ class RequestOfficerController extends Controller
             request_tab.request_done as accomplishedDate ,
             request_tab.request_acknowledged as acknowledgementDate ,
             request_tab.request_cancelled as cancelledDate ,
-            actiontaken_tab.action_taken AS actionTaken,
+            (SELECT action_taken FROM actiontaken_tab WHERE request_refid = request_tab.request_refid LIMIT 1) actionTaken,
             location_tab.location_value as locationVal ,
             bldgfloor_tab.bldgfloor_val as bldgFloorVal ,
             request_tab.request_condemn as condemn
@@ -67,7 +67,6 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->groupBy(
                 'refNo',
-                'actionTaken' ,
                 'reqFindings' ,
                 'reqRecommendation' ,
                 'reqOthers' ,
@@ -209,7 +208,7 @@ class RequestOfficerController extends Controller
             ->join('section_tab' , 'section_tab.section_id' , '=' , 'request_tab.section_id')
             ->join('location_tab' , 'location_tab.location_id' , '=' , 'request_tab.location_id')
             ->join('bldgfloor_tab' , 'bldgfloor_tab.bldgfloor_id' , '=' , 'request_tab.bldgfloor_id')
-            ->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
+            //->leftJoin('actiontaken_tab', 'actiontaken_tab.request_refid', '=', 'request_tab.request_refid')
             ->selectRaw("request_tab.request_refid as refNo ,
             request_tab.request_findings as reqFindings , 
             request_tab.request_recommendation as reqRecommendation , 
@@ -230,8 +229,7 @@ class RequestOfficerController extends Controller
             request_tab.request_done as accomplishedDate ,
             request_tab.request_acknowledged as acknowledgementDate ,
             request_tab.request_cancelled as cancelledDate ,
-            GROUP_CONCAT( CONCAT(actiontaken_tab.action_taken , ' : ' ,actiontaken_tab.action_datetime ) 
-            ORDER BY actiontaken_tab.action_datetime DESC SEPARATOR '<br>') AS actionTaken,
+            (SELECT action_taken FROM actiontaken_tab WHERE request_refid = request_tab.request_refid LIMIT 1) actionTaken,
             location_tab.location_value as locationVal ,
             bldgfloor_tab.bldgfloor_val as bldgFloorVal ,
             request_tab.request_condemn as condemn
