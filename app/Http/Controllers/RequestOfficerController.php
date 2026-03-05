@@ -903,8 +903,10 @@ class RequestOfficerController extends Controller
                  $pdf->MultiCell(25,3, '-' , 0, 'C' , 0,);
             }
 
-            if(strlen($datas->categoryVal) >= 25){
-                $pdf->SetFont('Arial', '', 7);
+            if(strlen($datas->categoryVal) >= 34){
+                $adjustFont = strlen($datas->categoryVal);
+                $adjustFont = ceil($adjustFont / 34);
+                $pdf->SetFont('Arial', '', 8.5-$adjustFont);
                 $pdf->SetXY(78, 74+$y);
                 $pdf->MultiCell(35,3, substr($datas->categoryVal , 0, 50) , 0, 'C' , 0,);
                 $y+=1;
@@ -1288,15 +1290,24 @@ class RequestOfficerController extends Controller
 
         $y = 0;
         $mod = 0;
+        $rowCounter=0;
+        $getRowsLeft = $countRows;
         for($i = 1; $i <= $countRows; $i++){
-
+            $rowCounter++;
             $mod = $i % 2;
             if($mod == 1){
                 $pdf->SetFillColor(220,220,220);
                 $pdf->Rect(10, 94+$y, 190, 5 ,'F');
             }
             $y+=5;
+
+            if($rowCounter >= 34){
+                $y = 0;
+                $rowCounter = 0;
+                $getRowsLeft = $i;
+            }
         }
+        
 
         
         $pdf->Image(public_path('images\vmclogo.png'), 40, 10, 20,0);
@@ -1379,7 +1390,7 @@ class RequestOfficerController extends Controller
 
             $rowCounter++;
             $pdf->SetXY(10, 96+$y);
-            $pdf->Write(2,$rowCounter.'-'.$datas->categoryVal);
+            $pdf->Write(2 , $datas->categoryVal);
 
             $pdf->SetXY(110, 96+$y);
             $pdf->Write(1,$datas->requestTaken);
@@ -1408,6 +1419,22 @@ class RequestOfficerController extends Controller
                 $rowCounter = 0;
                 $pdf->AliasNbPages();
                 $pdf->AddPage();
+                $y = 0;
+
+                for($i = 1; $i <= ($countRows - $getRowsLeft); $i++){
+                    $rowCounter++;
+                    $mod = $i % 2;
+                    if($mod == 1){
+                        $pdf->SetFillColor(220,220,220);
+                        $pdf->Rect(10, 94+$y, 190, 5 ,'F');
+                    }
+                    $y+=5;
+        
+                    if($rowCounter >= 34){
+                        $y = 0;
+                        $rowCounter = 0;
+                    }
+                }
                 $y = 0;
 
                 $pdf->Image(public_path('images\vmclogo.png'), 40, 10, 20,0);
