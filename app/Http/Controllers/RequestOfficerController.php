@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Events\NotifyUser;
 use Illuminate\Support\Facades\Crypt;
 require_once(public_path('fpdf_v1.86/fpdf.php'));
+require_once(app_path('Services/MyPDF.php'));
 
 
 class RequestOfficerController extends Controller
@@ -57,8 +58,7 @@ class RequestOfficerController extends Controller
             request_tab.request_done as accomplishedDate ,
             request_tab.request_acknowledged as acknowledgementDate ,
             request_tab.request_cancelled as cancelledDate ,
-            GROUP_CONCAT( CONCAT(actiontaken_tab.action_taken , ' : ' ,actiontaken_tab.action_datetime ) 
-            ORDER BY actiontaken_tab.action_datetime DESC SEPARATOR '<br>') AS actionTaken,
+            actiontaken_tab.action_taken AS actionTaken,
             location_tab.location_value as locationVal ,
             bldgfloor_tab.bldgfloor_val as bldgFloorVal ,
             request_tab.request_condemn as condemn
@@ -67,6 +67,7 @@ class RequestOfficerController extends Controller
             ->where('request_tab.agentunit_id' , $agentUnitID)
             ->groupBy(
                 'refNo',
+                'actionTaken' ,
                 'reqFindings' ,
                 'reqRecommendation' ,
                 'reqOthers' ,
@@ -778,8 +779,6 @@ class RequestOfficerController extends Controller
 
         $summary = $sql2->get();
 
-            
-        require_once(app_path('Services/MyPDF.php'));
         //$pdf = new \FPDF();
         $pdf = new \MyPDF();
         $pdf->AliasNbPages();
@@ -909,13 +908,13 @@ class RequestOfficerController extends Controller
             if(strlen($datas->categoryVal) >= 25){
                 $pdf->SetFont('Arial', '', 7);
                 $pdf->SetXY(78, 74+$y);
-                $pdf->MultiCell(35,3, $datas->categoryVal , 0, 'C' , 0,);
+                $pdf->MultiCell(35,3, substr($datas->categoryVal , 0, 50) , 0, 'C' , 0,);
                 $y+=1;
             }
             else{
                 $pdf->SetXY(78, 74+$y);
                 $pdf->SetFont('Arial', '', 8);
-                $pdf->MultiCell(35,3, $datas->categoryVal , 0, 'C' , 0,);
+                $pdf->MultiCell(35,3, $datas->categoryVal, 0, 'C' , 0,);
             }
 
             if(strlen($datas->requestBy) >= 30){
@@ -1282,7 +1281,9 @@ class RequestOfficerController extends Controller
             ->get();
 
 
-        $pdf = new \FPDF();
+        //$pdf = new \FPDF();
+        $pdf = new \MyPDF();
+        $pdf->AliasNbPages();
         $pdf->AddPage();
 
         $countRows = count($data);
@@ -1375,10 +1376,12 @@ class RequestOfficerController extends Controller
         $totalOverall = 0;
         $totalPercentage = 0;
 
+        $rowCounter = 0;
         foreach($data as $datas){
 
+            $rowCounter++;
             $pdf->SetXY(10, 96+$y);
-            $pdf->Write(2,$datas->categoryVal);
+            $pdf->Write(2,$rowCounter.'-'.$datas->categoryVal);
 
             $pdf->SetXY(110, 96+$y);
             $pdf->Write(1,$datas->requestTaken);
@@ -1396,10 +1399,90 @@ class RequestOfficerController extends Controller
             $pdf->SetXY(188, 96+$y);
             $pdf->Write(1,$percentage.'%');
 
+
             $y +=5;
             $totalTaken = $totalTaken + (int)$datas->requestTaken;
             $totalOverall = $totalOverall + (int)$datas->overAll;
             $totalPercentage = $totalPercentage + $percentage;
+
+            if($rowCounter >= 34){
+
+                $rowCounter = 0;
+                $pdf->AliasNbPages();
+                $pdf->AddPage();
+                $y = 0;
+
+                $pdf->Image(public_path('images\vmclogo.png'), 40, 10, 20,0);
+                $pdf->SetFont('Arial', '', 10);
+                $pdf->SetXY(160, 10);
+                $pdf->Image(public_path('images\doh2logo.png'), 150, 10, 20,0);
+
+
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->SetXY(10, 10);
+                $pdf->Cell(0,10,'REPUBLIC OF THE PHILIPPINES' , 0 , 1 , 'C');
+
+
+                $pdf->SetXY(10, 16);
+                $pdf->Cell(0,10,'Department of Health' , 0 , 1 , 'C');
+
+                $pdf->SetFont('Arial', 'B', 11);
+                $pdf->SetXY(10, 22);
+                $pdf->Cell(0,10,'Metro Manila Center for Health Development' , 0 , 1 , 'C');
+
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->SetXY(10, 28);
+                $pdf->Cell(0,10,'VALENZUELA MEDICAL CENTER' , 0 , 1 , 'C');
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(10, 60);
+                $pdf->Write(1, Auth::user()->account_fname.' '.Auth::user()->account_lname );
+
+                $pdf->SetFont('Arial', '', 10);
+                $pdf->SetXY(10, 65);
+                $pdf->Write(1,session('section_name').' ('.session('section_abbre').')');
+
+
+                $pdf->SetFont('Arial', '', 10);
+                $pdf->SetXY(10, 75);
+                $pdf->Write(1,'Overview for');
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(32, 75);
+                $pdf->Write(1, date('M. d, Y' ,strtotime($dateFrom)).' - '.date('M. d, Y' ,strtotime($req->reqDateTo)));
+
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(10, 85);
+                $pdf->Write(1,'Task Performed');
+
+                $pdf->SetFont('Arial', '', 9);
+                $pdf->SetXY(38, 85);
+                $pdf->Write(1, '('.$status.')');
+
+                $pdf->Line(10,89,200,89);
+                $pdf->Line(10,94,200,94);
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(10, 91);
+                $pdf->Write(1,'Categories');
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(110, 91);
+                $pdf->Write(1,'Request Taken');
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(150, 91);
+                $pdf->Write(1,'Overall');
+
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->SetXY(178, 91);
+                $pdf->Write(1,'Percentage');
+
+
+                $pdf->SetFont('Arial', '', 9);
+            }
+
         }
         $pdf->Line(10,94+$y,200,94+$y);
 
