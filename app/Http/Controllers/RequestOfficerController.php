@@ -903,8 +903,10 @@ class RequestOfficerController extends Controller
                  $pdf->MultiCell(25,3, '-' , 0, 'C' , 0,);
             }
 
-            if(strlen($datas->categoryVal) >= 25){
-                $pdf->SetFont('Arial', '', 7);
+            if(strlen($datas->categoryVal) >= 34){
+                $adjustFont = strlen($datas->categoryVal);
+                $adjustFont = ceil($adjustFont / 34);
+                $pdf->SetFont('Arial', '', 8.5-$adjustFont);
                 $pdf->SetXY(78, 74+$y);
                 $pdf->MultiCell(35,3, substr($datas->categoryVal , 0, 50) , 0, 'C' , 0,);
                 $y+=1;
